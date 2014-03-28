@@ -1,0 +1,21 @@
+Finished parsing, here is the AST
+
+  event a(int x);
+  event b(int y, int z);
+  int z;
+  int f;
+  int g;
+  int w;
+  int j;
+  int y;
+
+  (a(int e))-->  z=(z+1);;
+  ((a(int f)):(b(int y, int w)|w==f))-->  z=w;;
+  ((a(int f)):(b(int y, int w)|w==f))-->  z=f;;
+  ((a(int f)):(b(int y, int w)|f=w))-->  z=f;;
+  ((a(int g)):(b(int y, int w)|f==w))-->  z=g;;
+  ((a(int h)) \/ (b(int y, int w)|h==w))-->  z=1;;
+  ((a(int i)) \/ (b(int y, int w)|i==w))-->  z=w;;
+  ((a(int j)) \/ (b(int y, int w)|j==w))-->  z=j;;
+  (a(int k))-->  z=(k+y);;
+  

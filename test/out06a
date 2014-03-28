@@ -1,0 +1,42 @@
+Finished parsing, here is the AST
+
+  class CString;
+  string get(class CString s);
+  class Integer;
+  class ArgV;
+  class StatP;
+  class NewStatP;
+  int logmessage(string x);
+  int logmessageint(string x, int y);
+  bool isfile(string x, string y);
+  event open(class CString a1, class Integer a2, unsigned int a3);
+  event close(class Integer a1);
+  event execve(class CString a1, class ArgV a2, class ArgV a3);
+  event lstat(class CString a1, class NewStatP a2);
+  event stat(class CString a1, class StatP a2);
+  int i = 0;
+  int j = 1;
+  string rv;
+  string t2;
+
+  ((open(class CString a1, class Integer a2, unsigned int a3)|(get(a1)=="abc"&&rv=get(a2))):(((lstat(class CString s1, class NewStatP s2)):(close(class Integer c1)|get(c1)==rv))**))-->  {
+    logmessageint("proc_ops open.lstat.close", rv);
+  };
+  ;;
+  (((open(class CString o1, class Integer o2, unsigned int o3)|(!isfile(get(o1), "bd")&&t2=o3)):((stat(class CString s3, class StatP s4))**)):(execve(class CString b1, class ArgV b2, class ArgV b3)))-->  {
+    logmessage("proc_ops open.stat.execve");
+  };
+  ;;
+  (((((any)**):(close(class Integer c1)|(get(c1)==1&&rv=get(c1)))):((stat(class CString s3, class StatP s4))**)):(execve(class CString b1, class ArgV b2, class ArgV b3)))-->  {
+    logmessage("proc_ops any.close.stat.execve");
+  };
+  ;;
+  ((((any)**):(open(class CString o1, class Integer o2, unsigned int o3)|get(o1)=="abc")):(close(class Integer c1)))-->  {
+    logmessage("rule1:");
+  };
+  ;;
+  ((((any)**):(open(class CString a1, class Integer a2, unsigned int a3)|get(a1)=="xyz")):(close(class Integer d1)))-->  {
+    logmessage("rule2:");
+  };
+  ;;
+  

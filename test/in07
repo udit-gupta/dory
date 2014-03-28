@@ -1,0 +1,162 @@
+#define FTP_SITE_EXEC 7
+#define FTP_INVALID_EXEC 8
+#define FTP_PRIV_ESCALATE 9 
+
+	int geteuid();
+	int logMessageStr(string s);
+    class CString;;
+    int f(int g);
+    string get(CString s);
+    void setCStr(CString s, string t);
+    class Integer;
+    int getInt(Integer i);
+    void setInt(Integer i, int j);
+    class ArgV;
+    int getNumberOfArgs(ArgV a);
+    int getArg(int i, ArgV a);
+    class pid_t;
+    int getpid_t(pid_t p);
+    void setpid_t(pid_t p, int i);
+    class SchedParamP;
+    void set(SchedParamP s, int i);
+    class VoidP;
+    void setvoid(VoidP p, int i);
+    int getvoid(VoidP p);
+    class size_t;
+    int getsize(size_t s);
+    class StatP;
+    void setstat(StatP s);
+    class NewStatP;
+    void setnstat(NewStatP n, int i);
+    event open (CString a1 , int a2 , unsigned int a3);
+    event close (Integer a1);
+    event chroot (CString a1);
+    event lstat(CString a1 , NewStatP a2 );
+	event read(int r);
+	event write(int r);
+	event stat(int r);
+	event connect(int t);
+	event accept(int t);
+
+    int logMessage(string x);
+    int logMessageInt(string x, int y);
+    int isInFile(string x, string y);
+    int getpid();
+    int isChild(pid_t a);
+
+    event execve(CString a1, ArgV a2, ArgV a3);
+    event fork();
+    event clone();
+ 
+    event kill ( pid_t a1 , int a2);
+    event ptrace ( pid_t a1 , int a2 , int a3 , int a4);
+    event sched_setparam ( pid_t a1 , SchedParamP a2 );
+    event sched_setscheduler ( pid_t a1 , int a2 , SchedParamP a3);
+    event setpgid ( pid_t a1 , pid_t a2 );
+    event setpriority ( pid_t a1 , int a2 , int a3);
+    event mlock (VoidP a1, size_t a2);
+    event mlockall ( int a1);
+    event munlockall ( );
+        
+    int isInt(int i) ;
+    unsigned int isUInt(unsigned int i) ;
+
+    int isShort(int s) ;
+    unsigned int isUShort(unsigned int s) ;
+        
+    int isLong(int l) ;
+    unsigned int isULong(unsigned int l) ;
+
+    int valid_write; 
+
+#define privileged() (ptrace(a1,a2,a3,a4) \/ mlock (b1 ,b2 ))
+#define procInterference(x) \
+  ((kill(a1,a2)|getpid_t(a1)!=getpid()&&getpid_t(a1)!=0 && tmp = a2 && x = a2)\
+  \/ (ptrace(b1,b2,b3,b4))\
+  \/ (sched_setscheduler(c1,c2,c3)|getpid_t(c1)!=getpid()&&getpid_t(c1)!= 0\
+                                      && isChild(c1) != 0) \
+  \/ (sched_setparam (d1, d2)|getpid_t(d1) != getpid())\
+  \/ (setpriority(e1,e2,e3)|getpid_t(e1)!= getpid() && e2 !=0 \
+                                     && isChild(e1) !=0)\
+  \/ (setpgid(f1, f2))\
+  \/ (mlock (g1, g2))\
+  \/ (mlockall (h1))\
+  \/ (munlockall()))
+
+    int admin_file = 0; 
+    string admin_file_name; 
+    int globalTemp;
+    int realUid;
+    int foundFlag = 0; 
+    int syscall;
+    int loggedUser ; 
+    string tempfile; 
+    string checkProcess; 
+    string check_file;
+	int getCurrentSysCall();
+	int a, b=0;
+	int tmp;
+	int processname;
+
+    // privileged calls
+      any** : (privileged())  -> { 
+                    syscall = getCurrentSysCall();
+                    logMessageInt("privileged call %d\n", syscall);
+       } ;
+
+      any -> { a = b;};
+
+    // process interference
+     (any) : (procInterference(b)) ->   { a = b; };
+
+    // no execs as root -- rule not tested yet. 
+      (any)** : execve(proc, argv, envp)|
+            ((geteuid()==0) && processname = get(proc))-> {
+            checkProcess = processname; 
+            foundFlag = 0; 
+            if (foundFlag == 0) {
+             logMessageStr("exec of process  %s not permitted\n", checkProcess);            }
+            foundFlag = 0; 
+    } ;
+            
+
+    // write operations involving file names.
+      (any)**:write(check_file) -> 
+             { 
+                    valid_write = 0;
+            } ;
+
+    // only root can read certain files... customization needed. 
+    // read operations involving file names.
+     (any)**:read(check_file) ->
+	    { ;
+       } ;
+    
+    // file attribute change operation: rename, symlink, link, utime, chmod
+    (any)**:stat(check_file) ->
+    {
+            syscall = getCurrentSysCall();
+    } ;
+
+    // log all ipc calls
+     (any)**:connect(a1) -> 
+            { 
+                    logMessage("ipc call"); 
+            } ;
+
+    // no socket calls ..
+    (any)**:((connect(a)) \/ (accept(b)) \/ (read(c)))
+            -> {
+                    syscall = getCurrentSysCall();
+                    logMessageInt("socket call %d\n", syscall);
+               }
+
+
+
+
+
+
+
+
+
+

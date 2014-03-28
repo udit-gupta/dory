@@ -1,0 +1,3 @@
+in01b:31:Error: Redefinition of name c
+in01b:39:Error: Undeclared identifier "x"
+in01b:39:Error: Undeclared identifier "y"

@@ -1,0 +1,56 @@
+/* 
+ * One interface, one module
+ * Tests: all types
+ */
+
+event open (string a1 , int a2 , unsigned int a3);
+        
+byte b3;
+
+int s, l;
+int i = 65536;
+int j = -65536;
+
+unsigned int us1 = 4;
+unsigned int ui = -20;
+unsigned int ul = 80 ;
+
+int ci = 2 ;
+double d = 34.456; 
+
+void logMessage();
+
+bool b5=true;
+
+string str = "sss";
+
+string str1;//  = 0;
+
+int get (int a);
+
+open(file, flags, mode) -> {
+        
+	i=(-j);
+	i = ((s+l)) ; 
+        i= (s+l);
+        l = (s=l) ; 
+        l = i ; 
+        i = get(ci) ;
+        ci = 8;
+        d = i+j ; 
+        d = s-l ;
+        d = l/s ;
+        d=l*s;
+        i=l%s;
+       
+	i= d+l-s;
+	
+	i=d/l*s;
+  
+        i=d*l-s;
+
+	i=d*(l-s);
+ 
+        logMessage("open: testing types"); 
+	};
+
