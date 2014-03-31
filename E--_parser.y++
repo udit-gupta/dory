@@ -152,25 +152,39 @@ specification: ifc_decl_star rule_star { }
 ifc_decl_star: /* empty */ {
 }
 | ifc_decl_star ifc_decl { }
+| ifc_decl_star error TOK_SEMICOLON {
+        errMsg("Syntax error, expecting a declaration");
+}
 ;
 
 ifc_decl: TOK_SEMICOLON /* Fill in the other rules */ {  }
 | class_decl {  }
-| function_decl body_star { $1->body($2); stm.leaveScope(); stm.insert($1); }
-| event_decl { stm.leaveScope(); stm.insert($1); }
+| function_decl body_star { 
+	$1->body($2);
+	stm.leaveScope();
+	stm.insert($1);
+}
+| event_decl {
+	stm.leaveScope();
+	stm.insert($1);
+}
 | variable_decl { }
 ;
 
-class_decl: TOK_CLASS TOK_IDENT {
+class_decl: TOK_CLASS TOK_IDENT TOK_SEMICOLON {
 	$$ = new ClassEntry($2);
 	stm.insert($$);
 }
+| TOK_CLASS error TOK_SEMICOLON { errMsg("Syntax error in class declaration: expecting class name"); }
+;
 
 function_header: type TOK_IDENT TOK_LPAREN {
 	$$ = new FunctionEntry($2, nullptr);
 	fun_ret_type = $1;
 	stm.enterScope($$);
 }
+| type error TOK_LPAREN { errMsg("Expecting a function declaration -- may be a missing function name"); }
+;
 
 function_decl: function_header formal_param_list TOK_RPAREN {
 	$1->type(new Type($2, fun_ret_type));
@@ -289,6 +303,8 @@ variable_decl_star: /* empty */ {
 ;
 
 variable_decl: type variable TOK_SEMICOLON { $$ = $2; }
+| TOK_IDENT error TOK_SEMICOLON { errMsg("Error in variable declaration, may be a missing type name or identifier"); }
+| type error TOK_SEMICOLON { errMsg("Error in variable declaration, may be a missing identifier"); }
 ;
 
 variable: TOK_IDENT {
@@ -460,6 +476,7 @@ if_then_else_stmt: TOK_IF expr statement { $$ = new IfNode($2, $3); }
 statement_star: /* empty */ { $$ = nullptr;
 }
 | statement_star statement { if ($1) { $1->push_back($2); $$ = $1; } else { $$ = new std::list<StmtNode*>(); $$->push_back($2); } }
+| statement_star error TOK_SEMICOLON { errMsg("Syntax error while parsing a statement"); }
 ;
 
 statement: TOK_SEMICOLON { $$ = nullptr; }
