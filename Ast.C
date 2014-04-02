@@ -1,32 +1,34 @@
-#include "Ast.h"					
-#include "ParserUtil.h"					
+#include "Ast.h"                    
+#include "ParserUtil.h"                 
 
 
 AstNode::AstNode(NodeType nt, int line, int column, string file):
   ProgramElem(NULL, line, column, file) {
-	nodeType_ = nt;
+    AstNode::nodeType_ = nt;
 }
 
 AstNode::AstNode(const AstNode& ast): ProgramElem(ast) {
-	nodeType_ = ast.nodeType_;
+    AstNode::nodeType_ = ast.nodeType();
 }
 
 /****************************************************************/
 
 ExprNode::ExprNode(ExprNodeType et, const Value* val, int line, int column, 
-				   string file):
-	AstNode(AstNode::NodeType::EXPR_NODE, line, column, file)
+                   string file):
+    AstNode(AstNode::NodeType::EXPR_NODE, line, column, file)
 {
-	exprType_ = et;
-	val_ = val;
+    ExprNode::exprType_ = et;
+    ExprNode::val_ = val;
 }
 
 
 ExprNode::ExprNode(const ExprNode& e) : AstNode(e)
 {
-	exprType_ = e.exprType_;
-	val_ = e.val_;
+    ExprNode::exprType_ = e.exprNodeType();
+    ExprNode::val_ = new Value(*e.value());
+    ExprNode::coercedType_ = new Type(*e.coercedType());
 }
+
 /****************************************************************/
 extern const OpNode::OpInfo opInfo[] = {
   // print name, arity, paren_flag, fixity, arg types, out type, constraints
@@ -117,16 +119,16 @@ extern const OpNode::OpInfo opInfo[] = {
 };
 
 OpNode::OpNode(OpCode op, ExprNode* a1, ExprNode* a2, 
-			   int ln, int col, string file):
+               int ln, int col, string file):
   ExprNode(ExprNode::ExprNodeType::OP_NODE, NULL, ln,col,file) {
   opCode_ = op;
   if (a1 != NULL) {
-	arity_ = 1;
-	arg_.push_back(a1);
-	if (a2 != NULL) {
-	  arity_++;
-	  arg_.push_back(a2);
-	}
+    arity_ = 1;
+    arg_.push_back(a1);
+    if (a2 != NULL) {
+      arity_++;
+      arg_.push_back(a2);
+    }
   }
 }
 
@@ -138,7 +140,7 @@ OpNode::OpNode(const OpNode &other):
     if (other.arg_[i]) {
       arg_.push_back((other.arg_[i])->clone());
     } 
-	else {
+    else {
       arg_.push_back(NULL);
     }
   }
@@ -146,268 +148,310 @@ OpNode::OpNode(const OpNode &other):
 
 void 
 OpNode::print(ostream& os, int indent) const {
-	int iopcode = static_cast<int>(opCode_);
+    int iopcode = static_cast<int>(opCode_);
   if (opInfo[iopcode].prtType_ == OpNode::OpPrintType::PREFIX) {
-	os << opInfo[iopcode].name_;
-	if (arity_ > 0) {
-	  if (opInfo[iopcode].needParen_) 
-		os << '(';
-	  for (unsigned i=0; i < arity_-1; i++) {
-		if (arg_[i])
-		  arg_[i]->print(os, indent);
-	    else os << "NULL";
-		os << ", ";
-	  }
+    os << opInfo[iopcode].name_;
+    if (arity_ > 0) {
+      if (opInfo[iopcode].needParen_) 
+        os << '(';
+      for (unsigned i=0; i < arity_-1; i++) {
+        if (arg_[i])
+          arg_[i]->print(os, indent);
+        else os << "NULL";
+        os << ", ";
+      }
       if (arg_[arity_-1])
-		arg_[arity_-1]->print(os, indent);
-	  else os << "NULL";
-	  if (opInfo[iopcode].needParen_) 
-		os << ") ";
-	}
+        arg_[arity_-1]->print(os, indent);
+      else os << "NULL";
+      if (opInfo[iopcode].needParen_) 
+        os << ") ";
+    }
   }
   else if ((opInfo[iopcode].prtType_ == OpNode::OpPrintType::INFIX) && (arity_ == 2)) {
-	if (opInfo[iopcode].needParen_) 
-	  os << "(";
-	if(arg_[0])
-	  arg_[0]->print(os, indent);
-	else os << "NULL";
-	os << opInfo[iopcode].name_; 
-	if(arg_[1])
-	  arg_[1]->print(os, indent);
-	else os << "NULL";
-	if (opInfo[iopcode].needParen_) 
-	  os << ")";
+    if (opInfo[iopcode].needParen_) 
+      os << "(";
+    if(arg_[0])
+      arg_[0]->print(os, indent);
+    else os << "NULL";
+    os << opInfo[iopcode].name_; 
+    if(arg_[1])
+      arg_[1]->print(os, indent);
+    else os << "NULL";
+    if (opInfo[iopcode].needParen_) 
+      os << ")";
   }
   else internalErr("Unhandled case in OpNode::print");
 }
 
-void ValueNode::print(ostream& os, int indent) const {
-	this->value()->print(os, indent);
+
+/*************************************** Below this , I need to implement my own stuff ************************************************/
+
+/*******        Here, I neeed to initialize my constructors as per the requirements            ********/
+
+RefExprNode::RefExprNode(string ext, const SymTabEntry* ste, int line, int column, string file): 
+ExprNode::ExprNode(ExprNode::ExprNodeType::REF_EXPR_NODE, NULL, line, column, file)
+{
+    RefExprNode::ext_ = ext;
+    RefExprNode::sym_ = ste;
 }
 
-RefExprNode::RefExprNode(string ext, const SymTabEntry* ste, int line, int column, string file) :
-	ExprNode(ExprNode::ExprNodeType::REF_EXPR_NODE, NULL, line, column, file) {
-	ext_ = ext;
-	sym_ = ste;
+RefExprNode::RefExprNode(const RefExprNode& refExprNode): 
+ExprNode::ExprNode(refExprNode)
+{
+       RefExprNode::ext_ = refExprNode.ext();
+       RefExprNode::sym_ = refExprNode.symTabEntry();
 }
 
-RefExprNode::RefExprNode(const RefExprNode& e) : ExprNode(e) {
-	ext_ = e.ext_;
-	sym_ = e.sym_;
+InvocationNode::InvocationNode(const SymTabEntry *ste, vector<ExprNode*>* param, int line, int column, string file):
+ExprNode::ExprNode(ExprNode::ExprNodeType::INV_NODE, NULL, line, column, file)
+{
+    InvocationNode::ste_ = ste;
+    InvocationNode::params_ = param;
 }
 
-void RefExprNode::print(ostream& os, int indent) const {
-	os << this->ext_;
+InvocationNode::InvocationNode(const InvocationNode& invcNode):
+ExprNode::ExprNode(invcNode)
+{
+    InvocationNode::params_ = new vector<ExprNode*>(*invcNode.params());
+    InvocationNode::ste_ = invcNode.symTabEntry();
 }
 
-InvocationNode::InvocationNode(const SymTabEntry *ste, vector<ExprNode*>* param, int line, int column, string file) :
-	ExprNode(ExprNode::ExprNodeType::INV_NODE, NULL, line, column, file) {
-	ste_ = ste;
-	params_ = param;
+IfNode::IfNode(ExprNode* cond, StmtNode* thenStmt, StmtNode* elseStmt, int line, int column, string file):
+StmtNode(StmtNode::StmtNodeKind::IF, line, column, file) 
+{
+    IfNode::cond_ = cond;
+    IfNode::then_ = thenStmt;
+    IfNode::else_ = elseStmt;
 }
 
-InvocationNode::InvocationNode(const InvocationNode& e) : ExprNode(e) {
-	ste_ = e.ste_;
-	params_ = e.params_;
+PrimitivePatNode::PrimitivePatNode(EventEntry* ee, vector<VariableEntry*>* params, ExprNode* c, int line, int column, string file):
+BasePatNode(BasePatNode::PatNodeKind::PRIMITIVE, line, column, file)
+{
+    PrimitivePatNode::ee_ = ee;
+    PrimitivePatNode::params_ = params;
+    PrimitivePatNode::cond_ = c;
 }
 
-void InvocationNode::print(ostream& os, int indent) const {
-	os << ste_->name() << "(";
-
-	if (this->params()) {
-		for(std::vector<ExprNode*>::const_iterator it = this->params()->begin(); it != this->params()->end(); ++it) {
-			if(*it)
-				(*it)->print(os, indent);
-
-			if (it+1 != this->params()->end())
-				os << ", ";
-		}
-	}
-
-	os << ")";
+PatNode::PatNode(PatNodeKind pk, BasePatNode *p1, BasePatNode*p2, int line, int column, string file):
+BasePatNode(pk, line, column, file)
+{
+    PatNode::pat1_ = p1;
+    PatNode::pat2_ = p2;
 }
 
-RuleNode::RuleNode(BlockEntry *re, BasePatNode* pat, StmtNode* reaction, int line, int column, string file) : AstNode(AstNode::NodeType::RULE_NODE, line, column, file)  {
-	rste_ = re;
-	pat_ = pat;
-	reaction_ = reaction;
+RuleNode::RuleNode(BlockEntry *re, BasePatNode* pat, StmtNode* reaction, int line, int column, string file):
+AstNode(AstNode::NodeType::RULE_NODE, line, column, file)
+{
+    RuleNode::rste_ = re;
+    RuleNode::pat_ = pat;
+    RuleNode::reaction_ = reaction;
 }
 
-void RuleNode::print(ostream& os, int indent) const {
-	prtSpace(os, indent);
-	if (pat_) {
-		os << "(";
-		pat_->print(os, indent);
-		os << ")";
-	}
-	os << "--> ";
-	if (reaction_) {
-		reaction_->print(os, indent);
-	}
-	prtln(os, indent);
-	os << ";;" << endl;
+/*****************        Add printing Logic Here for Each Node     *****************/
+
+/***  Just to remember :  RuleNode->PatNode->PrimitiveNode->StmtNode(s)->ExprNode(s)->ValueNode(s)        ***/
+
+
+void ValueNode::print(ostream& out, int indent) const
+{
+    value()->print(out, indent);
 }
 
-PrimitivePatNode::PrimitivePatNode(EventEntry* ee, vector<VariableEntry*>* params, ExprNode* c, int line, int column, string file) : BasePatNode(BasePatNode::PatNodeKind::PRIMITIVE, line, column, file) {
-	ee_ = ee;
-	params_ = params;
-	cond_ = c;
-
-	/* TODO: Fill in condition to have no assignments. */
-	condition_ = c;
+void RefExprNode::print(ostream& out, int indent) const
+{
+    out << ext();
 }
 
-void PrimitivePatNode::print(ostream& os, int indent) const {
-
-	os << ee_->name();
-	
-	if (ee_->name() != "any")
-		os << "(";
-
-	if(params_) {
-		for(std::vector<VariableEntry*>::const_iterator it = params_->begin(); it != params_->end(); ++it) {
-			if (*it && (*it)->type()) {
-				(*it)->type()->print(os, indent);
-				os << " " << (*it)->name();
-
-				if ((it+1) != params_->end())
-					os << ", ";
-			}
-		}
-	}
-
-	if (ee_->name() != "any")
-		os << ")";
-
-	if (cond_) {
-		os << "| ";
-		cond_->print(os, indent);
-	}
+void CompoundStmtNode::print(ostream& out, int indent) const 
+{
+    out << "{";
+    if(stmts() != NULL && stmts()->size() > 0) 
+        prtln(out, indent);
+    CompoundStmtNode::printWithoutBraces(out, indent);
+    out << "};";
+    prtln(out, indent);
 }
 
-bool PrimitivePatNode::hasSeqOps() const {
-	if (kind() == PatNodeKind::SEQ)
-		return true;
-	return false;
+void CompoundStmtNode::printWithoutBraces(ostream& out, int indent) const 
+{
+    const list<StmtNode*>* stmts = CompoundStmtNode::stmts();
+    if(stmts != NULL && stmts->size() > 0) {
+        for(std::list<StmtNode*>::const_iterator it = stmts->begin(); it != stmts->end(); it++) {
+            prtSpace(out, indent);
+            (*it)->print(out, indent);
+            if((*it)->stmtNodeKind() == StmtNode::StmtNodeKind::EXPR || (*it)->stmtNodeKind() == StmtNode::StmtNodeKind::RETURN)
+                endln(out, indent);
+        }
+    }
 }
 
-bool PrimitivePatNode::hasNeg() const {
-	if (kind() == PatNodeKind::NEG)
-		return true;
-	return false;
-}	
-
-bool PrimitivePatNode::hasAnyOrOther() const {
-	if (kind() != PatNodeKind::SEQ && kind() != PatNodeKind::NEG)
-		return true;
-	return false;
+void InvocationNode::print(ostream& out, int indent) const 
+{
+    if(symTabEntry() != NULL) {
+        out << symTabEntry()->name();
+        out << "(";
+        bool prComma = false;
+        const vector<ExprNode*> *exps = params();
+        if(exps != NULL && exps->size() > 0) {
+            for(std::vector<ExprNode*>::const_iterator it = exps->begin(); it != exps->end(); it++) {
+                if(prComma)
+                    out << ", ";
+                (*it)->print(out, indent);
+                prComma = true;
+            }
+        }
+        out << ")";
+    }
 }
 
-PatNode::PatNode(int line, int column, string file) : BasePatNode(BasePatNode::PatNodeKind::EMPTY, line, column, file){
-
+void IfNode::print(ostream& out, int indent) const 
+{
+    out << "if (";
+    if(cond() != NULL)
+        cond()->print(out, indent);
+    out << ") ";
+    if(thenStmt() != NULL) {
+        thenStmt()->print(out, indent + STEP_INDENT);
+        if(thenStmt()->stmtNodeKind() != StmtNode::StmtNodeKind::COMPOUND) 
+            endln(out, indent);
+    }
+    else 
+        endln(out, indent);
+    
+    if(elseStmt() != NULL) {
+        prtSpace(out, indent);
+        out << "else ";
+        elseStmt()->print(out, indent + STEP_INDENT);
+        if(elseStmt()->stmtNodeKind() != StmtNode::StmtNodeKind::COMPOUND) 
+            endln(out, indent);
+    }
 }
 
-PatNode::PatNode(PatNodeKind pk, BasePatNode *p1, BasePatNode *p2, int line, int column, string file) : BasePatNode(pk, line, column, file) {
-	pat1_ = p1;
-	pat2_ = p2;
+void PrimitivePatNode::print(ostream& out, int indent) const 
+{
+    out << "(";
+    if(event() != NULL) {
+        out << event()->name();
+        if(event()->name().compare("any") == 0) {
+            
+        }
+        else {
+            out << "(";
+            bool prComma = false;
+            const vector<const VariableEntry*> *vars = params();
+            if(vars != NULL && vars->size() > 0) {
+                if(vars != NULL) {
+                    for(std::vector<const VariableEntry*>::const_iterator it =  vars->begin(); it != vars->end(); it++) {
+                        if(prComma) 
+                            out << ", ";
+                        (*it)->print(out, indent);
+                        prComma = true;
+                    }
+                }
+            }
+        out << ")";
+        }
+    }
+    
+    if(cond() != NULL) {
+        out << "|";
+        cond()->print(out, indent);
+    }
+    out << ")";
 }
 
-void PatNode::print(ostream& os, int indent) const {
-	if(kind() == PatNodeKind::SEQ) {
-		os << "(";
-		pat1_->print(os, indent);
-		os << "):(";
-		pat2_->print(os, indent);
-		os << ")";
-	} else if (kind() == PatNodeKind::NEG) {
-		os << "(!";
-		pat1_->print(os, indent);
-		os << ")";
-	} else if (kind() == PatNodeKind::STAR) {
-		os << "(";
-		pat1_->print(os, indent);
-		os << ")**";
-	} else if (kind() == PatNodeKind::OR) {
-		os << "(";
-		pat1_->print(os, indent);
-		os << ") \\/ (";
-		pat2_->print(os, indent);
-		os << ")";
-	}
+bool PrimitivePatNode::hasSeqOps() const 
+{
+    if(kind() == BasePatNode::PatNodeKind::SEQ)
+        return true;
+    return false;
 }
 
-bool PatNode::hasSeqOps() const {
-	if (kind() == PatNodeKind::SEQ)
-		return true;
-	return false;
+bool PrimitivePatNode::hasNeg() const 
+{
+    if(kind() == BasePatNode::PatNodeKind::NEG)
+        return true;
+    return false;
 }
 
-bool PatNode::hasNeg() const {
-	if (kind() == PatNodeKind::NEG)
-		return true;
-	return false;
-}    
-
-bool PatNode::hasAnyOrOther() const {
-	if (kind() != PatNodeKind::SEQ && kind() != PatNodeKind::NEG)
-		return true;
-	return false;
+bool PrimitivePatNode::hasAnyOrOther() const
+{
+    if(kind() == BasePatNode::PatNodeKind::UNDEFINED)
+        return true;
+    return false;
 }
 
-IfNode::IfNode(ExprNode* cond, StmtNode* thenStmt, StmtNode* elseStmt, int line, int column, string file) : StmtNode(StmtNode::StmtNodeKind::IF, line, column, file) {
-	cond_ = cond;
-	then_ = thenStmt;
-	else_ = elseStmt;
+void PatNode::print(ostream& out, int indent) const 
+{
+    out << "(";
+    switch(kind()) {
+    case BasePatNode::PatNodeKind::NEG:
+            out << "!";
+            if(pat1() != NULL)
+                pat1()->print(out, indent);
+            break;
+    case BasePatNode::PatNodeKind::STAR: 
+            if(pat1() != NULL)
+                pat1()->print(out, indent);
+            out << "**";
+            break;
+    case BasePatNode::PatNodeKind::SEQ:
+            if(pat1() != NULL)
+                pat1()->print(out, indent);
+            out << ":";
+            if(pat2() != NULL)
+                pat2()->print(out, indent);
+            break;
+    case BasePatNode::PatNodeKind::OR:
+            if(pat1() != NULL)
+                pat1()->print(out, indent);
+            out << " \\/ ";
+            if(pat2() != NULL)
+                pat2()->print(out, indent);
+            break;
+    default:
+            if(pat1() != NULL)
+                pat1()->print(out, indent);
+            if(pat2() != NULL)
+                pat2()->print(out, indent);
+            break;
+    }
+    out << ")";
 }
 
-void IfNode::print(ostream& os, int indent) const {
-	os << "if(";
-
-	if (cond_) {
-		cond_->print(os, indent);
-	}
-
-	os << ")";
-
-	if(then_) {
-		prtln(os, indent+4);
-		then_->print(os, indent+4);
-	}
-
-	if(else_) {
-		prtln(os, indent+2);
-		os << "else ";
-		prtln(os, indent+4);
-		else_->print(os, indent+4);
-	}
+bool PatNode::hasSeqOps() const 
+{
+    if(kind() == BasePatNode::PatNodeKind::SEQ)
+        return true;
+    return false;
 }
 
-void  CompoundStmtNode::print(ostream& os, int indent) const {
-	os << "{";
-
-	if (stmts_) {
-		prtln(os, indent+2);
-		for (std::list<StmtNode*>::const_iterator it = stmts_->begin(); it != stmts_->end(); ++it) {
-			if (*it) {
-				(*it)->print(os, indent);
-				os << ";";
-				prtln(os, indent+2);
-			}
-		}
-	}
-
-	os << "};";
+bool PatNode::hasNeg() const 
+{
+    if(kind() == BasePatNode::PatNodeKind::NEG)
+        return true;
+    return false;
 }
 
-void CompoundStmtNode::printWithoutBraces(ostream& os, int indent) const {
-	if (stmts_) {
-		prtln(os, indent+2);
-		for (std::list<StmtNode*>::const_iterator it = stmts_->begin(); it != stmts_->end(); ++it) {
-			if (*it) {
-				(*it)->print(os, indent);
-				os << ";";
-				prtln(os, indent+2);
-			}
-		}
-	}
+bool PatNode::hasAnyOrOther() const
+{
+    if(kind() == BasePatNode::PatNodeKind::UNDEFINED)
+        return true;
+    return false;
 }
+
+void RuleNode::print(ostream& out, int indent) const 
+{
+    prtSpace(out, indent);
+    if(pat() != NULL) 
+        pat()->print(out, indent);
+    out << "-->";
+    prtSpace(out, indent);
+    if(ruleEntry() != NULL) 
+        ruleEntry()->print(out, indent);
+    if(reaction() != NULL) 
+        reaction()->print(out, indent);
+    out << ";";
+} 
+
+

@@ -23,10 +23,10 @@ class VariableEntry;
 /*****************************************************************************
    Here is the class hierarchy:
                                                ProgramElem
-											       |
+                                                   |
                                                 AstNode
      +--------------------------------------------+----------------+
-     |		         |                 |                           | 
+     |               |                 |                           | 
  BasePatNode      ExprNode          RuleNode                    StmtNode
      |               |                                             |
      |               |                                             |
@@ -96,7 +96,7 @@ class ExprNode: public AstNode {
 
  public:
   ExprNode(ExprNodeType et, const Value* val=0, int line=0, int column=0,
-		   string file=""); // val is saved, but not copied
+           string file=""); // val is saved, but not copied
   ExprNode(const ExprNode&);
   virtual ~ExprNode() {};
  
@@ -122,7 +122,7 @@ class ExprNode: public AstNode {
 class RefExprNode: public ExprNode {
  public:
   RefExprNode(string ext, const SymTabEntry* ste=NULL, 
-	      int line=0, int column=0, string file="");
+          int line=0, int column=0, string file="");
   RefExprNode(const RefExprNode&);
   ExprNode* clone() const { return new RefExprNode(*this); }
 
@@ -160,21 +160,21 @@ class OpNode: public ExprNode {
     OpCode code_;
     const char* name_;
     int arity_;
-		int needParen_;
+        int needParen_;
     OpPrintType prtType_;
     Type::TypeTag argType_[3]; 
     // operators with > 2 args can be supported
     // only if types of args k through N are identical, for 1 <= k <= 3, 
     // and are given by argType[k-1]
     Type::TypeTag outType_;
-		const char *typeConstraints_;
+        const char *typeConstraints_;
   };
 
  public:
   static const int VARIABLE = 100;
  public:
   OpNode(OpCode op, ExprNode *l, ExprNode *r=NULL,
-	 int line=0, int column=0, string file="");
+     int line=0, int column=0, string file="");
   OpNode(const OpNode&);
   ExprNode* clone() const { return new OpNode(*this); }
   ~OpNode() {};
@@ -222,7 +222,7 @@ class InvocationNode: public ExprNode {
   // Used to represent function invocation
  public:
   InvocationNode(const SymTabEntry *ste, vector<ExprNode*>* param=0, 
-		 int line=0, int column=0, string file="");
+         int line=0, int column=0, string file="");
   InvocationNode(const InvocationNode&);
   ExprNode* clone() const  { return new InvocationNode(*this); }
   ~InvocationNode() {};
@@ -263,12 +263,12 @@ class BasePatNode: public AstNode {
 
  public:
   BasePatNode(PatNodeKind pk, int ln=0, int col=0, string f=""):
-	AstNode(AstNode::NodeType::PAT_NODE, ln, col, f) {
-	parent_ = NULL; root_ = NULL; patKind_ = pk;};
+    AstNode(AstNode::NodeType::PAT_NODE, ln, col, f) {
+    parent_ = NULL; root_ = NULL; patKind_ = pk;};
   BasePatNode(const BasePatNode& bpn): AstNode(bpn) {
-	patKind_ = bpn.patKind_; parent_ = bpn.parent_; root_ = bpn.root_;}
+    patKind_ = bpn.patKind_; parent_ = bpn.parent_; root_ = bpn.root_;}
   ~BasePatNode() {};
-  //virtual BasepatNode* clone() const { return new BasePatNode(*this);}	
+  //virtual BasepatNode* clone() const { return new BasePatNode(*this);}    
 
   PatNodeKind kind() const { return patKind_; };
   void kind(PatNodeKind p) {patKind_ = p;}
@@ -280,7 +280,7 @@ class BasePatNode: public AstNode {
   virtual bool hasNeg() const=0;
   virtual bool hasAnyOrOther() const=0;
   virtual bool isNegatable() const {
-	return ((!hasSeqOps()) && (!hasNeg())); }
+    return ((!hasSeqOps()) && (!hasNeg())); }
 
  private:
   PatNodeKind patKind_;
@@ -293,8 +293,8 @@ class BasePatNode: public AstNode {
 class PrimitivePatNode: public BasePatNode {
  public:
   PrimitivePatNode(EventEntry* ee, vector<VariableEntry*>* params, 
-				   ExprNode* c=NULL,
-				   int line=0, int column=0, string file="");
+                   ExprNode* c=NULL,
+                   int line=0, int column=0, string file="");
   //PrimitivePatNode(const PrimitivePatNode& ppn);
   ~PrimitivePatNode() {};
   //BasePatNode* clone() { return new PrimitivePatNode(*this); }
@@ -303,7 +303,7 @@ class PrimitivePatNode: public BasePatNode {
   EventEntry* event() { return ee_; }
 
   const vector<const VariableEntry*>* params() const { 
-	return (vector<const VariableEntry*>*)params_; }
+    return (vector<const VariableEntry*>*)params_; }
   vector<VariableEntry*>* params() { return params_; }
 
   const ExprNode* cond() const { return cond_; }
@@ -314,7 +314,7 @@ class PrimitivePatNode: public BasePatNode {
   const ExprNode* condition() const { return condition_; }
 
   const list<const OpNode*>& asgs() const { 
-	return (list<const OpNode*>&)asgs_; }  
+    return (list<const OpNode*>&)asgs_; }  
   list<OpNode*>& asgs() { return asgs_; }  
 
   bool hasSeqOps() const;
@@ -371,7 +371,7 @@ class StmtNode: public AstNode {
   enum class StmtNodeKind { ILLEGAL=-1, EXPR, IF, COMPOUND, RETURN};
  public: 
   StmtNode(StmtNodeKind skm, int line=0, int column=0, string file=""):
-	AstNode(AstNode::NodeType::STMT_NODE, line,column,file) { skind_ = skm; };
+    AstNode(AstNode::NodeType::STMT_NODE, line,column,file) { skind_ = skm; };
   ~StmtNode() {};
   //AstNode* clone() 
   //  { return new StmtNode(*this); }
@@ -388,13 +388,13 @@ class StmtNode: public AstNode {
 class ReturnStmtNode: public StmtNode {
  public:
   ReturnStmtNode(ExprNode *e, FunctionEntry* fe, 
-				 int line=0, int column=0, string file=""):
+                 int line=0, int column=0, string file=""):
     StmtNode(StmtNode::StmtNodeKind::RETURN,line,column,file) { expr_ = e; fun_ = fe;};
   ~ReturnStmtNode() {};
 
   void print(ostream& os, int indent) const {
-	os << "return "; 
-	if(expr_ != NULL) expr_->print(os, indent); else os << "NULL";};
+    os << "return "; 
+    if(expr_ != NULL) expr_->print(os, indent); else os << "NULL";};
 
  private:
   ExprNode* expr_;
@@ -412,7 +412,7 @@ class ExprStmtNode: public StmtNode {
   //  { return new ExprStmtNode(*this); }
 
   void print(ostream& os, int indent) const { 
-	if (expr_ != NULL) { expr_->print(os, indent);}};
+    if (expr_ != NULL) { expr_->print(os, indent);}};
 
  private:
   ExprNode* expr_;
@@ -423,7 +423,7 @@ class ExprStmtNode: public StmtNode {
 class CompoundStmtNode: public StmtNode{
  public: 
   CompoundStmtNode(list<StmtNode*> *Slist, int ln=0, int col=0, string fl=""):
-	StmtNode(StmtNode::StmtNodeKind::COMPOUND, ln,col,fl) { stmts_ = Slist;};
+    StmtNode(StmtNode::StmtNodeKind::COMPOUND, ln,col,fl) { stmts_ = Slist;};
   ~CompoundStmtNode() { };
   //AstNode* clone() 
   //  { return new CompoundStmtNode(*this); }
@@ -449,7 +449,7 @@ class IfNode: public StmtNode{
  public: 
   
   IfNode(ExprNode* cond, StmtNode* thenStmt, 
-		 StmtNode* elseStmt=NULL, int line=0, int column=0, string file="");
+         StmtNode* elseStmt=NULL, int line=0, int column=0, string file="");
   ~IfNode(){};
   //AstNode* clone() 
   //  { return new IfNode(*this); }
@@ -476,7 +476,7 @@ class IfNode: public StmtNode{
 class RuleNode: public AstNode {
  public:
   RuleNode(BlockEntry *re, BasePatNode* pat, StmtNode* reaction, 
-	   int line=0, int column=0, string file="");
+       int line=0, int column=0, string file="");
   ~RuleNode() {};
   //AstNode* clone() 
   //  { return new RuleNode(*this); }
@@ -502,3 +502,4 @@ class RuleNode: public AstNode {
 
 /****************************************************************/
 #endif
+
