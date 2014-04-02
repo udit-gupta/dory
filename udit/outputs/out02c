@@ -1,0 +1,14 @@
+Finished parsing, here is the AST
+
+  class CString;
+  string get(class CString s);
+  class CString a1;
+  int b = 2;
+  event open(class CString a1, int a2, unsigned int a3);
+  int logMessage(string x);
+
+  (open(class CString file, int flags, unsigned int mode)|get(a1))-->  {
+    logMessage("open: testing almost nothing");
+  };
+  ;;
+  

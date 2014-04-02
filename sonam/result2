@@ -1,0 +1,545 @@
+Processing file test/in01
+Processing file test/in02
+Processing file test/in02a
+Processing file test/in02b
+Processing file test/in02c
+Processing file test/in02d
+Processing file test/in03
+Processing file test/in03a
+Processing file test/in03b
+Processing file test/in03c
+Processing file test/in04
+Processing file test/in05
+Processing file test/in05a
+Processing file test/in05b
+Processing file test/in05c
+Processing file test/in06
+Processing file test/in06a
+Processing file test/in06b
+Processing file test/in06c
+Processing file test/in07
+Processing file test/in08
+Processing file test/in08a
+Processing file test/in09
+Processing output file outputs/out01
+3,4d2
+<   
+<   
+\ No newline at end of file
+Processing output file outputs/out02
+3d2
+<   event open(string a1, int a2, unsigned int a3);
+5c4,6
+<   (open(string file, int flags, unsigned int mode))-->  {};
+---
+>   event open(string a1, int a2, unsigned int a3);
+>   (open(string file, int flags, unsigned int mode))--> {
+>     };
+7c8,9
+<   (any)-->  {};
+---
+>   (any)--> {
+>     };
+9d10
+<   
+\ No newline at end of file
+Processing output file outputs/out02a
+2a3
+> 
+5d5
+< 
+10d9
+<   
+\ No newline at end of file
+Processing output file outputs/out02b
+2a3
+> 
+3a5
+>   
+8a11
+>   
+11d13
+< 
+20d21
+<   
+\ No newline at end of file
+Processing output file outputs/out02c
+2a3
+> 
+6a8
+>   
+9d10
+< 
+14d14
+<   
+\ No newline at end of file
+Processing output file outputs/out02d
+Processing output file outputs/out03
+2a3
+> 
+18d18
+< 
+37d36
+<   
+\ No newline at end of file
+Processing output file outputs/out03a
+10a11
+>   
+23d23
+< 
+70d69
+<   
+\ No newline at end of file
+Processing output file outputs/out03b
+2a3
+> 
+19d19
+< 
+41d40
+<   
+\ No newline at end of file
+Processing output file outputs/out03c
+2a3
+> 
+19d19
+< 
+40d39
+<   
+\ No newline at end of file
+Processing output file outputs/out04
+Processing output file outputs/out05
+2a3
+> 
+5d5
+< 
+7c7,9
+<     if (condition) {};
+---
+>     if(condition)
+>       {
+>         };;
+10d11
+<   
+\ No newline at end of file
+Processing output file outputs/out05a
+Processing output file outputs/out05b
+2a3
+> 
+16d16
+< 
+18c18,20
+<     if (((!i<6&&i<=j)||j>=k)) if ((i<j||j>k)) {
+---
+>     if(((!i<6&&i<=j)||j>=k))
+>       if((i<j||j>k))
+>           {
+21c23,24
+<     else {
+---
+>         else 
+>           {
+24,26c27,31
+<     ;
+<     else k=(k<<(j>>i));
+<     if (((!bo&&bo1<=bo2)||bo2>=bo3)) if ((bo3<bo1||bo>bo2)) {
+---
+>     else 
+>       k=(k<<(j>>i));
+>     if(((!bo&&bo1<=bo2)||bo2>=bo3))
+>       if((bo3<bo1||bo>bo2))
+>           {
+29,31c34,36
+<     };
+<     ;
+<     if (i>9) {
+---
+>             };;
+>     if(i>9)
+>       {
+33,34c38,40
+<     };
+<     if ((i+f)>9) {
+---
+>         };;
+>     if((i+f)>9)
+>       {
+36,37c42,44
+<     };
+<     if ((i/f)>9) {
+---
+>         };;
+>     if((i/f)>9)
+>       {
+39,40c46,48
+<     };
+<     if (f>9) {
+---
+>         };;
+>     if(f>9)
+>       {
+43c51,52
+<     else {
+---
+>     else 
+>       {
+45,46c54,56
+<     };
+<     if (bo) {
+---
+>         };;
+>     if(bo)
+>       {
+48c58
+<     };
+---
+>         };;
+51d60
+<   
+\ No newline at end of file
+Processing output file outputs/out05c
+2a3
+> 
+16d16
+< 
+18c18,20
+<     if (((!i<6&&i<=j)||j>=k)) if ((i==j||j!=k)) {
+---
+>     if(((!i<6&&i<=j)||j>=k))
+>       if((i==j||j!=k))
+>           {
+21c23,24
+<     else {
+---
+>         else 
+>           {
+24,26c27,31
+<     ;
+<     else k=(k<<(j>>i));
+<     if (((!bo&&bo1==bo2)||bo2>=bo3)) if ((bo3!=bo1||bo>bo2)) {
+---
+>     else 
+>       k=(k<<(j>>i));
+>     if(((!bo&&bo1==bo2)||bo2>=bo3))
+>       if((bo3!=bo1||bo>bo2))
+>           {
+29,31c34,36
+<     };
+<     ;
+<     if (i>9) {
+---
+>             };;
+>     if(i>9)
+>       {
+33,34c38,40
+<     };
+<     if (((i+f)+k)>9) {
+---
+>         };;
+>     if(((i+f)+k)>9)
+>       {
+36,37c42,44
+<     };
+<     if (((i/f)+k)>9) {
+---
+>         };;
+>     if(((i/f)+k)>9)
+>       {
+39,40c46,48
+<     };
+<     if ((i/(f+k))>9) {
+---
+>         };;
+>     if((i/(f+k))>9)
+>       {
+43c51,52
+<     else {
+---
+>     else 
+>       {
+45,46c54,56
+<     };
+<     if (bo) {
+---
+>         };;
+>     if(bo)
+>       {
+48c58
+<     };
+---
+>         };;
+51d60
+<   
+\ No newline at end of file
+Processing output file outputs/out06
+2a3
+> 
+3a5
+>   
+11,21c13,30
+< 
+<   (a(int e))-->  z=(z+1);;
+<   ((a(int f)):(b(int y, int w)|w==f))-->  z=w;;
+<   ((a(int f)):(b(int y, int w)|w==f))-->  z=f;;
+<   ((a(int f)):(b(int y, int w)|f=w))-->  z=f;;
+<   ((a(int g)):(b(int y, int w)|f==w))-->  z=g;;
+<   ((a(int h)) \/ (b(int y, int w)|h==w))-->  z=1;;
+<   ((a(int i)) \/ (b(int y, int w)|i==w))-->  z=w;;
+<   ((a(int j)) \/ (b(int y, int w)|j==w))-->  z=j;;
+<   (a(int k))-->  z=(k+y);;
+<   
+\ No newline at end of file
+---
+>   (a(int e))--> z=(z+1)
+>   ;;
+>   ((a(int f)):(b(int y, int w)| w==f))--> z=w
+>   ;;
+>   ((a(int f)):(b(int y, int w)| w==f))--> z=f
+>   ;;
+>   ((a(int f)):(b(int y, int w)| f=w))--> z=f
+>   ;;
+>   ((a(int g)):(b(int y, int w)| f==w))--> z=g
+>   ;;
+>   ((a(int h)) \/ (b(int y, int w)| h==w))--> z=1
+>   ;;
+>   ((a(int i)) \/ (b(int y, int w)| i==w))--> z=w
+>   ;;
+>   ((a(int j)) \/ (b(int y, int w)| j==w))--> z=j
+>   ;;
+>   (a(int k))--> z=(k+y)
+>   ;;
+Processing output file outputs/out06a
+2a3
+> 
+4a6
+>   
+5a8
+>   
+6a10
+>   
+7a12
+>   
+11a17
+>   
+12a19
+>   
+13a21
+>   
+14a23
+>   
+15a25
+>   
+21d30
+< 
+42d50
+<   
+\ No newline at end of file
+Processing output file outputs/out06b
+2a3
+> 
+4a6
+>   
+5a8
+>   
+7a11
+>   
+8a13
+>   
+9a15
+>   
+14a21
+>   
+15a23
+>   
+16a25
+>   
+17a27
+>   
+18a29
+>   
+19a31
+>   
+20a33
+>   
+21a35
+>   
+22a37
+>   
+23a39
+>   
+24a41
+>   
+25a43
+>   
+26a45
+>   
+27a47
+>   
+28a49
+>   
+29a51
+>   
+30a53
+>   
+39d61
+< 
+44c66
+<   ((((((open(class CString file, int flags, unsigned int mode))**):((any)**)):(open(class CString file1, int flags1, unsigned int mode1)|state_var=get(file1))):(!(close(int fd)))):(unlink(class CString path)|state_var==get(path)))-->  {
+---
+>   ((((((open(class CString file, int flags, unsigned int mode))**):((any)**)):(open(class CString file1, int flags1, unsigned int mode1)| state_var=get(file1))):((!close(int fd)))):(unlink(class CString path)| state_var==get(path)))--> {
+53d74
+<   
+\ No newline at end of file
+Processing output file outputs/out06c
+Processing output file outputs/out07
+4a5
+>   
+8a10
+>   
+11a14
+>   
+14a18
+>   
+17a22
+>   
+19a25
+>   
+22a29
+>   
+24a32
+>   
+26a35
+>   
+28a38
+>   
+29a40
+>   
+30a42
+>   
+31a44
+>   
+32a46
+>   
+33a48
+>   
+34a50
+>   
+35a52
+>   
+36a54
+>   
+42a61
+>   
+43a63
+>   
+44a65
+>   
+45a67
+>   
+46a69
+>   
+47a71
+>   
+48a73
+>   
+49a75
+>   
+50a77
+>   
+51a79
+>   
+52a81
+>   
+53a83
+>   
+77d106
+< 
+95c124,125
+<     if (foundFlag==0) {
+---
+>     if(foundFlag==0)
+>       {
+98c128
+<     };
+---
+>         };;
+106c136,137
+<   (((any)**):(read(int check_file)))-->  {};
+---
+>   (((any)**):(read(int check_file)))--> {
+>     };
+122d152
+<   
+\ No newline at end of file
+Processing output file outputs/out08
+2a3
+> 
+10d10
+< 
+17c17,18
+<   (open(string a, int b, unsigned int c))-->  {};
+---
+>   (open(string a, int b, unsigned int c))--> {
+>     };
+21,22c22,24
+<       {};
+<       };
+---
+>     {
+>     };;
+>     };;
+26c28,29
+<     {};
+---
+>     {
+>     };;
+29d31
+<   
+\ No newline at end of file
+Processing output file outputs/out08a
+2a3
+> 
+10d10
+< 
+15,18c15,20
+<         if (i==j) j=3;
+<         else j=2;
+<         };
+<       };
+---
+>     if(i==j)
+>       j=3
+>     else 
+>       j=2;
+>     };;
+>     };;
+22c24,25
+<     {};
+---
+>     {
+>     };;
+25d27
+<   
+\ No newline at end of file
+Processing output file outputs/out09
+2a3
+> 
+3a5
+>   
+14a17
+>   
+19a23
+>   
+22d25
+< 
+24c27,28
+<     if ((i<j||j>k)) {
+---
+>     if((i<j||j>k))
+>       {
+26c30
+<     };
+---
+>         };;
+29d32
+<   
+\ No newline at end of file

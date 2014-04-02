@@ -1,0 +1,557 @@
+Processing file test/in01
+Processing file test/in02
+Processing file test/in02a
+Processing file test/in02b
+Processing file test/in02c
+Processing file test/in02d
+Processing file test/in03
+Processing file test/in03a
+Processing file test/in03b
+Processing file test/in03c
+Processing file test/in04
+Processing file test/in05
+Processing file test/in05a
+Processing file test/in05b
+Processing file test/in05c
+Processing file test/in06
+Processing file test/in06a
+Processing file test/in06b
+Processing file test/in06c
+Processing file test/in07
+Processing file test/in08
+Processing file test/in08a
+Processing file test/in09
+Processing output file outputs/out01
+2,4d1
+< 
+<   
+<   
+\ No newline at end of file
+Processing output file outputs/out02
+4,5c4,5
+< 
+<   (open(string file, int flags, unsigned int mode))-->  {};
+---
+>   (open(string file, int flags, unsigned int mode))--> {
+>     };
+7c7,8
+<   (any)-->  {};
+---
+>   (any)--> {
+>     };
+9d9
+<   
+\ No newline at end of file
+Processing output file outputs/out02a
+5d4
+< 
+10d8
+<   
+\ No newline at end of file
+Processing output file outputs/out02b
+3a4
+>   
+8a10
+>   
+11d12
+< 
+20d20
+<   
+\ No newline at end of file
+Processing output file outputs/out02c
+6a7
+>   
+9,10c10
+< 
+<   (open(class CString file, int flags, unsigned int mode)|get(a1))-->  {
+---
+>   (open(class CString file, int flags, unsigned int mode)| get(a1))--> {
+14d13
+<   
+\ No newline at end of file
+Processing output file outputs/out02d
+Processing output file outputs/out03
+18d17
+< 
+37d35
+<   
+\ No newline at end of file
+Processing output file outputs/out03a
+2,3c2
+< 
+<   int isInFile(string x, string y);
+---
+> int isInFile(string x, string y);
+10a10
+>   
+23d22
+< 
+70d68
+<   
+\ No newline at end of file
+Processing output file outputs/out03b
+19d18
+< 
+41d39
+<   
+\ No newline at end of file
+Processing output file outputs/out03c
+19d18
+< 
+40d38
+<   
+\ No newline at end of file
+Processing output file outputs/out04
+Processing output file outputs/out05
+5d4
+< 
+7c6,8
+<     if (condition) {};
+---
+>     if(condition)
+>       {
+>         };;
+10d10
+<   
+\ No newline at end of file
+Processing output file outputs/out05a
+Processing output file outputs/out05b
+16d15
+< 
+18c17,19
+<     if (((!i<6&&i<=j)||j>=k)) if ((i<j||j>k)) {
+---
+>     if(((!i<6&&i<=j)||j>=k))
+>       if((i<j||j>k))
+>           {
+21c22,23
+<     else {
+---
+>         else 
+>           {
+24,26c26,30
+<     ;
+<     else k=(k<<(j>>i));
+<     if (((!bo&&bo1<=bo2)||bo2>=bo3)) if ((bo3<bo1||bo>bo2)) {
+---
+>     else 
+>       k=(k<<(j>>i));
+>     if(((!bo&&bo1<=bo2)||bo2>=bo3))
+>       if((bo3<bo1||bo>bo2))
+>           {
+29,31c33,35
+<     };
+<     ;
+<     if (i>9) {
+---
+>             };;
+>     if(i>9)
+>       {
+33,34c37,39
+<     };
+<     if ((i+f)>9) {
+---
+>         };;
+>     if((i+f)>9)
+>       {
+36,37c41,43
+<     };
+<     if ((i/f)>9) {
+---
+>         };;
+>     if((i/f)>9)
+>       {
+39,40c45,47
+<     };
+<     if (f>9) {
+---
+>         };;
+>     if(f>9)
+>       {
+43c50,51
+<     else {
+---
+>     else 
+>       {
+45,46c53,55
+<     };
+<     if (bo) {
+---
+>         };;
+>     if(bo)
+>       {
+48c57
+<     };
+---
+>         };;
+51d59
+<   
+\ No newline at end of file
+Processing output file outputs/out05c
+16d15
+< 
+18c17,19
+<     if (((!i<6&&i<=j)||j>=k)) if ((i==j||j!=k)) {
+---
+>     if(((!i<6&&i<=j)||j>=k))
+>       if((i==j||j!=k))
+>           {
+21c22,23
+<     else {
+---
+>         else 
+>           {
+24,26c26,30
+<     ;
+<     else k=(k<<(j>>i));
+<     if (((!bo&&bo1==bo2)||bo2>=bo3)) if ((bo3!=bo1||bo>bo2)) {
+---
+>     else 
+>       k=(k<<(j>>i));
+>     if(((!bo&&bo1==bo2)||bo2>=bo3))
+>       if((bo3!=bo1||bo>bo2))
+>           {
+29,31c33,35
+<     };
+<     ;
+<     if (i>9) {
+---
+>             };;
+>     if(i>9)
+>       {
+33,34c37,39
+<     };
+<     if (((i+f)+k)>9) {
+---
+>         };;
+>     if(((i+f)+k)>9)
+>       {
+36,37c41,43
+<     };
+<     if (((i/f)+k)>9) {
+---
+>         };;
+>     if(((i/f)+k)>9)
+>       {
+39,40c45,47
+<     };
+<     if ((i/(f+k))>9) {
+---
+>         };;
+>     if((i/(f+k))>9)
+>       {
+43c50,51
+<     else {
+---
+>     else 
+>       {
+45,46c53,55
+<     };
+<     if (bo) {
+---
+>         };;
+>     if(bo)
+>       {
+48c57
+<     };
+---
+>         };;
+51d59
+<   
+\ No newline at end of file
+Processing output file outputs/out06
+3a4
+>   
+11,21c12,29
+< 
+<   (a(int e))-->  z=(z+1);;
+<   ((a(int f)):(b(int y, int w)|w==f))-->  z=w;;
+<   ((a(int f)):(b(int y, int w)|w==f))-->  z=f;;
+<   ((a(int f)):(b(int y, int w)|f=w))-->  z=f;;
+<   ((a(int g)):(b(int y, int w)|f==w))-->  z=g;;
+<   ((a(int h)) \/ (b(int y, int w)|h==w))-->  z=1;;
+<   ((a(int i)) \/ (b(int y, int w)|i==w))-->  z=w;;
+<   ((a(int j)) \/ (b(int y, int w)|j==w))-->  z=j;;
+<   (a(int k))-->  z=(k+y);;
+<   
+\ No newline at end of file
+---
+>   (a(int e))--> z=(z+1)
+>   ;;
+>   ((a(int f)):(b(int y, int w)| w==f))--> z=w
+>   ;;
+>   ((a(int f)):(b(int y, int w)| w==f))--> z=f
+>   ;;
+>   ((a(int f)):(b(int y, int w)| f=w))--> z=f
+>   ;;
+>   ((a(int g)):(b(int y, int w)| f==w))--> z=g
+>   ;;
+>   ((a(int h)) \/ (b(int y, int w)| h==w))--> z=1
+>   ;;
+>   ((a(int i)) \/ (b(int y, int w)| i==w))--> z=w
+>   ;;
+>   ((a(int j)) \/ (b(int y, int w)| j==w))--> z=j
+>   ;;
+>   (a(int k))--> z=(k+y)
+>   ;;
+Processing output file outputs/out06a
+4a5
+>   
+5a7
+>   
+6a9
+>   
+7a11
+>   
+11a16
+>   
+12a18
+>   
+13a20
+>   
+14a22
+>   
+15a24
+>   
+21,22c30
+< 
+<   ((open(class CString a1, class Integer a2, unsigned int a3)|(get(a1)=="abc"&&rv=get(a2))):(((lstat(class CString s1, class NewStatP s2)):(close(class Integer c1)|get(c1)==rv))**))-->  {
+---
+>   ((open(class CString a1, class Integer a2, unsigned int a3)| (get(a1)=="abc"&&rv=get(a2))):(((lstat(class CString s1, class NewStatP s2)):(close(class Integer c1)| get(c1)==rv))**))--> {
+26c34
+<   (((open(class CString o1, class Integer o2, unsigned int o3)|(!isfile(get(o1), "bd")&&t2=o3)):((stat(class CString s3, class StatP s4))**)):(execve(class CString b1, class ArgV b2, class ArgV b3)))-->  {
+---
+>   (((open(class CString o1, class Integer o2, unsigned int o3)| (!isfile(get(o1), "bd")&&t2=o3)):((stat(class CString s3, class StatP s4))**)):(execve(class CString b1, class ArgV b2, class ArgV b3)))--> {
+30c38
+<   (((((any)**):(close(class Integer c1)|(get(c1)==1&&rv=get(c1)))):((stat(class CString s3, class StatP s4))**)):(execve(class CString b1, class ArgV b2, class ArgV b3)))-->  {
+---
+>   (((((any)**):(close(class Integer c1)| (get(c1)==1&&rv=get(c1)))):((stat(class CString s3, class StatP s4))**)):(execve(class CString b1, class ArgV b2, class ArgV b3)))--> {
+34c42
+<   ((((any)**):(open(class CString o1, class Integer o2, unsigned int o3)|get(o1)=="abc")):(close(class Integer c1)))-->  {
+---
+>   ((((any)**):(open(class CString o1, class Integer o2, unsigned int o3)| get(o1)=="abc")):(close(class Integer c1)))--> {
+38c46
+<   ((((any)**):(open(class CString a1, class Integer a2, unsigned int a3)|get(a1)=="xyz")):(close(class Integer d1)))-->  {
+---
+>   ((((any)**):(open(class CString a1, class Integer a2, unsigned int a3)| get(a1)=="xyz")):(close(class Integer d1)))--> {
+42d49
+<   
+\ No newline at end of file
+Processing output file outputs/out06b
+4a5
+>   
+5a7
+>   
+7a10
+>   
+8a12
+>   
+9a14
+>   
+14a20
+>   
+15a22
+>   
+16a24
+>   
+17a26
+>   
+18a28
+>   
+19a30
+>   
+20a32
+>   
+21a34
+>   
+22a36
+>   
+23a38
+>   
+24a40
+>   
+25a42
+>   
+26a44
+>   
+27a46
+>   
+28a48
+>   
+29a50
+>   
+30a52
+>   
+39,40c61
+< 
+<   ((((((kill(class pid_t a1, int a2)|((getpid_t(a1)!=getpid()&&getpid_t(a1)!=0)&&tmp=(a2&&y=a2))) \/ (ptrace(class pid_t b1, int b2, int b3, int b4))) \/ (sched_setscheduler(class pid_t c1, int c2, class SchedParamP c3)|((getpid_t(c1)!=getpid()&&getpid_t(c1)!=0)&&isChild(c1)!=0))) \/ (sched_setparam(class pid_t d1, int d2)|getpid_t(d1)!=getpid())) \/ (setpriority(class pid_t e1, int e2, class pid_t e3)|((getpid_t(e1)!=getpid()&&e2!=0)&&isChild(e1)!=0))):(((execve()) \/ (clone())) \/ (fork())))-->  {
+---
+>   ((((((kill(class pid_t a1, int a2)| ((getpid_t(a1)!=getpid()&&getpid_t(a1)!=0)&&tmp=(a2&&y=a2))) \/ (ptrace(class pid_t b1, int b2, int b3, int b4))) \/ (sched_setscheduler(class pid_t c1, int c2, class SchedParamP c3)| ((getpid_t(c1)!=getpid()&&getpid_t(c1)!=0)&&isChild(c1)!=0))) \/ (sched_setparam(class pid_t d1, int d2)| getpid_t(d1)!=getpid())) \/ (setpriority(class pid_t e1, int e2, class pid_t e3)| ((getpid_t(e1)!=getpid()&&e2!=0)&&isChild(e1)!=0))):(((execve()) \/ (clone())) \/ (fork())))--> {
+44c65
+<   ((((((open(class CString file, int flags, unsigned int mode))**):((any)**)):(open(class CString file1, int flags1, unsigned int mode1)|state_var=get(file1))):(!(close(int fd)))):(unlink(class CString path)|state_var==get(path)))-->  {
+---
+>   ((((((open(class CString file, int flags, unsigned int mode))**):((any)**)):(open(class CString file1, int flags1, unsigned int mode1)| state_var=get(file1))):((!close(int fd)))):(unlink(class CString path)| state_var==get(path)))--> {
+53d73
+<   
+\ No newline at end of file
+Processing output file outputs/out06c
+Processing output file outputs/out07
+2,3c2
+< 
+<   int geteuid();
+---
+> int geteuid();
+4a4
+>   
+8a9
+>   
+11a13
+>   
+14a17
+>   
+17a21
+>   
+19a24
+>   
+22a28
+>   
+24a31
+>   
+26a34
+>   
+28a37
+>   
+29a39
+>   
+30a41
+>   
+31a43
+>   
+32a45
+>   
+33a47
+>   
+34a49
+>   
+35a51
+>   
+36a53
+>   
+42a60
+>   
+43a62
+>   
+44a64
+>   
+45a66
+>   
+46a68
+>   
+47a70
+>   
+48a72
+>   
+49a74
+>   
+50a76
+>   
+51a78
+>   
+52a80
+>   
+53a82
+>   
+77d105
+< 
+88c116
+<   ((any):(((((((((kill(class pid_t a1, int a2)|((getpid_t(a1)!=getpid()&&getpid_t(a1)!=0)&&tmp=(a2&&b=a2))) \/ (ptrace(class pid_t b1, int b2, int b3, int b4))) \/ (sched_setscheduler(class pid_t c1, int c2, class SchedParamP c3)|((getpid_t(c1)!=getpid()&&getpid_t(c1)!=0)&&isChild(c1)!=0))) \/ (sched_setparam(class pid_t d1, class SchedParamP d2)|getpid_t(d1)!=getpid())) \/ (setpriority(class pid_t e1, int e2, int e3)|((getpid_t(e1)!=getpid()&&e2!=0)&&isChild(e1)!=0))) \/ (setpgid(class pid_t f1, class pid_t f2))) \/ (mlock(class VoidP g1, class size_t g2))) \/ (mlockall(int h1))) \/ (munlockall())))-->  {
+---
+>   ((any):(((((((((kill(class pid_t a1, int a2)| ((getpid_t(a1)!=getpid()&&getpid_t(a1)!=0)&&tmp=(a2&&b=a2))) \/ (ptrace(class pid_t b1, int b2, int b3, int b4))) \/ (sched_setscheduler(class pid_t c1, int c2, class SchedParamP c3)| ((getpid_t(c1)!=getpid()&&getpid_t(c1)!=0)&&isChild(c1)!=0))) \/ (sched_setparam(class pid_t d1, class SchedParamP d2)| getpid_t(d1)!=getpid())) \/ (setpriority(class pid_t e1, int e2, int e3)| ((getpid_t(e1)!=getpid()&&e2!=0)&&isChild(e1)!=0))) \/ (setpgid(class pid_t f1, class pid_t f2))) \/ (mlock(class VoidP g1, class size_t g2))) \/ (mlockall(int h1))) \/ (munlockall())))--> {
+92c120
+<   (((any)**):(execve(class CString proc, class ArgV argv, class ArgV envp)|(geteuid()==0&&processname=get(proc))))-->  {
+---
+>   (((any)**):(execve(class CString proc, class ArgV argv, class ArgV envp)| (geteuid()==0&&processname=get(proc))))--> {
+95c123,124
+<     if (foundFlag==0) {
+---
+>     if(foundFlag==0)
+>       {
+98c127
+<     };
+---
+>         };;
+106c135,136
+<   (((any)**):(read(int check_file)))-->  {};
+---
+>   (((any)**):(read(int check_file)))--> {
+>     };
+122d151
+<   
+\ No newline at end of file
+Processing output file outputs/out08
+10d9
+< 
+17c16,17
+<   (open(string a, int b, unsigned int c))-->  {};
+---
+>   (open(string a, int b, unsigned int c))--> {
+>     };
+21,22c21,23
+<       {};
+<       };
+---
+>     {
+>     };;
+>     };;
+26c27,28
+<     {};
+---
+>     {
+>     };;
+29d30
+<   
+\ No newline at end of file
+Processing output file outputs/out08a
+10d9
+< 
+15,18c14,19
+<         if (i==j) j=3;
+<         else j=2;
+<         };
+<       };
+---
+>     if(i==j)
+>       j=3
+>     else 
+>       j=2;
+>     };;
+>     };;
+22c23,24
+<     {};
+---
+>     {
+>     };;
+25d26
+<   
+\ No newline at end of file
+Processing output file outputs/out09
+3a4
+>   
+14a16
+>   
+19a22
+>   
+22d24
+< 
+24c26,27
+<     if ((i<j||j>k)) {
+---
+>     if((i<j||j>k))
+>       {
+26c29
+<     };
+---
+>         };;
+29d31
+<   
+\ No newline at end of file

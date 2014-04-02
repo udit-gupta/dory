@@ -1,0 +1,35 @@
+/*
+ *        Test: compound statements
+*/
+
+
+    event open (string a1 , int a2 , unsigned int a3);
+
+    int i = 2 ;
+    int j = 3 ;
+    int k = 4.0 ;
+    double f = 3.3;
+
+    byte b ;
+    string s ;
+
+
+
+   open(a,b,c)->{
+ 
+    { { i=j;  
+       
+        if(i==j)
+		j=3;
+	else j=2;
+
+
+       }  } 
+
+  };
+
+  open(a,b,c)-> {
+    {;
+	
+  };
+};

@@ -1,0 +1,19 @@
+/* 
+ * One interface, one module
+ * Tests: 
+ * 	Condition on event
+ *      Arguments of events  		
+ */
+        
+        class CString;;
+        string get(CString s);
+
+	CString a1;;	
+	int b=2;
+
+        event open (CString a1 , int a2 , unsigned int a3);
+        int logMessage(string x) ;
+
+        open(file, flags, mode) | get(a1) -> { 
+		logMessage("open: testing almost nothing"); 
+        } ;

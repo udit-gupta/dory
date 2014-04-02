@@ -1,0 +1,49 @@
+/* 
+ * One interface, one module
+ * Tests: 
+ *        class declaration, variable decl
+ *        function decl with body 
+ */
+        
+
+    class CString;;
+
+    CString x, y;
+
+    int i1,i2;
+    int i3=0;
+ 
+    double d1= 3.0;
+    double d2, d3;
+ 
+    unsigned int i4=0;
+    
+    bool b1=true;
+
+    bool b2=false;
+
+    byte y2;
+   
+    string cs1, cs2;
+
+
+   string cs3="sdsd";     
+
+    event open (CString a1 , int a2 , unsigned int a3);
+    int logMessage(string x) ;
+
+    void g() {
+        int a1, a2;
+        a1=1;
+   };
+
+
+    open(file, flags, mode) -> { 
+            logMessage("open: testing almost nothing"); 
+    };
+
+
+   open(file, flags, mode) -> {
+            g();
+    } ;
+

@@ -1,0 +1,39 @@
+/*
+ *   return stmt 
+ *
+ *
+ */
+
+
+    event open (string a1 , int a2 , unsigned int a3);
+
+    int i = 2 ;
+    int j = 3 ;
+    int k = 4.0 ;
+
+    byte b ;
+    string s ;
+
+    int g() {
+         int a,b,c;
+         return 1;
+   };
+
+   int f(){
+ 	int a,b;
+        return ((a+b));
+
+  };
+
+    open(file, flags, mode) -> {
+                     
+                     if ((i < j) || (j > k)) {
+                        i = (23 * (-i)/j);
+                    }
+                    else ;
+		 	
+		return 1;  
+
+
+    };
+   

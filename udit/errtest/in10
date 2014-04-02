@@ -1,0 +1,58 @@
+/* 
+ * One interface, one module
+ * Tests: Abstract event declarations
+ *                Enum Declarations
+ *                Function Declarations
+ *                Event patterns in Rule
+ */
+
+    class CString;;
+    string get(CString c);
+    class ArgV;
+    class pid_t;
+    int getpid_t(pid_t t);
+    class SchedParamP;
+    class StatP;
+    class NewStatP;
+    int logMessage(string x);
+    int logMessageInt(string x, int y) ;    
+    int getpid();
+    int isChild(pid_t a);
+    event open (CString a1 , int a2 , unsigned int a3);
+    event close (int a1);
+    event lstat(CString a1 , NewStatP a2 );
+    event execve(CString a1, ArgV a2, ArgV a3);
+    event fork();
+    event clone();
+    event unlink(CString a1);
+    event kill ( pid_t a1 , int a2 );
+    event ptrace ( pid_t a1 , int a2 , int a3 , int a4);
+    event sched_setscheduler ( pid_t a1 , int a2 , SchedParamP a3);
+    event umask(int a1) ;
+    event write(int a1, CString a2, int a3) ;
+    event chmod(CString a1, unsigned int a2) ;
+    event truncate(CString a1, int a2) ;    
+    event sysinfo(int a1) ;
+int tmp;
+int y;
+
+#define proc_ops() ((execve()) \/ (clone()) \/ (fork()))
+
+#define ABS(X) ((open(a1, a2, a3) | ((get(a1) == "abc") && (X = a2))): (lstat(s1, s2):(close(c1) | (c1 == X)))*)
+
+
+int i = 2;
+int j = 3;
+int k = 4;
+double f = 3.3;
+
+
+// Simple pattern 2: 
+open(file,flags,mode)**: any** :
+        
+// Simple pattern 3: tests all the operators
+(open(file, flags, mode) \/ unlink(file) \/chmod(file, mode) \/ truncate(file2, len))** -> {
+        logMessageInt("simple pattern 3, %d", mode);
+};
+
+        

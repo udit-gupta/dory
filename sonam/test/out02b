@@ -1,0 +1,20 @@
+Finished parsing, here is the AST
+
+  class CString;
+  event open(class CString a1, int a2, unsigned int a3);
+  int logMessage(string x);
+  void g() {
+    int a1;
+    int a2;
+    a1=1;
+  };
+
+  (open(class CString file, int flags, unsigned int mode))-->  {
+    logMessage("open: testing almost nothing");
+  };
+  ;;
+  (open(class CString file, int flags, unsigned int mode))-->  {
+    g();
+  };
+  ;;
+  

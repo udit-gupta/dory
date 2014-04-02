@@ -1,0 +1,3 @@
+in06b:6:Error: a: mismatch in the number of arguments
+in06b:9:Error: Only simple patterns without `.', `*', and `!' operatorscan be negated
+in06b:11:Error: Undeclared identifier "p"

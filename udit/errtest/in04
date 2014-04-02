@@ -1,0 +1,40 @@
+/* 
+ * One interface, one module
+ * Tests: all types
+ */
+
+event open (string a1 , int a2 , unsigned int a3);
+        
+byte b3;
+
+class CString;
+class CString;
+
+class String;
+
+CString a;
+String a;
+
+int i = 65536;
+int j = -65536;
+
+string i;
+
+unsigned int us1 = 4;
+unsigned int ui = -20;
+unsigned int ul = 80 ;
+
+int ci = 2 ;
+double d = 34.456; 
+
+bool b5=true;
+
+string str = "sss";
+
+string str1;//  = 0;
+
+open(file, flags, mode) -> {
+   ;	
+
+};
+

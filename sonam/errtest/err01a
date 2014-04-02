@@ -1,0 +1,4 @@
+in01a:26:Error: Undeclared type "CString"
+in01a:30:Error: Unknown type "STR"
+in01a:33:Error: "logMessage" is not a function or module name
+in01a:38:Error: Undeclared identifier "a"
