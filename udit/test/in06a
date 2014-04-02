@@ -1,0 +1,49 @@
+class CString;;
+string get(CString s);
+
+class Integer;
+class ArgV;
+class StatP;
+  
+class NewStatP;
+
+int logmessage(string x) ;
+int logmessageint(string x, int y) ;
+bool isfile(string x, string y) ;
+
+event open (CString a1 , Integer a2 , unsigned int a3);
+event close (Integer a1);
+event execve(CString a1, ArgV a2, ArgV a3);     
+event lstat(CString a1 , NewStatP a2 );
+event stat (CString a1, StatP a2);
+#define abs1 (open(o1, o2, o3)|(get(o1) == "abc"))
+
+int i = 0;
+int j = 1;
+
+string rv, t2;
+             
+(open(a1, a2, a3)|((get(a1) == "abc") && (rv = get(a2)))):
+ (lstat(s1, s2): (close(c1)|(get(c1) == rv)))**  -> {
+     logmessageint("proc_ops open.lstat.close", rv) ;
+}; 
+
+
+(open(o1, o2, o3) |(!(isfile(get(o1), "bd")) && (t2 = o3))) :
+(stat(s3, s4))**:execve(b1, b2, b3) -> {
+     logmessage("proc_ops open.stat.execve") ;
+};
+     
+any** : close(c1)|(get(c1) == 1 && rv = get(c1)) : 
+     (stat(s3, s4))**:execve(b1, b2, b3) -> {
+     logmessage("proc_ops any.close.stat.execve") ;
+};
+
+any**: (open(o1, o2, o3)|get(o1) == "abc"): close(c1) -> {
+     logmessage("rule1:");
+};   
+
+any**: (open(a1, a2, a3)|get(a1) == "xyz"): close(d1) -> {
+     logmessage("rule2:");   
+};           
+

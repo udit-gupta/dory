@@ -1,0 +1,122 @@
+Finished parsing, here is the AST
+
+  int geteuid();
+  int logMessageStr(string s);
+  class CString;
+  int f(int g);
+  string get(class CString s);
+  void setCStr(class CString s, string t);
+  class Integer;
+  int getInt(class Integer i);
+  void setInt(class Integer i, int j);
+  class ArgV;
+  int getNumberOfArgs(class ArgV a);
+  int getArg(int i, class ArgV a);
+  class pid_t;
+  int getpid_t(class pid_t p);
+  void setpid_t(class pid_t p, int i);
+  class SchedParamP;
+  void set(class SchedParamP s, int i);
+  class VoidP;
+  void setvoid(class VoidP p, int i);
+  int getvoid(class VoidP p);
+  class size_t;
+  int getsize(class size_t s);
+  class StatP;
+  void setstat(class StatP s);
+  class NewStatP;
+  void setnstat(class NewStatP n, int i);
+  event open(class CString a1, int a2, unsigned int a3);
+  event close(class Integer a1);
+  event chroot(class CString a1);
+  event lstat(class CString a1, class NewStatP a2);
+  event read(int r);
+  event write(int r);
+  event stat(int r);
+  event connect(int t);
+  event accept(int t);
+  int logMessage(string x);
+  int logMessageInt(string x, int y);
+  int isInFile(string x, string y);
+  int getpid();
+  int isChild(class pid_t a);
+  event execve(class CString a1, class ArgV a2, class ArgV a3);
+  event fork;
+  event clone;
+  event kill(class pid_t a1, int a2);
+  event ptrace(class pid_t a1, int a2, int a3, int a4);
+  event sched_setparam(class pid_t a1, class SchedParamP a2);
+  event sched_setscheduler(class pid_t a1, int a2, class SchedParamP a3);
+  event setpgid(class pid_t a1, class pid_t a2);
+  event setpriority(class pid_t a1, int a2, int a3);
+  event mlock(class VoidP a1, class size_t a2);
+  event mlockall(int a1);
+  event munlockall;
+  int isInt(int i);
+  unsigned int isUInt(unsigned int i);
+  int isShort(int s);
+  unsigned int isUShort(unsigned int s);
+  int isLong(int l);
+  unsigned int isULong(unsigned int l);
+  int valid_write;
+  int admin_file = 0;
+  string admin_file_name;
+  int globalTemp;
+  int realUid;
+  int foundFlag = 0;
+  int syscall;
+  int loggedUser;
+  string tempfile;
+  string checkProcess;
+  string check_file;
+  int getCurrentSysCall();
+  int a;
+  int b = 0;
+  int tmp;
+  int processname;
+
+  (((any)**):((ptrace(class pid_t a1, int a2, int a3, int a4)) \/ (mlock(class VoidP b1, class size_t b2))))-->  {
+    syscall=getCurrentSysCall();
+    logMessageInt("privileged call %d
+", syscall);
+  };
+  ;;
+  (any)-->  {
+    a=b;
+  };
+  ;;
+  ((any):(((((((((kill(class pid_t a1, int a2)|((getpid_t(a1)!=getpid()&&getpid_t(a1)!=0)&&tmp=(a2&&b=a2))) \/ (ptrace(class pid_t b1, int b2, int b3, int b4))) \/ (sched_setscheduler(class pid_t c1, int c2, class SchedParamP c3)|((getpid_t(c1)!=getpid()&&getpid_t(c1)!=0)&&isChild(c1)!=0))) \/ (sched_setparam(class pid_t d1, class SchedParamP d2)|getpid_t(d1)!=getpid())) \/ (setpriority(class pid_t e1, int e2, int e3)|((getpid_t(e1)!=getpid()&&e2!=0)&&isChild(e1)!=0))) \/ (setpgid(class pid_t f1, class pid_t f2))) \/ (mlock(class VoidP g1, class size_t g2))) \/ (mlockall(int h1))) \/ (munlockall())))-->  {
+    a=b;
+  };
+  ;;
+  (((any)**):(execve(class CString proc, class ArgV argv, class ArgV envp)|(geteuid()==0&&processname=get(proc))))-->  {
+    checkProcess=processname;
+    foundFlag=0;
+    if (foundFlag==0) {
+      logMessageStr("exec of process  %s not permitted
+", checkProcess);
+    };
+    foundFlag=0;
+  };
+  ;;
+  (((any)**):(write(int check_file)))-->  {
+    valid_write=0;
+  };
+  ;;
+  (((any)**):(read(int check_file)))-->  {};
+  ;;
+  (((any)**):(stat(int check_file)))-->  {
+    syscall=getCurrentSysCall();
+  };
+  ;;
+  (((any)**):(connect(int a1)))-->  {
+    logMessage("ipc call");
+  };
+  ;;
+  (((any)**):(((connect(int a)) \/ (accept(int b))) \/ (read(int c))))-->  {
+    syscall=getCurrentSysCall();
+    logMessageInt("socket call %d
+", syscall);
+  };
+  ;;
+  

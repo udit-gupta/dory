@@ -1,0 +1,12 @@
+/* 
+ * One interface, one module
+ * Tests: 
+ *        event declaration
+ *        simple rule
+ */
+   
+    event open (string a1 , int a2 , unsigned int a3);
+
+    open(file, flags, mode) -> {;} ;
+
+   any -> {;};

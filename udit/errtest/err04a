@@ -1,0 +1,4 @@
+in04a:7:Error: Redefinition of name open
+in04a:7:Error: Type::argTypes(vector<Type*> *) called when type = void
+in04a:16:Error: Redefinition of name a
+in04a:17:Error: Redefinition of name a

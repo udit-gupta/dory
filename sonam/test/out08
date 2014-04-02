@@ -1,0 +1,29 @@
+Finished parsing, here is the AST
+
+  event open(string a1, int a2, unsigned int a3);
+  int i = 2;
+  int j = 3;
+  int k = 4;
+  double f = 3.3;
+  byte b;
+  string s;
+
+  (open(string file, int flags, unsigned int mode))-->  {
+    i=(((23*-i/j)-f)-(45%j));
+    i=(s*1%f);
+    i=((b+s)-f);
+  };
+  ;;
+  (open(string a, int b, unsigned int c))-->  {};
+  ;;
+  (open(string a, int b, unsigned int c))-->  {
+    {
+      {};
+      };
+    };
+  ;;
+  (open(string a, int b, unsigned int c))-->  {
+    {};
+    };
+  ;;
+  

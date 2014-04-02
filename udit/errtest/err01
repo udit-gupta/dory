@@ -1,0 +1,5 @@
+in01:22:Error: Invalid use of keyword "unsigned"
+in01:26:Error: Invalid use of keyword "unsigned"
+in01:30:Error: Undeclared type "CString"
+in01:32:Error: Undeclared identifier "a1"
+in01:33:Error: Undeclared identifier "b"

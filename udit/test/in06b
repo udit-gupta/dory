@@ -1,0 +1,80 @@
+/* 
+ * One interface, one module
+ * Tests: Abstract event declarations
+ *                Enum Declarations
+ *                Function Declarations
+ *                Event patterns in Rule
+ */
+
+    class CString;;
+    string get(CString c);
+    class ArgV;
+    class pid_t;
+    int getpid_t(pid_t t);
+    class SchedParamP;
+    class StatP;
+    class NewStatP;
+    int logMessage(string x);
+    int logMessageInt(string x, int y) ;    
+    int getpid();
+    int isChild(pid_t a);
+    event open (CString a1 , int a2 , unsigned int a3);
+    event close (int a1);
+    event lstat(CString a1 , NewStatP a2 );
+    event execve();
+    event fork();
+    event clone();
+    event unlink(CString a1);
+    event kill ( pid_t a1 , int a2 );
+    event ptrace ( pid_t a1 , int a2 , int a3 , int a4);
+    event sched_setscheduler ( pid_t a1 , int a2 , SchedParamP a3);
+    event umask(int a1) ;
+    event write(int a1, CString a2, int a3) ;
+    event chmod(CString a1, unsigned int a2) ;
+    event truncate(CString a1, int a2) ;    
+    event sysinfo(int a1) ;
+    event sched_setparam (pid_t a1, int a2);
+    event setpriority(pid_t a1, int a2,pid_t a3);
+
+#define proc_ops() ((execve()) \/ (clone()) \/ (fork()))
+#define procInterference(x) \
+  ((kill(a1,a2)|getpid_t(a1)!=getpid()&&getpid_t(a1)!=0 && tmp = a2 && x = a2)\
+  \/ (ptrace(b1,b2,b3,b4))\
+  \/ (sched_setscheduler(c1,c2,c3)|getpid_t(c1)!=getpid()&&getpid_t(c1)!= 0\
+                                      && isChild(c1) != 0) \
+  \/ (sched_setparam (d1, d2)|getpid_t(d1) != getpid())\
+  \/ (setpriority(e1,e2,e3)|getpid_t(e1)!= getpid() && e2 !=0 \
+                                     && isChild(e1) !=0))
+
+#define ABS(X) ((open(a1, a2, a3) | ((get(a1) == "abc") && (X = a2))): (lstat(s1, s2):(close(c1) | (c1 == X)))*)
+
+int tmp;
+int i = 2;
+int j = 3;
+int k = 4;
+double f = 3.3;
+int y;
+string state_var;
+
+
+procInterference(y) : proc_ops() -> {
+        logMessage("proc_ops: testing abstract event declarations");
+};
+
+
+// Simple pattern 2: 
+open(file,flags,mode)**: any** :
+(open(file1,flags1,mode1)|(state_var = get(file1))) :
+(!(close(fd))): (unlink(path)|(state_var == get(path))) -> {
+        logMessage("unlink path\n"); 
+};
+        
+// Simple pattern 3: tests all the operators
+(open(file, flags, mode)  \/ close(fd) \/ unlink(file1) \/chmod(file2, mode2) \/ truncate(file3, len))**: 
+unlink(file7) : 
+(write(b1, b2, b3) \/ umask(c1) \/ sysinfo(d1)) :
+open(file4,flags4, mode4) -> {
+        logMessageInt("simple pattern 3, %d", mode);
+};
+
+        

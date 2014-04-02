@@ -1,0 +1,41 @@
+Finished parsing, here is the AST
+
+  class CString;
+  string get(class CString c);
+  class ArgV;
+  class pid_t;
+  int getpid_t(class pid_t t);
+  class SchedParamP;
+  class StatP;
+  class NewStatP;
+  int logMessage(string x);
+  int logMessageInt(string x, int y);
+  int getpid();
+  int isChild(class pid_t a);
+  event open(class CString a1, int a2, unsigned int a3);
+  event close(int a1);
+  event lstat(class CString a1, class NewStatP a2);
+  event execve(class CString a1, class ArgV a2, class ArgV a3);
+  event fork;
+  event clone;
+  event unlink(class CString a1);
+  event kill(class pid_t a1, int a2);
+  event ptrace(class pid_t a1, int a2, int a3, int a4);
+  event sched_setscheduler(class pid_t a1, int a2, class SchedParamP a3);
+  event umask(int a1);
+  event write(int a1, class CString a2, int a3);
+  event chmod(class CString a1, unsigned int a2);
+  event truncate(class CString a1, int a2);
+  event sysinfo(int a1);
+  int tmp;
+  int y;
+  int i = 2;
+  int j = 3;
+  int k = 4;
+  double f = 3.3;
+
+  ((((open(class CString file, int flags, unsigned int mode))**):((any)**)):(((((open(class CString file, int flags, unsigned int mode)) \/ (unlink(class CString file))) \/ (chmod(class CString file, unsigned int mode))) \/ (truncate(class CString file2, int len)))**))-->  {
+    logMessageInt("simple pattern 3, %d", mode);
+  };
+  ;;
+  

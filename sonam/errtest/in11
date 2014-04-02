@@ -1,0 +1,13 @@
+event a(int x);
+event b(int y, int z);
+int z;
+int f,g,w,j,y ;
+
+a(i):!b(y,w) ->;
+
+a(g) : (b(y, w)|f==w) -> z=g;
+a(h) \/ b(y, w)|h==w -> z=1;
+a(i) \/ b(y, w)|i==w -> z=w;
+a(j) \/ b(y, w)|j==w -> z=j;
+a(k) -> z=k+y;
+

@@ -1,0 +1,3 @@
+in07:10:Error: Undeclared type "short"
+in07:13:Error: Undeclared type "long"
+in07:34:Error: "logMessage" is not a function or module name

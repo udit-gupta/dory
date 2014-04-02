@@ -1,0 +1,36 @@
+in03a:26: Error:Return value incompatible with current function's type
+in03a:31: Error:No return value expected for a void function
+in03a:36: Error:Return value incompatible with current function's type
+
+  event open(string a1, int a2, unsigned int a3);
+  int a
+  int b
+  int c
+  double x
+  double y
+  string s1
+  string s2
+  class CString;
+  class CString cs
+  string file
+  int flags
+  unsigned int mode
+  int g(int a, int b, double x) {
+      double=(double)(int+int);
+    return double;
+  }
+  void f(string s1, class CString s2) {
+      double=(double+(double)unsigned int);
+    return double;
+  }
+  int h(unsigned int m, int n) {
+      string=string;
+    return double;
+  }
+
+  (open(string file, int flags, unsigned int mode))-->  {
+    g(int, int, double);
+    f(string, class CString);
+  };
+  ;;
+  
