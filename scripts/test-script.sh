@@ -1,4 +1,3 @@
-rm -rf outputs
 mkdir outputs
 for OUTPUT in $(ls test/in*)
 do
@@ -11,3 +10,4 @@ do
 	echo "Processing output file $OUTPUT"
 	diff -b ${OUTPUT/outputs/test} $OUTPUT
 done
+rm -rf outputs
