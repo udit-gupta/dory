@@ -148,3 +148,62 @@ void
 Type::print(ostream& os, int indent) const {
   os << fullName();
 }
+
+/* Is this Type a subType of Type t? */
+bool
+Type::isSubType(Type *t) {
+  if (tag_ == CLASS) {
+    if (t->tag() != CLASS)
+      return false;
+
+    /* Check Symbol Table if same class type */
+    if (fullName().compare(t->fullName()))
+      return true;
+    else
+      return false;
+  }
+  
+  if (tag_ == BYTE) {
+    if (isNumeric(t->tag()))
+      return true;
+    else
+      return false;
+  }
+  
+  if (tag_ == UINT) {
+    if (isNumeric(t->tag()) && t->tag() != BYTE)
+      return true;
+    else
+      return false;
+  }
+  
+  if (tag_ == INT) {
+    if (isSigned(t->tag()))
+      return true;
+    else
+      return false;
+  }
+  
+  if (tag_ == DOUBLE) {
+    if (t->tag() == DOUBLE)
+      return true;
+    else
+      return false;
+  }
+  
+  if (tag_ == BOOL) {
+    if (t->tag() == BOOL)
+      return true;
+    else
+      return false;
+  }
+  
+  if (tag_ == STRING) {
+    if (t->tag() == STRING)
+      return true;
+    else
+      return false;
+  }
+
+  return false;
+}
