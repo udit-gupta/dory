@@ -66,6 +66,7 @@ class AstNode: public ProgramElem {
   NodeType nodeType() const { return nodeType_;}
 
   virtual const Type* typeCheck() {return NULL;};
+  virtual const Type* typePrint() {return NULL;};
   virtual void print(ostream& os, int indent=0) const=0;
   virtual EFSA* codeGen() {return NULL;};
 
@@ -112,6 +113,9 @@ class ExprNode: public AstNode {
 
   void print(ostream& os, int indent=0) const=0;
 
+  const Type* typeCheck() {return NULL;};
+  const Type* typePrint() {return NULL;};
+
  private:
   ExprNodeType exprType_;
   const Value *val_; // reference semantics for val_ and coercedType_
@@ -135,6 +139,9 @@ class RefExprNode: public ExprNode {
   void symTabEntry(const SymTabEntry *ste)  { sym_ = ste;};
 
   void print(ostream& os, int indent=0) const;
+
+  const Type* typeCheck();
+  const Type* typePrint() {return NULL;};
 
  private:
   string ext_;
@@ -191,6 +198,9 @@ class OpNode: public ExprNode {
     { return &arg_; }
 
   void print(ostream& os, int indent=0) const;  
+
+  const Type* typeCheck();
+  const Type* typePrint() {return NULL;};
   
  private: 
   unsigned int arity_;
@@ -211,6 +221,9 @@ class ValueNode: public ExprNode {
   ~ValueNode() {};
 
   void print(ostream& os, int indent=0) const;
+
+  const Type* typeCheck();
+  const Type* typePrint() {return NULL;};
 
  private:
   /* val_ field is already included in ExprNode, so no new data members */
@@ -240,6 +253,9 @@ class InvocationNode: public ExprNode {
     { if (params_ != NULL && i < params_->size()) (*params_)[i] = arg;};
 
   void print(ostream& os, int indent=0) const;
+
+  const Type* typeCheck();
+  const Type* typePrint() {return NULL;};
 
  private:
   vector<ExprNode*>* params_;

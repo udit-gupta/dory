@@ -183,6 +183,135 @@ OpNode::print(ostream& os, int indent) const {
   else internalErr("Unhandled case in OpNode::print");
 }
 
+const Type *
+OpNode::typeCheck()
+{
+  if (opCode_ == OpNode::OpCode::MOD) {
+    /* MOD accepts two integer arguments and output is integer type */
+    if (arg(0)->type()->isInt(arg(0)->type()->tag()) && arg(1)->type()->isInt(arg(1)->type()->tag())) {
+      if (arg(0)->type()->isUnsigned(arg(0)->type()->tag()) && arg(1)->type()->isUnsigned(arg(1)->type()->tag()))
+        type(new Type(Type::TypeTag::UINT));
+      else
+        type(new Type(Type::TypeTag::INT));
+    } else
+      type(new Type(Type::TypeTag::ERROR));
+
+    return type();
+  }
+
+  if (opCode_ == OpNode::OpCode::PLUS ||
+      opCode_ == OpNode::OpCode::MINUS ||
+      opCode_ == OpNode::OpCode::MULT ||
+      opCode_ == OpNode::OpCode::DIV ||
+      opCode_ == OpNode::OpCode::BITAND ||
+      opCode_ == OpNode::OpCode::BITOR ||
+      opCode_ == OpNode::OpCode::BITXOR ||
+      opCode_ == OpNode::OpCode::SHL ||
+      opCode_ == OpNode::OpCode::SHR) {
+    if (arg(0)->type()->isNumeric(arg(0)->type()->tag()) && arg(1)->type()->isNumeric(arg(1)->type()->tag())) {
+      if (arg(0)->type()->isSubType(arg(1)->type()) && !arg(1)->type()->isSubType(arg(0)->type())) {
+        arg(1)->coercedType(arg(0)->type());
+	type(arg(0)->type());
+      } else if (!arg(0)->type()->isSubType(arg(1)->type()) && arg(1)->type()->isSubType(arg(0)->type())) {
+        arg(0)->coercedType(arg(1)->type());
+	type(arg(1)->type());
+      } else if (arg(0)->type()->isSubType(arg(1)->type()) && arg(1)->type()->isSubType(arg(0)->type())) {
+        /* They must be of same type. */
+        type(arg(0)->type());
+      } else {
+        /* This should not happen. Return error. */
+        type(new Type(Type::TypeTag::ERROR));
+      }
+    } else
+      type(new Type(Type::TypeTag::ERROR));
+
+    return type();
+  }
+
+  if (opCode_ == OpNode::OpCode::BITNOT) {
+    assert(arity_ == 1);
+
+    if (arg(0)->type()->isNumeric(arg(0)->type()->tag()))
+      type(arg(0)->type());
+    else
+      type(new Type(Type::TypeTag::ERROR));
+
+    return type();
+  }
+
+  if (opCode_ == OpNode::OpCode::EQ ||
+      opCode_ == OpNode::OpCode::NE ||
+      opCode_ == OpNode::OpCode::GT ||
+      opCode_ == OpNode::OpCode::LT ||
+      opCode_ == OpNode::OpCode::GE ||
+      opCode_ == OpNode::OpCode::LE) {
+    if (arg(0)->type()->isNumeric(arg(0)->type()->tag()) && arg(1)->type()->isNumeric(arg(1)->type()->tag())) {
+      if (arg(0)->type()->isSubType(arg(1)->type()) && !arg(1)->type()->isSubType(arg(0)->type())) {
+        arg(1)->coercedType(arg(0)->type());
+	type(new Type(Type::TypeTag::BOOL));
+      } else if (!arg(0)->type()->isSubType(arg(1)->type()) && arg(1)->type()->isSubType(arg(0)->type())) {
+        arg(0)->coercedType(arg(1)->type());
+	type(new Type(Type::TypeTag::BOOL));
+      } else if (arg(0)->type()->isSubType(arg(1)->type()) && arg(1)->type()->isSubType(arg(0)->type())) {
+        /* They must be of same type. */
+        type(new Type(Type::TypeTag::BOOL));
+      } else {
+        /* This should not happen. Return error. */
+        type(new Type(Type::TypeTag::ERROR));
+      }
+    } else
+      type(new Type(Type::TypeTag::ERROR));
+
+    return type();
+  }
+
+  if (opCode_ == OpNode::OpCode::AND ||
+      opCode_ == OpNode::OpCode::OR) {
+    if (arg(0)->type()->isBool(arg(0)->type()->tag()) && arg(1)->type()->isBool(arg(1)->type()->tag()))
+      type(new Type(Type::TypeTag::BOOL));
+    else
+      type(new Type(Type::TypeTag::ERROR));
+
+    return type();
+  }
+
+  if (opCode_ == OpNode::OpCode::NOT) {
+    assert(arity_ == 1);
+
+    if (arg(0)->type()->isBool(arg(0)->type()->tag()))
+      type(new Type(Type::TypeTag::BOOL));
+    else
+      type(new Type(Type::TypeTag::ERROR));
+
+    return type();
+  }
+
+  if (opCode_ == OpNode::OpCode::UMINUS) {
+    assert(arity_ == 1);
+
+    if (arg(0)->type()->isNumeric(arg(0)->type()->tag()))
+      type(arg(0)->type());
+    else
+      type(new Type(Type::TypeTag::ERROR));
+
+    return type();
+  }
+
+  if (opCode_ == OpNode::OpCode::ASSIGN) {
+    if (arg(0)->type()->isSubType(arg(1)->type())) {
+      if (!arg(1)->type()->isSubType(arg(0)->type()))
+        arg(1)->coercedType(arg(0)->type());
+      
+      type(new Type(Type::TypeTag::BOOL));
+    } else
+      type(new Type(Type::TypeTag::ERROR));
+
+    return type();
+  }
+
+  type(new Type(Type::TypeTag::ERROR));
+  return type();
+}
 
 /*************************************** Below this , I need to implement my own stuff ************************************************/
 
@@ -257,9 +386,29 @@ void ValueNode::print(ostream& out, int indent) const
     value()->print(out, indent);
 }
 
+const Type *
+ValueNode::typeCheck()
+{
+	type((Type*) value()->type()); 
+	return type();
+}
+
 void RefExprNode::print(ostream& out, int indent) const
 {
     out << ext();
+}
+
+const Type *
+RefExprNode::typeCheck()
+{
+  /* Lookup Symbol table to find type and set it. */
+  if (symTabEntry()) {
+    type((Type *)symTabEntry()->type());
+  } else {
+    type(new Type(Type::TypeTag::ERROR));
+  }
+
+  return type();
 }
 
 void CompoundStmtNode::print(ostream& out, int indent) const 
@@ -302,6 +451,19 @@ void InvocationNode::print(ostream& out, int indent) const
         }
         out << ")";
     }
+}
+
+const Type *
+InvocationNode::typeCheck()
+{
+  const vector<ExprNode*> *parameters = params();
+
+  if (symTabEntry()) {
+
+  }
+
+  type(new Type(Type::TypeTag::ERROR));
+  return type();
 }
 
 void IfNode::print(ostream& out, int indent) const 

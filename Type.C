@@ -149,11 +149,11 @@ Type::print(ostream& os, int indent) const {
   os << fullName();
 }
 
-/* Is this Type a subType of Type t? */
+/* Is t a subType of this Type? */
 bool
 Type::isSubType(Type *t) {
-  if (tag_ == CLASS) {
-    if (t->tag() != CLASS)
+  if (t->tag() == CLASS) {
+    if (tag_ != CLASS)
       return false;
 
     /* Check Symbol Table if same class type */
@@ -163,43 +163,43 @@ Type::isSubType(Type *t) {
       return false;
   }
   
-  if (tag_ == BYTE) {
-    if (isNumeric(t->tag()))
+  if (t->tag() == BYTE) {
+    if (isNumeric(tag_))
       return true;
     else
       return false;
   }
   
-  if (tag_ == UINT) {
-    if (isNumeric(t->tag()) && t->tag() != BYTE)
+  if (t->tag() == UINT) {
+    if (isNumeric(tag_) && tag_ != BYTE)
       return true;
     else
       return false;
   }
   
-  if (tag_ == INT) {
-    if (isSigned(t->tag()))
+  if (t->tag() == INT) {
+    if (isSigned(tag_))
       return true;
     else
       return false;
   }
   
-  if (tag_ == DOUBLE) {
-    if (t->tag() == DOUBLE)
+  if (t->tag() == DOUBLE) {
+    if (tag_ == DOUBLE)
       return true;
     else
       return false;
   }
   
-  if (tag_ == BOOL) {
-    if (t->tag() == BOOL)
+  if (t->tag() == BOOL) {
+    if (tag_ == BOOL)
       return true;
     else
       return false;
   }
   
-  if (tag_ == STRING) {
-    if (t->tag() == STRING)
+  if (t->tag() == STRING) {
+    if (tag_ == STRING)
       return true;
     else
       return false;
