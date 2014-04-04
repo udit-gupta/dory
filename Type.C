@@ -157,7 +157,7 @@ Type::isSubType(Type *t) {
       return false;
 
     /* Check Symbol Table if same class type */
-    if (fullName().compare(t->fullName()))
+    if (!fullName().compare(t->fullName()))
       return true;
     else
       return false;
