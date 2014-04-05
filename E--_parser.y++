@@ -12,6 +12,10 @@ extern void yyerror(const char *s);
 int offSet;
 extern const OpNode::OpInfo opInfo[];
 
+/* Global variables for inherited attributes */
+Type *var_type;
+Type *fun_ret_type;
+
 %}
 
 %union{
@@ -103,6 +107,8 @@ extern const OpNode::OpInfo opInfo[];
 %type <ifVal> if_expr_star if_expr
 %type <refexpVal> ref_expr
 
+%type <typeList> formal_params formal_param_list formal_list
+%type <variableEntry> formal_param
 
 /******************************** Type Info ********************************/
 /* Uncomment types below as you start adding rules.
@@ -267,17 +273,35 @@ event_hdr:              TOK_EVENT TOK_IDENT {
                             stm.insert($$);
                             stm.enterScope($$);
                         };
-formal_list:            TOK_LPAREN formal_param_list TOK_RPAREN{
+
+formal_list:            TOK_LPAREN formal_param_list TOK_RPAREN {
                            SymTabEntry *cs = stm.currentScope();
-                            if(cs->kind() == SymTabEntry::Kind::EVENT_KIND) 
+                           if(cs->kind() == SymTabEntry::Kind::EVENT_KIND) 
                                     stm.leaveScope();
+
+			   $$ = $2;
                         };
-formal_param_list:      {} 
-                        |   formal_params {};
-formal_params:          formal_param 
-                        |   formal_params TOK_COMMA formal_param {};
+
+formal_param_list:      /* empty */ { $$ = nullptr; }
+                        |   formal_params { $$ = $1; };
+
+formal_params:          formal_param {
+				$$ = new std::vector<Type*>();
+				$$->push_back(var_type);
+			}
+                        |   formal_params TOK_COMMA formal_param {
+				if ($1)
+					$1->push_back(var_type);
+				else {
+					$1 = new std::vector<Type*>();
+					$1->push_back(var_type);
+				}
+			};
+
 formal_param:           type var_ident {
-                            stm.insert(new VariableEntry($2->name(), VariableEntry::VarKind::PARAM_VAR, $1));
+			    $$ = new VariableEntry($2->name(), VariableEntry::VarKind::PARAM_VAR, $1);
+                            stm.insert($$);
+			    var_type = $1;
                         };
 
 
@@ -286,16 +310,19 @@ formal_param:           type var_ident {
 
 
 func:                   func_hdr formal_list TOK_SEMICOLON {
+			    $1->type(new Type($2, fun_ret_type));
                             $$ = $1; 
                             stm.leaveScope();
                         }
                         |   func_hdr formal_list func_body {
+			    $1->type(new Type($2, fun_ret_type));
                             $$ = $1; 
                             stm.leaveScope();
                         };
 
 func_hdr:               type TOK_IDENT {
-                            $$ = new FunctionEntry($2, $1);
+                            $$ = new FunctionEntry($2, nullptr);
+			    fun_ret_type = $1;
                             stm.insert($$);
                             stm.enterScope($$); 
                         } 
@@ -304,7 +331,7 @@ func_hdr:               type TOK_IDENT {
                         };
 func_body:              TOK_LBRACE func_stmt TOK_RBRACE { 
                             SymTabEntry *ce = stm.currentScope();
-                            if(ce->kind() == SymTabEntry::Kind::FUNCTION_KIND) 
+                            if(ce->kind() == SymTabEntry::Kind::FUNCTION_KIND)
                                 ((FunctionEntry*)ce)->body($2);
                         };
 func_stmt:              stmt_star { $$ = new CompoundStmtNode($1); }

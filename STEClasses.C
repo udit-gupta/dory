@@ -53,38 +53,22 @@ void VariableEntry::print(ostream& out, int indent) const
 
 void FunctionEntry::print(ostream& out, int indent) const 
 {
-    int prmCnt = 0;
-    int tot= 0;
-    out << type()->fullName() << " " << name();
-    out << "(";
-    const SymTab *smt = symTab();
-    if(smt == NULL) 
-        cout << ")";
-    else {
-        for(SymTab::const_iterator it = smt->begin(); it != smt->end(); ++it) {
-            if((*it)->kind() == SymTabEntry::Kind::VARIABLE_KIND && ((VariableEntry*)(*it))->varKind() == VariableEntry::VarKind::PARAM_VAR) {
-            prmCnt++;
-            } 
-        tot++;
-        }
-        if(prmCnt > 0) 
-            printST(out, indent, '\0', '\0', false, 0, prmCnt);
-        cout << ")";
-    }
-    if( (tot - prmCnt) > 0) {
-        out << " {";
-        printST(out, indent, '\0', ';', true, prmCnt, tot);
-        if(body() != NULL) 
-            body()->printWithoutBraces(out, indent);
-    out << "}";
-    }
-    else {
-        if(body() != NULL) {
-            out << " {";
-            body()->printWithoutBraces(out, indent);
-            out << "}"; 
-        }
-    }
+	int prmCnt = 0;
+	int tot= 0;
+	out << type()->retType()->fullName() << " " << name();
+
+	if (this->type()->arity())
+		this->printST(out, indent, '(', ')', false, 0, this->type()->arity());
+	else
+		out << "()";
+
+
+	if (this->body()) {
+		out << " {";
+		this->printST(out, indent, '\0', ';', true, this->type()->arity(), 10000);
+		this->body()->printWithoutBraces(out, indent);
+		out << "}";
+	}
 }
 
 void BlockEntry::print(ostream& out, int indent) const
