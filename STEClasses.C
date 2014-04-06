@@ -53,8 +53,6 @@ void VariableEntry::print(ostream& out, int indent) const
 
 void FunctionEntry::print(ostream& out, int indent) const 
 {
-	int prmCnt = 0;
-	int tot= 0;
 	out << type()->retType()->fullName() << " " << name();
 
 	if (this->type()->arity())

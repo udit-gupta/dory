@@ -456,13 +456,48 @@ void InvocationNode::print(ostream& out, int indent) const
 const Type *
 InvocationNode::typeCheck()
 {
+  int num_params = 0, i;
   const vector<ExprNode*> *parameters = params();
+  vector<Type*> *formal_param = NULL;
 
-  if (symTabEntry()) {
+  /* Need to first check if number of params match number of types in SymTabEntry.
+   * Next check that each parameter is a subtype of formal param in SymTabEntry.*/
+  if (symTabEntry() && symTabEntry()->type()) {
+    if ((!parameters && !symTabEntry()->type()->argTypes()) || (!parameters->size() && !symTabEntry()->type()->argTypes()->size())) {
+      type((Type *)symTabEntry()->type()->retType());
+
+      return type();
+    }
+
+    if (!parameters || !symTabEntry()->type()->argTypes()) {
+      cout << "Either parameters or symTabEntry argTypes is null!" << endl;
+      type((Type *)symTabEntry()->type()->retType());
+      return type();
+    }
+
+    if ((int)parameters->size() != symTabEntry()->type()->arity()) {
+      cout << "Incorrect number of parameters passed. Call: " << parameters->size() << " Decl: " << symTabEntry()->type()->arity() << endl;
+    }
+
+    if ((int)parameters->size() <= symTabEntry()->type()->arity())
+      num_params = parameters->size();
+    else
+      num_params = symTabEntry()->type()->arity();
+
+    formal_param = (std::vector<Type *>*)symTabEntry()->type()->argTypes();
+
+    for (i = 0; i < num_params; i++) {
+      if(formal_param->at(i)->isSubType((Type *)parameters->at(i)->type())) {
+        if (!parameters->at(i)->type()->isSubType((Type *)formal_param->at(i)))
+          parameters->at(i)->coercedType(formal_param->at(i));
+      } else {
+        cout << "Parameter mismatch........." << endl;
+      }
+    }
 
   }
 
-  type(new Type(Type::TypeTag::ERROR));
+  type((Type *)symTabEntry()->type()->retType());
   return type();
 }
 
