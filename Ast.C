@@ -501,6 +501,37 @@ InvocationNode::typeCheck()
   return type();
 }
 
+const Type *
+ExprStmtNode::typeCheck()
+{
+    type((Type *)expr_->type());
+    return type();
+}
+
+
+const Type *
+ReturnStmtNode::typeCheck()
+{
+  if (fun_->type()->isSubType(expr_->type())) {
+    type((Type *)fun_->type());
+  } else {
+    type(new Type(Type::TypeTag::ERROR));
+  }
+
+  return type();
+}
+
+
+const Type *
+IfNode::typeCheck()
+{
+  if (cond()->type()->isBool(cond()->type()->tag()))
+      type(new Type(Type::TypeTag::BOOL));
+  else
+      type(new Type(Type::TypeTag::ERROR));
+  return type();
+}
+
 void IfNode::print(ostream& out, int indent) const 
 {
     out << "if (";

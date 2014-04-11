@@ -392,6 +392,7 @@ class StmtNode: public AstNode {
   //AstNode* clone() 
   //  { return new StmtNode(*this); }
 
+  const Type* typeCheck() {return NULL;}
   StmtNodeKind stmtNodeKind() const { return skind_;}
 
   void print(ostream& os, int indent) const = 0;
@@ -408,6 +409,7 @@ class ReturnStmtNode: public StmtNode {
     StmtNode(StmtNode::StmtNodeKind::RETURN,line,column,file) { expr_ = e; fun_ = fe;};
   ~ReturnStmtNode() {};
 
+  const Type* typeCheck();
   void print(ostream& os, int indent) const {
     os << "return "; 
     if(expr_ != NULL) expr_->print(os, indent); else os << "NULL";};
@@ -426,7 +428,7 @@ class ExprStmtNode: public StmtNode {
   ~ExprStmtNode() {};
   //AstNode* clone() 
   //  { return new ExprStmtNode(*this); }
-
+  const Type* typeCheck();
   void print(ostream& os, int indent) const { 
     if (expr_ != NULL) { expr_->print(os, indent);}};
 
@@ -470,6 +472,7 @@ class IfNode: public StmtNode{
   //AstNode* clone() 
   //  { return new IfNode(*this); }
 
+  const Type* typeCheck();
   const ExprNode* cond() const {return cond_;}
   const StmtNode* elseStmt() const { return else_;};
   const StmtNode* thenStmt() const  { return then_;};
