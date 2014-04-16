@@ -70,7 +70,7 @@ Type *fun_ret_type;
 %token TOK_INT TOK_UNSIGNED TOK_BOOL TOK_BYTE TOK_DOUBLE TOK_SHORT
 %token TOK_TRUE TOK_FALSE TOK_IDENT
 %token TOK_WHILE TOK_BREAK
-
+%token TOK_RBRACK TOK_QMARK TOK_LONG TOK_BIT TOK_ENUM
 
 /******************************** Type Info ********************************/
 

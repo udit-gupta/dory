@@ -94,9 +94,14 @@
      TOK_IDENT = 312,
      TOK_WHILE = 313,
      TOK_BREAK = 314,
-     TOK_DOUBLE_COLON = 315,
-     TOK_LBRACK = 316,
-     TOK_DOT = 317
+     TOK_RBRACK = 315,
+     TOK_QMARK = 316,
+     TOK_LONG = 317,
+     TOK_BIT = 318,
+     TOK_ENUM = 319,
+     TOK_DOUBLE_COLON = 320,
+     TOK_LBRACK = 321,
+     TOK_DOT = 322
    };
 #endif
 
@@ -146,7 +151,7 @@ typedef union YYSTYPE
 
 
 /* Line 2068 of yacc.c  */
-#line 150 "E--_parser.H"
+#line 155 "E--_parser.H"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

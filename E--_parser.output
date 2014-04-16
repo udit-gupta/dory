@@ -7,6 +7,11 @@ Terminals unused in grammar
    TOK_SHORT
    TOK_WHILE
    TOK_BREAK
+   TOK_RBRACK
+   TOK_QMARK
+   TOK_LONG
+   TOK_BIT
+   TOK_ENUM
    TOK_DOUBLE_COLON
    TOK_LBRACK
    TOK_DOT
@@ -248,108 +253,113 @@ TOK_FALSE (311) 110
 TOK_IDENT (312) 12 17 18 21 23 32 50 53 54 71 72 105 119
 TOK_WHILE (313)
 TOK_BREAK (314)
-TOK_DOUBLE_COLON (315)
-TOK_LBRACK (316)
-TOK_DOT (317)
-"reduce" (318)
-"then" (319)
+TOK_RBRACK (315)
+TOK_QMARK (316)
+TOK_LONG (317)
+TOK_BIT (318)
+TOK_ENUM (319)
+TOK_DOUBLE_COLON (320)
+TOK_LBRACK (321)
+TOK_DOT (322)
+"reduce" (323)
+"then" (324)
 
 
 Nonterminals, with rules where they appear
 
-$accept (65)
+$accept (70)
     on left: 0
-specification (66)
+specification (71)
     on left: 1, on right: 0
-decl_star (67)
+decl_star (72)
     on left: 2 3 4, on right: 1 3 4
-decl (68)
+decl (73)
     on left: 5 6 7 8 9, on right: 3
-variable (69)
+variable (74)
     on left: 10 11 12, on right: 5 13 14
-var_star (70)
+var_star (75)
     on left: 13 14, on right: 14 36
-ident_list (71)
+ident_list (76)
     on left: 15 16, on right: 10 15
-var_ident (72)
+var_ident (77)
     on left: 17 18, on right: 15 16 29
-class_decl (73)
+class_decl (78)
     on left: 19 20, on right: 8
-class_ident (74)
+class_ident (79)
     on left: 21, on right: 19
-event_decl (75)
+event_decl (80)
     on left: 22, on right: 6
-event_hdr (76)
+event_hdr (81)
     on left: 23, on right: 22
-formal_list (77)
+formal_list (82)
     on left: 24, on right: 22 30 31
-formal_param_list (78)
+formal_param_list (83)
     on left: 25 26, on right: 24
-formal_params (79)
+formal_params (84)
     on left: 27 28, on right: 26 28
-formal_param (80)
+formal_param (85)
     on left: 29, on right: 27 28
-func (81)
+func (86)
     on left: 30 31, on right: 7
-func_hdr (82)
+func_hdr (87)
     on left: 32 33, on right: 30 31
-func_body (83)
+func_body (88)
     on left: 34, on right: 31
-func_stmt (84)
+func_stmt (89)
     on left: 35 36, on right: 34
-rule_star (85)
+rule_star (90)
     on left: 37 38, on right: 1 38
-rule (86)
+rule (91)
     on left: 39, on right: 37 38
-rule_pattern (87)
+rule_pattern (92)
     on left: 40 41 42 43 44 45, on right: 39 41 42 43 44 45
-primitive_pat_star (88)
+primitive_pat_star (93)
     on left: 46 47, on right: 40
-primitive_pat (89)
+primitive_pat (94)
     on left: 48 49, on right: 46 47
-event_call (90)
+event_call (95)
     on left: 50, on right: 48
-event_params_list (91)
+event_params_list (96)
     on left: 51, on right: 50
-event_params (92)
+event_params (97)
     on left: 52 53 54, on right: 51 54
-stmt (93)
+stmt (98)
     on left: 55 56 57 58 59 60, on right: 39 64 65 69 70
-compstmt_star (94)
+compstmt_star (99)
     on left: 61 62, on right: 57
-compstmt (95)
+compstmt (100)
     on left: 63, on right: 61 62
-stmt_star (96)
+stmt_star (101)
     on left: 64 65 66, on right: 35 36 63 64 66
-return_stmt (97)
+return_stmt (102)
     on left: 67, on right: 56
-if_expr_star (98)
+if_expr_star (103)
     on left: 68 69, on right: 59
-if_expr (99)
+if_expr (104)
     on left: 70, on right: 68 69
-fun_call_stmt (100)
+fun_call_stmt (105)
     on left: 71, on right: 60
-fun_call (101)
+fun_call (106)
     on left: 72, on right: 103
-func_params (102)
+func_params (107)
     on left: 73, on right: 71 72
-func_param_list (103)
+func_param_list (108)
     on left: 74 75 76, on right: 73 76
-expr (104)
+expr (109)
     on left: 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94
     95 96 97 98 99, on right: 18 47 67 70 75 76 78 79 80 81 82 83 84
     85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 104
-expr_star (105)
+expr_star (110)
     on left: 100 101 102 103, on right: 77
-assign_expr (106)
+assign_expr (111)
     on left: 104, on right: 58 102
-ref_expr (107)
+ref_expr (112)
     on left: 105, on right: 101 104
-literal (108)
+literal (113)
     on left: 106 107 108 109 110, on right: 100
-baseType (109)
+baseType (114)
     on left: 111 112 113 114 115 116 117, on right: 118
-type (110)
+type (115)
     on left: 118 119, on right: 10 11 29 32 33
 
 
