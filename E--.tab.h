@@ -99,9 +99,9 @@
      TOK_LONG = 317,
      TOK_BIT = 318,
      TOK_ENUM = 319,
-     TOK_DOUBLE_COLON = 320,
-     TOK_LBRACK = 321,
-     TOK_DOT = 322
+     TOK_DOUBLE_COLON = 322,
+     TOK_LBRACK = 323,
+     TOK_DOT = 324
    };
 #endif
 

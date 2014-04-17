@@ -18,8 +18,6 @@ Terminals unused in grammar
 
 
 State 18 conflicts: 1 shift/reduce
-State 82 conflicts: 1 shift/reduce
-State 85 conflicts: 1 shift/reduce
 State 115 conflicts: 1 shift/reduce
 
 
@@ -258,11 +256,11 @@ TOK_QMARK (316)
 TOK_LONG (317)
 TOK_BIT (318)
 TOK_ENUM (319)
-TOK_DOUBLE_COLON (320)
-TOK_LBRACK (321)
-TOK_DOT (322)
-"reduce" (323)
-"then" (324)
+"reduce" (320)
+"then" (321)
+TOK_DOUBLE_COLON (322)
+TOK_LBRACK (323)
+TOK_DOT (324)
 
 
 Nonterminals, with rules where they appear
@@ -1227,8 +1225,7 @@ state 82
 
     TOK_SEMICOLON  shift, and go to state 127
 
-    TOK_SEMICOLON  [reduce using rule 61 (compstmt_star)]
-    $default       reduce using rule 61 (compstmt_star)
+    $default  reduce using rule 61 (compstmt_star)
 
 
 state 83
@@ -1252,7 +1249,6 @@ state 85
 
     TOK_ELSE  shift, and go to state 129
 
-    TOK_ELSE  [reduce using rule 68 (if_expr_star)]
     $default  reduce using rule 68 (if_expr_star)
 
 

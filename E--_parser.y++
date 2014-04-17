@@ -143,9 +143,9 @@ Type *fun_ret_type;
 
 /*********************   Precedence and Associativity    ********************/
 
-/*%right TOK_SEMICOLON "reduce"    
+%right TOK_SEMICOLON "reduce"
 %right "then" TOK_ELSE           
-*/
+
 
 %nonassoc TOK_ASSIGN
 
