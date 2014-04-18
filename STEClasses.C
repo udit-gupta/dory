@@ -1,6 +1,7 @@
 #include "STEClasses.h"
 #include "Value.h"
 #include "ParserUtil.h"
+#include "log.h"
 
 /*************
 
@@ -33,6 +34,7 @@ void GlobalEntry::print(ostream& out, int indent) const
 
 const Type* GlobalEntry::typeCheck()
 {
+    LOG("");
     /* TODO: Figure out how to indicate error in Type Checking Phase */
     const Type *type = NULL;
     const vector<RuleNode*> pr = GlobalEntry::rules();
@@ -55,6 +57,7 @@ void EventEntry::print(ostream& out, int indent) const
 
 const Type* EventEntry::typeCheck()
 {
+    LOG("");
     return NULL;
 }
 
@@ -65,6 +68,7 @@ void ClassEntry::print(ostream& out, int indent) const
 
 const Type* ClassEntry::typeCheck()
 {
+    LOG("");
     return NULL;
 }
 
@@ -79,6 +83,7 @@ void VariableEntry::print(ostream& out, int indent) const
 
 const Type* VariableEntry::typeCheck()
 {
+    LOG("");
     Type *init_type = NULL;
     const Type *return_type = NULL;
 
@@ -121,6 +126,7 @@ const Type* FunctionEntry::typeCheck()
      * VariableEntry contains type information for variable declarations.
      * Need to validate that they are correct.
      */
+    LOG("");
     typeST(0, 0);
     return NULL;
 }
@@ -132,6 +138,7 @@ void BlockEntry::print(ostream& out, int indent) const
 
 const Type* BlockEntry::typeCheck()
 {
+    LOG("");
     typeST(0, 0);
     return NULL;
 }

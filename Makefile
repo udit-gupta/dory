@@ -1,6 +1,10 @@
 CXX=g++
 #CXX=clang++
-CXXFLAGS = -g -O -Wno-deprecated -std=c++0x -Wall
+CXXFLAGS_DEF = -g -O -Wno-deprecated -std=c++0x -Wall
+CXXFLAGS = $(CXXFLAGS_DEF)
+ifeq ($(DEBUG), 1)
+CXXFLAGS = $(CXXFLAGS_DEF) -DDEBUG
+endif
 FLEX = flex
 BISON = bison
 

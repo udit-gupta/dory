@@ -1,6 +1,6 @@
 #include "Ast.h"                    
 #include "ParserUtil.h"                 
-
+#include "log.h"
 
 AstNode::AstNode(NodeType nt, int line, int column, string file):
   ProgramElem(NULL, line, column, file) {
@@ -186,6 +186,7 @@ OpNode::print(ostream& os, int indent) const {
 const Type *
 OpNode::typeCheck()
 {
+  LOG("");
   if (opCode_ == OpNode::OpCode::MOD) {
     /* MOD accepts two integer arguments and output is integer type */
     if (arg(0)->type()->isInt(arg(0)->type()->tag()) && arg(1)->type()->isInt(arg(1)->type()->tag())) {
@@ -389,6 +390,7 @@ void ValueNode::print(ostream& out, int indent) const
 const Type *
 ValueNode::typeCheck()
 {
+	LOG("");
 	type((Type*) value()->type()); 
 	return type();
 }
@@ -401,6 +403,7 @@ void RefExprNode::print(ostream& out, int indent) const
 const Type *
 RefExprNode::typeCheck()
 {
+  LOG("");
   /* Lookup Symbol table to find type and set it. */
   if (symTabEntry()) {
     type((Type *)symTabEntry()->type());
@@ -456,6 +459,7 @@ void InvocationNode::print(ostream& out, int indent) const
 const Type *
 InvocationNode::typeCheck()
 {
+  LOG("");
   int num_params = 0, i;
   const vector<ExprNode*> *parameters = params();
   vector<Type*> *formal_param = NULL;
@@ -504,6 +508,7 @@ InvocationNode::typeCheck()
 const Type *
 ExprStmtNode::typeCheck()
 {
+    LOG("");
     type((Type *)expr_->type());
     return type();
 }
@@ -512,6 +517,7 @@ ExprStmtNode::typeCheck()
 const Type *
 ReturnStmtNode::typeCheck()
 {
+  LOG("");
   if (fun_->type()->isSubType(expr_->type())) {
     type((Type *)fun_->type());
   } else {
@@ -525,6 +531,7 @@ ReturnStmtNode::typeCheck()
 const Type *
 IfNode::typeCheck()
 {
+  LOG("");
   if (cond()->type()->isBool(cond()->type()->tag()))
       type(new Type(Type::TypeTag::BOOL));
   else
