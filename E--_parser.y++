@@ -207,7 +207,9 @@ decl:                   variable {}
 variable:               type ident_list TOK_SEMICOLON   {                                              
                             for(std::vector<VariableEntry*>::iterator it = $2->begin(); it != $2->end();  it++) {
                                     (*it)->type($1);
-                                    stm.insert((*it));
+                                    if(stm.insert(*it) == DUPLICATE_SYM) {
+                                        errMsg("Double declaration");
+                                    }
                             } 
                         }
                         | type error TOK_SEMICOLON {
@@ -254,7 +256,9 @@ var_ident:              TOK_IDENT {
 
 class_decl:             TOK_CLASS class_ident   {   
                             $$=new ClassEntry($2);        
-                            stm.insert($$);
+                            if(stm.insert($$) == DUPLICATE_SYM) {
+                                errMsg("Double declaration");
+                            }
                         } 
                         |
                         TOK_CLASS error {
@@ -270,7 +274,9 @@ event_decl:            event_hdr formal_list { $$=$1; };
                         
 event_hdr:              TOK_EVENT TOK_IDENT {
                             $$ = new EventEntry($2);
-                            stm.insert($$);
+                            if(stm.insert($$) == DUPLICATE_SYM) {
+                                errMsg("Double declaration");
+                            }
                             stm.enterScope($$);
                         };
 
@@ -300,7 +306,9 @@ formal_params:          formal_param {
 
 formal_param:           type var_ident {
 			    $$ = new VariableEntry($2->name(), VariableEntry::VarKind::PARAM_VAR, $1);
-                            stm.insert($$);
+                            if(stm.insert($$) == DUPLICATE_SYM) {
+                                errMsg("Double declaration");
+                            }
 			    var_type = $1;
                         };
 
@@ -323,7 +331,9 @@ func:                   func_hdr formal_list TOK_SEMICOLON {
 func_hdr:               type TOK_IDENT {
                             $$ = new FunctionEntry($2, nullptr);
 			    fun_ret_type = $1;
-                            stm.insert($$);
+                            if(stm.insert($$) == DUPLICATE_SYM) {
+                                errMsg("Double declaration");
+                            }
                             stm.enterScope($$); 
                         } 
                         | type error {
