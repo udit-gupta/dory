@@ -437,6 +437,18 @@ void CompoundStmtNode::printWithoutBraces(ostream& out, int indent) const
     }
 }
 
+const Type* CompoundStmtNode::typeCheck() {
+    LOG("");
+    const list<StmtNode*>* stmts = CompoundStmtNode::stmts();
+    if(stmts != NULL && stmts->size() > 0) {
+        for(std::list<StmtNode*>::const_iterator it = stmts->begin(); it != stmts->end(); it++) {
+            (*it)->typeCheck();
+        }
+    }
+    return NULL;
+}
+
+
 void InvocationNode::print(ostream& out, int indent) const 
 {
     if(symTabEntry() != NULL) {
@@ -689,4 +701,14 @@ void RuleNode::print(ostream& out, int indent) const
     out << ";";
 } 
 
+const Type* RuleNode::typeCheck() {
+	LOG("");
+	if(pat() != NULL)
+		pat()->typeCheck();
+	if(ruleEntry() != NULL)
+		ruleEntry()->typeCheck();
+	if(reaction() != NULL)
+		reaction()->typeCheck();
+	return NULL;
+}
 

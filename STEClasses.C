@@ -142,3 +142,10 @@ const Type* BlockEntry::typeCheck()
     typeST(0, 0);
     return NULL;
 }
+
+const Type* RuleBlockEntry::typeCheck() {
+	LOG("");
+	typeST(0, 0);
+	return NULL;
+}
+

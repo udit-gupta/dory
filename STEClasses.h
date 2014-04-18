@@ -55,7 +55,7 @@ class RuleBlockEntry: public BlockEntry {
     BlockEntry(newName("rule"), line,column, file) { kind(SymTabEntry::Kind::RULE_BLOCK_KIND);};
   ~RuleBlockEntry() {};
 
-  const Type* typeCheck() { return NULL; };
+  const Type* typeCheck();
 };
 
 /****************************************************************

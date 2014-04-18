@@ -454,6 +454,7 @@ class CompoundStmtNode: public StmtNode{
   
   void  printWithoutBraces(ostream& os, int indent) const;
   void  print(ostream& os, int indent) const;
+  const Type* typeCheck();
 
  private:
   CompoundStmtNode(const CompoundStmtNode&);
@@ -510,6 +511,7 @@ class RuleNode: public AstNode {
   StmtNode* reaction() { return reaction_; };   
 
   void print(ostream& os, int indent=0) const;
+  const Type* typeCheck();
 
  private:
   BlockEntry    *rste_;
