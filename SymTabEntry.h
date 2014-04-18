@@ -72,6 +72,13 @@ class SymTabEntry: public ProgramElem {
 		symTab()->printST(os, ind, ldelim, rdelim, linebreaks, first, last);
   }
 
+  virtual void typeST(int first=0, int last=0) const {
+    if (symTab() != nullptr)
+      symTab()->typeST(first, last);
+  }
+
+  virtual const Type* typeCheck() { return NULL; };
+
  private:
   string name_;
   Kind kind_;

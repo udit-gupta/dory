@@ -37,6 +37,8 @@ const Type* GlobalEntry::typeCheck()
     const Type *type = NULL;
     const vector<RuleNode*> pr = GlobalEntry::rules();
 
+    typeST(0, 0);
+
     for(vector<RuleNode*>::const_iterator it = pr.begin(); it != pr.end(); it++) {
       /* XXX: We have the type, now what to do? */
       type = (*it)->typeCheck();
@@ -119,6 +121,7 @@ const Type* FunctionEntry::typeCheck()
      * VariableEntry contains type information for variable declarations.
      * Need to validate that they are correct.
      */
+    typeST(0, 0);
     return NULL;
 }
 
@@ -129,5 +132,6 @@ void BlockEntry::print(ostream& out, int indent) const
 
 const Type* BlockEntry::typeCheck()
 {
+    typeST(0, 0);
     return NULL;
 }
