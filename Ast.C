@@ -183,6 +183,63 @@ OpNode::print(ostream& os, int indent) const {
   else internalErr("Unhandled case in OpNode::print");
 }
 
+void 
+OpNode::typePrint(ostream& os, int indent) const {
+    int iopcode = static_cast<int>(opCode_);
+  if (opInfo[iopcode].prtType_ == OpNode::OpPrintType::PREFIX) {
+    os << opInfo[iopcode].name_;
+    if (arity_ > 0) {
+      if (opInfo[iopcode].needParen_) 
+        os << '(';
+      for (unsigned i=0; i < arity_-1; i++) {
+        if (arg_[i]) {
+	  if (arg_[i]->coercedType()) {
+            os << "(";
+            arg_[i]->coercedType()->print(os, indent);
+	    os << ")";
+	  }
+          arg_[i]->type()->print(os, indent);
+	} else os << "NULL";
+        os << ", ";
+      }
+      if (arg_[arity_-1]) {
+	if (arg_[arity_-1]->coercedType()) {
+	  os << "(";
+	  arg_[arity_-1]->coercedType()->print(os, indent);
+	  os << ")";
+	}
+        arg_[arity_-1]->type()->print(os, indent);
+      } else os << "NULL";
+      if (opInfo[iopcode].needParen_) 
+        os << ") ";
+    }
+  }
+  else if ((opInfo[iopcode].prtType_ == OpNode::OpPrintType::INFIX) && (arity_ == 2)) {
+    if (opInfo[iopcode].needParen_) 
+      os << "(";
+    if(arg_[0]) {
+      if (arg_[0]->coercedType()) {
+	os << "(";
+	arg_[0]->coercedType()->print(os, indent);
+	os << ")";
+      }
+      arg_[0]->type()->print(os, indent);
+    } else os << "NULL";
+    os << opInfo[iopcode].name_; 
+    if(arg_[1]) {
+      if (arg_[1]->coercedType()) {
+        os << "(";
+        arg_[1]->coercedType()->print(os, indent);
+        os << ")";
+      }
+      arg_[1]->type()->print(os, indent);
+    } else os << "NULL";
+    if (opInfo[iopcode].needParen_) 
+      os << ")";
+  }
+  else internalErr("Unhandled case in OpNode::print");
+}
+
 const Type *
 OpNode::typeCheck()
 {
@@ -395,6 +452,12 @@ ValueNode::typeCheck()
 	return type();
 }
 
+void ValueNode::typePrint(ostream& out, int indent) const
+{
+    if (type())
+        type()->print(out, indent);
+}
+
 void RefExprNode::print(ostream& out, int indent) const
 {
     out << ext();
@@ -412,6 +475,12 @@ RefExprNode::typeCheck()
   }
 
   return type();
+}
+
+void RefExprNode::typePrint(ostream& out, int indent) const
+{
+    if (type())
+        type()->print(out, indent);
 }
 
 void CompoundStmtNode::print(ostream& out, int indent) const 
@@ -461,6 +530,30 @@ void InvocationNode::print(ostream& out, int indent) const
                 if(prComma)
                     out << ", ";
                 (*it)->print(out, indent);
+                prComma = true;
+            }
+        }
+        out << ")";
+    }
+}
+
+void InvocationNode::typePrint(ostream& out, int indent) const 
+{
+    if(symTabEntry() != NULL) {
+        out << symTabEntry()->name();
+        out << "(";
+        bool prComma = false;
+        const vector<ExprNode*> *exps = params();
+        if(exps != NULL && exps->size() > 0) {
+            for(std::vector<ExprNode*>::const_iterator it = exps->begin(); it != exps->end(); it++) {
+                if(prComma)
+                    out << ", ";
+		if ((*it)->coercedType()) {
+			out << "(";
+			(*it)->coercedType()->print(out, indent);
+			out << ")";
+		}
+                (*it)->type()->print(out, indent);
                 prComma = true;
             }
         }

@@ -66,7 +66,7 @@ class AstNode: public ProgramElem {
   NodeType nodeType() const { return nodeType_;}
 
   virtual const Type* typeCheck() {return NULL;};
-  virtual const Type* typePrint() {return NULL;};
+  virtual void typePrint(ostream& os, int indent=0) const { return; };
   virtual void print(ostream& os, int indent=0) const=0;
   virtual EFSA* codeGen() {return NULL;};
 
@@ -114,7 +114,7 @@ class ExprNode: public AstNode {
   void print(ostream& os, int indent=0) const=0;
 
   const Type* typeCheck() {return NULL;};
-  const Type* typePrint() {return NULL;};
+  void typePrint(ostream& os, int indent=0) const { return; };
 
  private:
   ExprNodeType exprType_;
@@ -141,7 +141,7 @@ class RefExprNode: public ExprNode {
   void print(ostream& os, int indent=0) const;
 
   const Type* typeCheck();
-  const Type* typePrint() {return NULL;};
+  void typePrint(ostream& os, int indent=0) const;
 
  private:
   string ext_;
@@ -200,7 +200,7 @@ class OpNode: public ExprNode {
   void print(ostream& os, int indent=0) const;  
 
   const Type* typeCheck();
-  const Type* typePrint() {return NULL;};
+  void typePrint(ostream& os, int indent=0) const;
   
  private: 
   unsigned int arity_;
@@ -223,7 +223,7 @@ class ValueNode: public ExprNode {
   void print(ostream& os, int indent=0) const;
 
   const Type* typeCheck();
-  const Type* typePrint() {return NULL;};
+  void typePrint(ostream& os, int indent=0) const;
 
  private:
   /* val_ field is already included in ExprNode, so no new data members */
@@ -255,7 +255,7 @@ class InvocationNode: public ExprNode {
   void print(ostream& os, int indent=0) const;
 
   const Type* typeCheck();
-  const Type* typePrint() {return NULL;};
+  void typePrint(ostream& os, int indent=0) const;
 
  private:
   vector<ExprNode*>* params_;
