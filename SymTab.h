@@ -66,6 +66,9 @@ class SymTab {
 
   void typeST(int first, int last) const;
 
+  virtual void typePrintST(ostream& os,int ind=0,char ldelim='{',char rdelim='}',
+					   bool linebreaks=true, int first=0, int last=0) const;
+
   const_iterator begin() const { return const_iterator(first_); };
   iterator begin() { return iterator(first_); };
   // End of list is indicated when the iterator's current pointer

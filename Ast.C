@@ -745,6 +745,39 @@ void PrimitivePatNode::print(ostream& out, int indent) const
     out << ")";
 }
 
+void PrimitivePatNode::typePrint(ostream& out, int indent) const 
+{
+    out << "(";
+    if(event() != NULL) {
+        out << event()->name();
+        if(event()->name().compare("any") == 0) {
+            
+        }
+        else {
+            out << "(";
+            bool prComma = false;
+            const vector<const VariableEntry*> *vars = params();
+            if(vars != NULL && vars->size() > 0) {
+                if(vars != NULL) {
+                    for(std::vector<const VariableEntry*>::const_iterator it =  vars->begin(); it != vars->end(); it++) {
+                        if(prComma) 
+                            out << ", ";
+                        (*it)->typePrint(out, indent);
+                        prComma = true;
+                    }
+                }
+            }
+        out << ")";
+        }
+    }
+    
+    if(cond() != NULL) {
+        out << "|";
+        cond()->typePrint(out, indent);
+    }
+    out << ")";
+}
+
 bool PrimitivePatNode::hasSeqOps() const 
 {
     if(kind() == BasePatNode::PatNodeKind::SEQ)
@@ -804,6 +837,44 @@ void PatNode::print(ostream& out, int indent) const
     out << ")";
 }
 
+void PatNode::typePrint(ostream& out, int indent) const 
+{
+    out << "(";
+    switch(kind()) {
+    case BasePatNode::PatNodeKind::NEG:
+            out << "!";
+            if(pat1() != NULL)
+                pat1()->typePrint(out, indent);
+            break;
+    case BasePatNode::PatNodeKind::STAR: 
+            if(pat1() != NULL)
+                pat1()->typePrint(out, indent);
+            out << "**";
+            break;
+    case BasePatNode::PatNodeKind::SEQ:
+            if(pat1() != NULL)
+                pat1()->typePrint(out, indent);
+            out << ":";
+            if(pat2() != NULL)
+                pat2()->typePrint(out, indent);
+            break;
+    case BasePatNode::PatNodeKind::OR:
+            if(pat1() != NULL)
+                pat1()->typePrint(out, indent);
+            out << " \\/ ";
+            if(pat2() != NULL)
+                pat2()->typePrint(out, indent);
+            break;
+    default:
+            if(pat1() != NULL)
+                pat1()->typePrint(out, indent);
+            if(pat2() != NULL)
+                pat2()->typePrint(out, indent);
+            break;
+    }
+    out << ")";
+}
+
 bool PatNode::hasSeqOps() const 
 {
     if(kind() == BasePatNode::PatNodeKind::SEQ)
@@ -836,6 +907,20 @@ void RuleNode::print(ostream& out, int indent) const
         ruleEntry()->print(out, indent);
     if(reaction() != NULL) 
         reaction()->print(out, indent);
+    out << ";";
+} 
+
+void RuleNode::typePrint(ostream& out, int indent) const 
+{
+    prtSpace(out, indent);
+    if(pat() != NULL) 
+        pat()->typePrint(out, indent);
+    out << "-->";
+    prtSpace(out, indent);
+    if(ruleEntry() != NULL) 
+        ruleEntry()->typePrint(out, indent);
+    if(reaction() != NULL) 
+        reaction()->typePrint(out, indent);
     out << ";";
 } 
 

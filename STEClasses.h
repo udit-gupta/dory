@@ -35,6 +35,8 @@ class GlobalEntry: public SymTabEntry {
 
   const Type* typeCheck();
 
+  void typePrint(ostream&, int indent=0) const;
+
  private:
   vector<RuleNode*> rules_;
 };
@@ -47,6 +49,8 @@ class BlockEntry: public SymTabEntry {
   void print(ostream& out, int indent=0) const; 
 
   const Type* typeCheck();
+
+  void typePrint(ostream&, int indent=0) const;
 };
 
 class RuleBlockEntry: public BlockEntry {
@@ -91,6 +95,8 @@ class VariableEntry: public SymTabEntry {
 
   const Type* typeCheck();
 
+  void typePrint(ostream&, int indent=0) const;
+
  private:
   VarKind vkind_;
   int offSet_;
@@ -106,6 +112,8 @@ class ClassEntry: public SymTabEntry {
   void print(ostream& os, int indent) const;
 
   const Type* typeCheck();
+
+  void typePrint(ostream&, int indent=0) const;
 };
 
 class FunctionEntry: public SymTabEntry {
@@ -125,6 +133,8 @@ class FunctionEntry: public SymTabEntry {
 
   const Type* typeCheck();
 
+  void typePrint(ostream&, int indent=0) const;
+
  private:
   CompoundStmtNode* body_;
 };
@@ -138,6 +148,8 @@ class EventEntry: public SymTabEntry {
   void print(ostream& out, int indent=0) const; 
 
   const Type* typeCheck();
+
+  void typePrint(ostream&, int indent=0) const;
 };  
 
 #endif

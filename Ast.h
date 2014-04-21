@@ -340,7 +340,7 @@ class PrimitivePatNode: public BasePatNode {
   //-const Type* typeCheck();
   void print(ostream& os, int indent=0) const; 
 
-  void  typePrint(ostream& os, int indent) const { return; };
+  void  typePrint(ostream& os, int indent) const;
 
  private:
 
@@ -374,7 +374,7 @@ class PatNode: public BasePatNode {
 
   void print(ostream& os, int indent=0) const; 
 
-  void  typePrint(ostream& os, int indent) const { return; };
+  void  typePrint(ostream& os, int indent) const;
 
  private: 
   PatNode(const PatNode&);
@@ -534,7 +534,7 @@ class RuleNode: public AstNode {
   void print(ostream& os, int indent=0) const;
 
   const Type* typeCheck();
-  void  typePrint(ostream& os, int indent) const { return; };
+  void  typePrint(ostream& os, int indent) const;
 
  private:
   BlockEntry    *rste_;

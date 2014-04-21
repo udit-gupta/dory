@@ -32,6 +32,21 @@ void GlobalEntry::print(ostream& out, int indent) const
     prtSpace(out, indent + STEP_INDENT);
 }
 
+void GlobalEntry::typePrint(ostream& out, int indent) const
+{   
+    prtSpace(out, indent);
+    typePrintST(out, indent, '\0', ';', true);
+    prtln(out, indent);
+    const vector<RuleNode*> pr = GlobalEntry::rules();
+    if(pr.size() == 0 ) 
+        prtln(out, indent);
+    for(vector<RuleNode*>::const_iterator it = pr.begin(); it != pr.end(); it++) {
+        (*it)->typePrint(out, indent + STEP_INDENT);
+        endln(out, indent);
+    }
+    prtSpace(out, indent + STEP_INDENT);
+}
+
 const Type* GlobalEntry::typeCheck()
 {
     LOG("");
@@ -55,6 +70,12 @@ void EventEntry::print(ostream& out, int indent) const
     printST(out, indent, '(', ')', false);
 }
 
+void EventEntry::typePrint(ostream& out, int indent) const
+{
+    out << "event " << name();
+    typePrintST(out, indent, '(', ')', false);
+}
+
 const Type* EventEntry::typeCheck()
 {
     LOG("");
@@ -62,6 +83,11 @@ const Type* EventEntry::typeCheck()
 }
 
 void ClassEntry::print(ostream& out, int indent) const 
+{
+    out << "class " << name();
+} 
+
+void ClassEntry::typePrint(ostream& out, int indent) const 
 {
     out << "class " << name();
 } 
@@ -78,6 +104,15 @@ void VariableEntry::print(ostream& out, int indent) const
     if(initVal() != NULL) {
         out << " = ";
         initVal()->print(out, indent);
+    }
+}
+
+void VariableEntry::typePrint(ostream& out, int indent) const
+{
+    out << type()->fullName() << " " << name();
+    if(initVal() != NULL) {
+        out << " = ";
+        initVal()->typePrint(out, indent);
     }
 }
 
@@ -120,6 +155,23 @@ void FunctionEntry::print(ostream& out, int indent) const
     }
 }
 
+void FunctionEntry::typePrint(ostream& out, int indent) const 
+{
+    out << type()->retType()->fullName() << " " << name();
+
+    if (this->type()->arity())
+        this->typePrintST(out, indent, '(', ')', false, 0, this->type()->arity());
+    else
+        out << "()";
+
+    if (this->body()) {
+        out << " {";
+        this->typePrintST(out, indent, '\0', ';', true, this->type()->arity(), 10000);
+        this->body()->typePrintWithoutBraces(out, indent);
+        out << "}";
+    }
+}
+
 const Type* FunctionEntry::typeCheck()
 {
     /* TODO: Call typeST() for this scope.
@@ -136,6 +188,11 @@ void BlockEntry::print(ostream& out, int indent) const
     printST(out, indent, '{', '}', true);
 }
 
+void BlockEntry::typePrint(ostream& out, int indent) const
+{
+    typePrintST(out, indent, '{', '}', true);
+}
+
 const Type* BlockEntry::typeCheck()
 {
     LOG("");
@@ -148,4 +205,3 @@ const Type* RuleBlockEntry::typeCheck() {
 	typeST(0, 0);
 	return NULL;
 }
-
