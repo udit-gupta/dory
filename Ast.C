@@ -237,7 +237,7 @@ OpNode::typePrint(ostream& os, int indent) const {
     if (opInfo[iopcode].needParen_) 
       os << ")";
   }
-  else internalErr("Unhandled case in OpNode::print");
+  else internalErr("Unhandled case in OpNode::typePrint");
 }
 
 const Type *
@@ -506,6 +506,29 @@ void CompoundStmtNode::printWithoutBraces(ostream& out, int indent) const
     }
 }
 
+void CompoundStmtNode::typePrint(ostream& out, int indent) const 
+{
+    out << "{";
+    if(stmts() != NULL && stmts()->size() > 0) 
+        prtln(out, indent);
+    CompoundStmtNode::typePrintWithoutBraces(out, indent);
+    out << "};";
+    prtln(out, indent);
+}
+
+void CompoundStmtNode::typePrintWithoutBraces(ostream& out, int indent) const 
+{
+    const list<StmtNode*>* stmts = CompoundStmtNode::stmts();
+    if(stmts != NULL && stmts->size() > 0) {
+        for(std::list<StmtNode*>::const_iterator it = stmts->begin(); it != stmts->end(); it++) {
+            prtSpace(out, indent);
+            (*it)->typePrint(out, indent);
+            if((*it)->stmtNodeKind() == StmtNode::StmtNodeKind::EXPR || (*it)->stmtNodeKind() == StmtNode::StmtNodeKind::RETURN)
+                endln(out, indent);
+        }
+    }
+}
+
 const Type* CompoundStmtNode::typeCheck() {
     LOG("");
     const list<StmtNode*>* stmts = CompoundStmtNode::stmts();
@@ -516,7 +539,6 @@ const Type* CompoundStmtNode::typeCheck() {
     }
     return NULL;
 }
-
 
 void InvocationNode::print(ostream& out, int indent) const 
 {
@@ -662,6 +684,29 @@ void IfNode::print(ostream& out, int indent) const
         prtSpace(out, indent);
         out << "else ";
         elseStmt()->print(out, indent + STEP_INDENT);
+        if(elseStmt()->stmtNodeKind() != StmtNode::StmtNodeKind::COMPOUND) 
+            endln(out, indent);
+    }
+}
+
+void IfNode::typePrint(ostream& out, int indent) const 
+{
+    out << "if (";
+    if(cond() != NULL)
+        cond()->typePrint(out, indent);
+    out << ") ";
+    if(thenStmt() != NULL) {
+        thenStmt()->typePrint(out, indent + STEP_INDENT);
+        if(thenStmt()->stmtNodeKind() != StmtNode::StmtNodeKind::COMPOUND) 
+            endln(out, indent);
+    }
+    else 
+        endln(out, indent);
+    
+    if(elseStmt() != NULL) {
+        prtSpace(out, indent);
+        out << "else ";
+        elseStmt()->typePrint(out, indent + STEP_INDENT);
         if(elseStmt()->stmtNodeKind() != StmtNode::StmtNodeKind::COMPOUND) 
             endln(out, indent);
     }
