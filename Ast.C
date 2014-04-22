@@ -244,6 +244,12 @@ const Type *
 OpNode::typeCheck()
 {
   LOG("");
+  if (arg(0))
+    arg(0)->typeCheck();
+
+  if (arg(1))
+    arg(1)->typeCheck();
+
   if (opCode_ == OpNode::OpCode::MOD) {
     /* MOD accepts two integer arguments and output is integer type */
     if (arg(0)->type()->isInt(arg(0)->type()->tag()) && arg(1)->type()->isInt(arg(1)->type()->tag())) {
