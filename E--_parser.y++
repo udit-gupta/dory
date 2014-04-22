@@ -270,7 +270,10 @@ class_ident:            TOK_IDENT { $$ = $1; };
  /****** E-- Event Calls *******/
 
 
-event_decl:            event_hdr formal_list { $$=$1; };
+event_decl:            event_hdr formal_list {
+			    $$=$1;
+			    $$->type(new Type($2, Type::TypeTag::EVENT));
+		       };
                         
 event_hdr:              TOK_EVENT TOK_IDENT {
                             $$ = new EventEntry($2);

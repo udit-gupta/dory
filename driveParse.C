@@ -209,7 +209,7 @@ main(int argc, char *argv[], char *envp[]) {
   stm.leaveToScope(SymTabEntry::Kind::GLOBAL_KIND);
   GlobalEntry *ge = (GlobalEntry*)(stm.currentScope());
   if (ge != NULL) {
-	//cout << "Finished parsing, here is the AST\n";
+	cout << "Finished parsing, here is the AST\n";
 	ge->print(cout);
 	ge->typeCheck();
   }
