@@ -583,7 +583,7 @@ void InvocationNode::typePrint(ostream& out, int indent) const
 			(*it)->coercedType()->print(out, indent);
 			out << ")";
 		}
-                (*it)->type()->print(out, indent);
+                (*it)->typePrint(out, indent);
                 prComma = true;
             }
         }
