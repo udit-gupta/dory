@@ -618,6 +618,7 @@ InvocationNode::typeCheck()
       cout << "Incorrect number of parameters passed. Call: " << parameters->size() << " Decl: " << symTabEntry()->type()->arity() << endl;
     }
 
+    /* Even if number of parameters is wrong, we still go ahead with the typeCheck() */
     if ((int)parameters->size() <= symTabEntry()->type()->arity())
       num_params = parameters->size();
     else
@@ -626,6 +627,8 @@ InvocationNode::typeCheck()
     formal_param = (std::vector<Type *>*)symTabEntry()->type()->argTypes();
 
     for (i = 0; i < num_params; i++) {
+      parameters->at(i)->typeCheck();
+
       if(formal_param->at(i)->isSubType((Type *)parameters->at(i)->type())) {
         if (!parameters->at(i)->type()->isSubType((Type *)formal_param->at(i)))
           parameters->at(i)->coercedType(formal_param->at(i));
