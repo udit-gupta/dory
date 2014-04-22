@@ -151,7 +151,7 @@ Type::print(ostream& os, int indent) const {
 
 /* Is t a subType of this Type? */
 bool
-Type::isSubType(Type *t) {
+Type::isSubType(Type *t) const {
   if (t->tag() == CLASS) {
     if (tag_ != CLASS)
       return false;

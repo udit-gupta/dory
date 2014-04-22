@@ -135,7 +135,7 @@ class Type {
   void print(ostream &os, int indent=0) const;
 
   /* Is this Type a subType of Type t? */
-  bool isSubType(Type *t);
+  bool isSubType(Type *t) const;
 };
 
 inline ostream& operator<< (ostream& os, const Type& tt) {

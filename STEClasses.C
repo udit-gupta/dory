@@ -125,7 +125,7 @@ const Type* VariableEntry::typeCheck()
     if (initVal()) {
         init_type = (Type *)initVal()->typeCheck();
 
-        if (type()->isSubType((Type *)init_type)) {
+        if (type()->isSubType(init_type)) {
             if (!init_type->isSubType(type()))
                 initVal()->coercedType(type());
             return_type = type();

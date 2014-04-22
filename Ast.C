@@ -645,8 +645,13 @@ const Type *
 ReturnStmtNode::typeCheck()
 {
   LOG("");
-  if (fun_->type()->isSubType(expr_->type())) {
-    type((Type *)fun_->type());
+  if (fun_ && expr_ && expr_->type() && fun_->type() &&
+		  fun_->type()->retType() &&
+		  fun_->type()->retType()->isSubType((Type *)expr_->type())) {
+
+    if (!expr_->type()->isSubType((Type *)fun_->type()->retType()))
+      expr_->coercedType(fun_->type()->retType());
+    type((Type *)fun_->type()->retType());
   } else {
     type(new Type(Type::TypeTag::ERROR));
   }
@@ -659,7 +664,8 @@ const Type *
 IfNode::typeCheck()
 {
   LOG("");
-  if (cond()->type()->isBool(cond()->type()->tag()))
+  if (cond() && cond()->type() &&
+		  cond()->type()->isBool(cond()->type()->tag()))
       type(new Type(Type::TypeTag::BOOL));
   else
       type(new Type(Type::TypeTag::ERROR));
