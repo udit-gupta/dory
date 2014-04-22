@@ -223,7 +223,7 @@ OpNode::typePrint(ostream& os, int indent) const {
 	arg_[0]->coercedType()->print(os, indent);
 	os << ")";
       }
-      arg_[0]->type()->print(os, indent);
+      arg_[0]->typePrint(os, indent);
     } else os << "NULL";
     os << opInfo[iopcode].name_; 
     if(arg_[1]) {
@@ -232,7 +232,7 @@ OpNode::typePrint(ostream& os, int indent) const {
         arg_[1]->coercedType()->print(os, indent);
         os << ")";
       }
-      arg_[1]->type()->print(os, indent);
+      arg_[1]->typePrint(os, indent);
     } else os << "NULL";
     if (opInfo[iopcode].needParen_) 
       os << ")";
@@ -644,6 +644,10 @@ const Type *
 ExprStmtNode::typeCheck()
 {
     LOG("");
+    /* TODO: Add Check: LHS of Assignments in Rules must be Global Variables */
+    if (expr_)
+	    expr_->typeCheck();
+
     type((Type *)expr_->type());
     return type();
 }
@@ -672,6 +676,15 @@ const Type *
 IfNode::typeCheck()
 {
   LOG("");
+  if (cond())
+      cond()->typeCheck();
+
+  if (thenStmt())
+      thenStmt()->typeCheck();
+
+  if (elseStmt())
+      elseStmt()->typeCheck();
+
   if (cond() && cond()->type() &&
 		  cond()->type()->isBool(cond()->type()->tag()))
       type(new Type(Type::TypeTag::BOOL));
