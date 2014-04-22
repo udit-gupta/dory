@@ -266,7 +266,9 @@ OpNode::typeCheck()
       opCode_ == OpNode::OpCode::BITXOR ||
       opCode_ == OpNode::OpCode::SHL ||
       opCode_ == OpNode::OpCode::SHR) {
-    if (arg(0)->type()->isNumeric(arg(0)->type()->tag()) && arg(1)->type()->isNumeric(arg(1)->type()->tag())) {
+    if (arg(0) && arg(1) && arg(0)->type() && arg(1)->type() &&
+		    arg(0)->type()->isNumeric(arg(0)->type()->tag()) &&
+		    arg(1)->type()->isNumeric(arg(1)->type()->tag())) {
       if (arg(0)->type()->isSubType(arg(1)->type()) && !arg(1)->type()->isSubType(arg(0)->type())) {
         arg(1)->coercedType(arg(0)->type());
 	type(arg(0)->type());

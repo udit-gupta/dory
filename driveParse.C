@@ -212,6 +212,7 @@ main(int argc, char *argv[], char *envp[]) {
 	cout << "Finished parsing, here is the AST\n";
 	ge->print(cout);
 	ge->typeCheck();
+	ge->typePrint(cout);
   }
 #endif
 }
