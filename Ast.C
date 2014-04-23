@@ -198,7 +198,7 @@ OpNode::typePrint(ostream& os, int indent) const {
             arg_[i]->coercedType()->print(os, indent);
 	    os << ")";
 	  }
-          arg_[i]->type()->print(os, indent);
+          arg_[i]->typePrint(os, indent);
 	} else os << "NULL";
         os << ", ";
       }
@@ -208,7 +208,7 @@ OpNode::typePrint(ostream& os, int indent) const {
 	  arg_[arity_-1]->coercedType()->print(os, indent);
 	  os << ")";
 	}
-        arg_[arity_-1]->type()->print(os, indent);
+        arg_[arity_-1]->typePrint(os, indent);
       } else os << "NULL";
       if (opInfo[iopcode].needParen_) 
         os << ") ";
@@ -244,11 +244,11 @@ const Type *
 OpNode::typeCheck()
 {
   LOG("");
-  if (arg(0))
-    arg(0)->typeCheck();
 
-  if (arg(1))
-    arg(1)->typeCheck();
+  for (int i = 0; i < arity_; i++) {
+    if (arg(i))
+      arg(i)->typeCheck();
+  }
 
   if (opCode_ == OpNode::OpCode::MOD) {
     /* MOD accepts two integer arguments and output is integer type */
