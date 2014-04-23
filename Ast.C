@@ -245,7 +245,7 @@ OpNode::typeCheck()
 {
   LOG("");
 
-  for (int i = 0; i < arity_; i++) {
+  for (unsigned int i = 0; i < arity_; i++) {
     if (arg(i))
       arg(i)->typeCheck();
   }
@@ -660,6 +660,10 @@ const Type *
 ReturnStmtNode::typeCheck()
 {
   LOG("");
+
+  if (expr_)
+    expr_->typeCheck();
+
   if (fun_ && expr_ && expr_->type() && fun_->type() &&
 		  fun_->type()->retType() &&
 		  fun_->type()->retType()->isSubType((Type *)expr_->type())) {
@@ -964,4 +968,3 @@ const Type* RuleNode::typeCheck() {
 		reaction()->typeCheck();
 	return NULL;
 }
-

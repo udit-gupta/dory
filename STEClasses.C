@@ -180,6 +180,8 @@ const Type* FunctionEntry::typeCheck()
      */
     LOG("");
     typeST(0, 0);
+    if (body())
+	    body()->typeCheck();
     return NULL;
 }
 

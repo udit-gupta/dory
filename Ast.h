@@ -422,8 +422,16 @@ class ReturnStmtNode: public StmtNode {
   };
 
   void typePrint(ostream& os, int indent) const {
-    os << "return "; 
-    if(expr_ != NULL) expr_->typePrint(os, indent); else os << "NULL";
+    os << "return ";
+    if(expr_ != NULL) {
+	    if (expr_->coercedType()) {
+		    os << "(";
+		    expr_->coercedType()->print(os, indent);
+		    os << ")";
+	    }
+	    expr_->typePrint(os, indent); 
+    }
+    else os << "NULL";
   };
 
  private:
@@ -446,7 +454,14 @@ class ExprStmtNode: public StmtNode {
   };
 
   void typePrint(ostream& os, int indent) const { 
-    if (expr_ != NULL) { expr_->typePrint(os, indent); }
+    if (expr_ != NULL) {
+	    if (expr_->coercedType()) {
+		    os << "(";
+		    expr_->coercedType()->print(os, indent);
+		    os << ")";
+	    }
+	    expr_->typePrint(os, indent);
+    }
   };
 
  private:
