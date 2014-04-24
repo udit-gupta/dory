@@ -892,17 +892,7 @@ const Type* PatNode::typeCheck() {
             }
             break;
     case BasePatNode::PatNodeKind::SEQ:
-            if(pat1() != NULL)
-                pat1()->typeCheck();
-            if(pat2() != NULL)
-                pat2()->typeCheck();
-            break;
     case BasePatNode::PatNodeKind::OR:
-            if(pat1() != NULL)
-                pat1()->typeCheck();
-            if(pat2() != NULL)
-                pat2()->typeCheck();
-            break;
     default:
             if(pat1() != NULL)
                 pat1()->typeCheck();
