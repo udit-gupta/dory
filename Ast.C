@@ -779,6 +779,11 @@ void PrimitivePatNode::print(ostream& out, int indent) const
     out << ")";
 }
 
+const Type* PrimitivePatNode::typeCheck() {
+	LOG("");
+	return NULL;
+}
+
 void PrimitivePatNode::typePrint(ostream& out, int indent) const 
 {
     out << "(";
@@ -869,6 +874,44 @@ void PatNode::print(ostream& out, int indent) const
             break;
     }
     out << ")";
+}
+
+const Type* PatNode::typeCheck() {
+    LOG("");
+    switch(kind()) {
+    case BasePatNode::PatNodeKind::NEG:
+            if(pat1() != NULL) {
+                pat1()->typeCheck();
+                if(!(pat1()->isNegatable()))
+			errMsg("Not negatable");
+            }
+            break;
+    case BasePatNode::PatNodeKind::STAR: 
+            if(pat1() != NULL) {
+                pat1()->typeCheck();
+            }
+            break;
+    case BasePatNode::PatNodeKind::SEQ:
+            if(pat1() != NULL)
+                pat1()->typeCheck();
+            if(pat2() != NULL)
+                pat2()->typeCheck();
+            break;
+    case BasePatNode::PatNodeKind::OR:
+            if(pat1() != NULL)
+                pat1()->typeCheck();
+            if(pat2() != NULL)
+                pat2()->typeCheck();
+            break;
+    default:
+            if(pat1() != NULL)
+                pat1()->typeCheck();
+            if(pat2() != NULL)
+                pat2()->typeCheck();
+            break;
+    }
+
+    return NULL;
 }
 
 void PatNode::typePrint(ostream& out, int indent) const 
