@@ -883,7 +883,7 @@ const Type* PatNode::typeCheck() {
             if(pat1() != NULL) {
                 pat1()->typeCheck();
                 if(!(pat1()->isNegatable()))
-			cout << line() << "Not negatable" << endl;
+			errMsg("Only simple patterns without `.', `*', and `!' operators can be negated", pat1());
             }
             break;
     case BasePatNode::PatNodeKind::STAR: 
