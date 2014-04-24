@@ -602,7 +602,7 @@ InvocationNode::typeCheck()
   /* Need to first check if number of params match number of types in SymTabEntry.
    * Next check that each parameter is a subtype of formal param in SymTabEntry.*/
   if (symTabEntry() && symTabEntry()->type()) {
-    if ((!parameters && !symTabEntry()->type()->argTypes()) || (!parameters->size() && !symTabEntry()->type()->argTypes()->size())) {
+    if ((!parameters && !symTabEntry()->type()->argTypes()) || (parameters && !parameters->size() && symTabEntry()->type()->argTypes() && !symTabEntry()->type()->argTypes()->size())) {
       type((Type *)symTabEntry()->type()->retType());
 
       return type();
