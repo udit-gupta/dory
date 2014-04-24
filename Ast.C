@@ -819,7 +819,7 @@ void PrimitivePatNode::typePrint(ostream& out, int indent) const
 
 bool PrimitivePatNode::hasSeqOps() const 
 {
-    if(kind() == BasePatNode::PatNodeKind::SEQ)
+    if(kind() == BasePatNode::PatNodeKind::SEQ || kind() == BasePatNode::PatNodeKind::STAR)
         return true;
     return false;
 }
@@ -883,7 +883,7 @@ const Type* PatNode::typeCheck() {
             if(pat1() != NULL) {
                 pat1()->typeCheck();
                 if(!(pat1()->isNegatable()))
-			errMsg("Not negatable");
+			cout << line() << "Not negatable" << endl;
             }
             break;
     case BasePatNode::PatNodeKind::STAR: 
@@ -954,7 +954,7 @@ void PatNode::typePrint(ostream& out, int indent) const
 
 bool PatNode::hasSeqOps() const 
 {
-    if(kind() == BasePatNode::PatNodeKind::SEQ)
+    if(kind() == BasePatNode::PatNodeKind::SEQ || kind() == BasePatNode::PatNodeKind::STAR)
         return true;
     return false;
 }
