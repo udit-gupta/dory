@@ -399,17 +399,20 @@ event_call:             TOK_IDENT event_params_list {
                             if(cST != NULL) {
                                 SymTab::const_iterator it = cST->begin();
                                 std::vector<string>::const_iterator it1  = $2->begin();
-                                for(; it != cST->end() || it1 != $2->end(); ++it, ++it1) {
-                                    if((*it)->kind() == SymTabEntry::Kind::VARIABLE_KIND) {
-                                        VariableEntry *ve = (VariableEntry*)(*it);
-                                        prm->push_back(new VariableEntry((*it1), ve->varKind(), ve->type()));
+                                //for(; it != cST->end(), it1 != $2->end(); ++it, ++it1) {
+                                for(; it1 != $2->end(); ++it, ++it1) {
+                                    if(it !=cST->end())  {
+                                        if((*it)->kind() == SymTabEntry::Kind::VARIABLE_KIND) {
+                                            VariableEntry *ve = (VariableEntry*)(*it);
+                                                prm->push_back(new VariableEntry((*it1), ve->varKind(), ve->type()));
+                                        }
                                     }
                                 }
                             }
                             $$ = new PrimitivePatNode(ee, prm, NULL, yylinenum, 0, yyfilename);
                         };
 event_params_list:      TOK_LPAREN event_params TOK_RPAREN      { $$=$2;                                                    };
-event_params:           {} 
+event_params:           {$$ = new vector<string>();} 
                         |   TOK_IDENT {
                                 $$ = new vector<string>();
                                 if($1 != NULL)

@@ -781,6 +781,7 @@ void PrimitivePatNode::print(ostream& out, int indent) const
 
 const Type* PrimitivePatNode::typeCheck() {
 	LOG("");
+   // cout<<"Inside Primitve PAtnode";
 	return NULL;
 }
 
