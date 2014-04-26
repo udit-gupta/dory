@@ -355,9 +355,12 @@ OpNode::typeCheck()
   if (opCode_ == OpNode::OpCode::UMINUS) {
     assert(arity_ == 1);
 
-    if (arg(0)->type()->isNumeric(arg(0)->type()->tag()))
+    if (arg(0)->type()->isNumeric(arg(0)->type()->tag())) {
       type(arg(0)->type());
-    else
+
+      if (!arg(0)->type()->isSigned(arg(0)->type()->tag()))
+        arg(0)->coercedType(new Type(Type::TypeTag::INT)); 
+    } else
       type(new Type(Type::TypeTag::ERROR));
 
     return type();
@@ -369,8 +372,10 @@ OpNode::typeCheck()
         arg(1)->coercedType(arg(0)->type());
       
       type(new Type(Type::TypeTag::BOOL));
-    } else
+    } else {
       type(new Type(Type::TypeTag::ERROR));
+      errMsg("Assigned expression must be a subtype of target", arg(1));
+    }
 
     return type();
   }
@@ -615,7 +620,12 @@ InvocationNode::typeCheck()
     }
 
     if ((int)parameters->size() != symTabEntry()->type()->arity()) {
-      cout << "Incorrect number of parameters passed. Call: " << parameters->size() << " Decl: " << symTabEntry()->type()->arity() << endl;
+        char *ival = (char *)malloc(10);
+	sprintf(ival, "%d", symTabEntry()->type()->arity());
+	string message = ival;
+	message.append(" arguments expected for ");
+	message.append(symTabEntry()->name());
+	errMsg(message, parameters->at(0));
     }
 
     /* Even if number of parameters is wrong, we still go ahead with the typeCheck() */
@@ -633,7 +643,13 @@ InvocationNode::typeCheck()
         if (!parameters->at(i)->type()->isSubType((Type *)formal_param->at(i)))
           parameters->at(i)->coercedType(formal_param->at(i));
       } else {
-        cout << "Parameter mismatch........." << endl;
+        char *ival = (char *)malloc(10);
+	sprintf(ival, "%d", i+1);
+	string message = "Type mismatch for argument ";
+	message.append(ival);
+	message.append(" to ");
+	message.append(symTabEntry()->name());
+	errMsg(message, parameters->at(i));
       }
     }
 
@@ -672,6 +688,12 @@ ReturnStmtNode::typeCheck()
       expr_->coercedType(fun_->type()->retType());
     type((Type *)fun_->type()->retType());
   } else {
+    if (fun_ && expr_ && expr_->type() && fun_->type() &&
+		                      fun_->type()->retType() && fun_->type()->retType()->tag() == Type::TypeTag::VOID
+				      && expr_->type()->tag() != Type::TypeTag::VOID)
+    	errMsg("No return value expected for a void function", expr_);
+    else
+    	errMsg("Return value incompatible with current function's type", expr_);
     type(new Type(Type::TypeTag::ERROR));
   }
 
@@ -695,8 +717,10 @@ IfNode::typeCheck()
   if (cond() && cond()->type() &&
 		  cond()->type()->isBool(cond()->type()->tag()))
       type(new Type(Type::TypeTag::BOOL));
-  else
+  else {
+      errMsg("Boolean argument expected", cond());
       type(new Type(Type::TypeTag::ERROR));
+  }
   return type();
 }
 
