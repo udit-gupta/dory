@@ -257,8 +257,15 @@ OpNode::typeCheck()
         type(new Type(Type::TypeTag::UINT));
       else
         type(new Type(Type::TypeTag::INT));
-    } else
+
+      if (!arg(0)->type()->isSubType(arg(1)->type()) && arg(1)->type()->isSubType(arg(0)->type()))
+	      arg(0)->coercedType(arg(1)->type());
+      else if (arg(0)->type()->isSubType(arg(1)->type()) && !arg(1)->type()->isSubType(arg(0)->type()))
+	      arg(1)->coercedType(arg(0)->type());
+    } else {
+
       type(new Type(Type::TypeTag::ERROR));
+    }
 
     return type();
   }
