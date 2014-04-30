@@ -73,6 +73,11 @@ int memAllocUtil(Type *var_type, enum EntryKind entry_kind, int reset_AR)
     int return_offset = 0;
     int type_size = 0;
 
+    if (!var_type) {
+	LOG("Type is NULL!");
+	return return_offset;
+    }
+
     type_size = size_of_type(var_type);
 
     switch(entry_kind) {
