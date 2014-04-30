@@ -50,15 +50,12 @@ void GlobalEntry::typePrint(ostream& out, int indent) const
 const Type* GlobalEntry::typeCheck()
 {
     LOG("");
-    /* TODO: Figure out how to indicate error in Type Checking Phase */
-    const Type *type = NULL;
     const vector<RuleNode*> pr = GlobalEntry::rules();
 
     typeST(0, 0);
 
     for(vector<RuleNode*>::const_iterator it = pr.begin(); it != pr.end(); it++) {
-      /* XXX: We have the type, now what to do? */
-      type = (*it)->typeCheck();
+      (*it)->typeCheck();
     }
 
     return NULL;
@@ -131,6 +128,7 @@ const Type* VariableEntry::typeCheck()
             return_type = type();
         } else {
             return_type = new Type(Type::TypeTag::ERROR);
+            errMsg("Assignment between incompatible types", initVal());
         }
     }
 

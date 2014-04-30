@@ -257,8 +257,15 @@ OpNode::typeCheck()
         type(new Type(Type::TypeTag::UINT));
       else
         type(new Type(Type::TypeTag::INT));
-    } else
+
+      if (!arg(0)->type()->isSubType(arg(1)->type()) && arg(1)->type()->isSubType(arg(0)->type()))
+	      arg(0)->coercedType(arg(1)->type());
+      else if (arg(0)->type()->isSubType(arg(1)->type()) && !arg(1)->type()->isSubType(arg(0)->type()))
+	      arg(1)->coercedType(arg(0)->type());
+    } else {
+
       type(new Type(Type::TypeTag::ERROR));
+    }
 
     return type();
   }
@@ -360,9 +367,12 @@ OpNode::typeCheck()
   if (opCode_ == OpNode::OpCode::UMINUS) {
     assert(arity_ == 1);
 
-    if (arg(0)->type()->isNumeric(arg(0)->type()->tag()))
+    if (arg(0)->type()->isNumeric(arg(0)->type()->tag())) {
       type(arg(0)->type());
-    else
+
+      if (!arg(0)->type()->isSigned(arg(0)->type()->tag()))
+        arg(0)->coercedType(new Type(Type::TypeTag::INT)); 
+    } else
       type(new Type(Type::TypeTag::ERROR));
 
     return type();
@@ -374,8 +384,10 @@ OpNode::typeCheck()
         arg(1)->coercedType(arg(0)->type());
       
       type(new Type(Type::TypeTag::BOOL));
-    } else
+    } else {
       type(new Type(Type::TypeTag::ERROR));
+      errMsg("Assigned expression must be a subtype of target", arg(1));
+    }
 
     return type();
   }
@@ -424,6 +436,13 @@ StmtNode(StmtNode::StmtNodeKind::IF, line, column, file)
     IfNode::else_ = elseStmt;
 }
 
+WhileNode::WhileNode(ExprNode* cond, StmtNode* doStmt, int line, int column, string file):
+StmtNode(StmtNode::StmtNodeKind::WHILE, line, column, file) 
+{
+    WhileNode::cond_ = cond;
+    WhileNode::do_ = doStmt;
+}
+
 PrimitivePatNode::PrimitivePatNode(EventEntry* ee, vector<VariableEntry*>* params, ExprNode* c, int line, int column, string file):
 BasePatNode(BasePatNode::PatNodeKind::PRIMITIVE, line, column, file)
 {
@@ -469,6 +488,7 @@ void ValueNode::typePrint(ostream& out, int indent) const
 {
     if (type())
         type()->print(out, indent);
+   // cout << "Value:" << value()->ival() << endl;
 }
 
 void RefExprNode::print(ostream& out, int indent) const
@@ -621,7 +641,12 @@ InvocationNode::typeCheck()
     }
 
     if ((int)parameters->size() != symTabEntry()->type()->arity()) {
-      cout << "Incorrect number of parameters passed. Call: " << parameters->size() << " Decl: " << symTabEntry()->type()->arity() << endl;
+        char *ival = (char *)malloc(10);
+	sprintf(ival, "%d", symTabEntry()->type()->arity());
+	string message = ival;
+	message.append(" arguments expected for ");
+	message.append(symTabEntry()->name());
+	errMsg(message, parameters->at(0));
     }
 
     /* Even if number of parameters is wrong, we still go ahead with the typeCheck() */
@@ -639,7 +664,13 @@ InvocationNode::typeCheck()
         if (!parameters->at(i)->type()->isSubType((Type *)formal_param->at(i)))
           parameters->at(i)->coercedType(formal_param->at(i));
       } else {
-        cout << "Parameter mismatch........." << endl;
+        char *ival = (char *)malloc(10);
+	sprintf(ival, "%d", i+1);
+	string message = "Type mismatch for argument ";
+	message.append(ival);
+	message.append(" to ");
+	message.append(symTabEntry()->name());
+	errMsg(message, parameters->at(i));
       }
     }
 
@@ -678,12 +709,32 @@ ReturnStmtNode::typeCheck()
       expr_->coercedType(fun_->type()->retType());
     type((Type *)fun_->type()->retType());
   } else {
+    if (fun_ && expr_ && expr_->type() && fun_->type() &&
+		                      fun_->type()->retType() && fun_->type()->retType()->tag() == Type::TypeTag::VOID
+				      && expr_->type()->tag() != Type::TypeTag::VOID)
+    	errMsg("No return value expected for a void function", expr_);
+    else
+    	errMsg("Return value incompatible with current function's type", expr_);
     type(new Type(Type::TypeTag::ERROR));
   }
 
   return type();
 }
 
+const Type *
+BreakStmtNode::typeCheck()
+{
+  LOG("");
+
+  if (expr_){
+    expr_->typeCheck();
+    type((Type *)expr_->type());
+  } else {
+    type(new Type(Type::TypeTag::INT));
+  }
+
+  return type();
+}
 
 const Type *
 IfNode::typeCheck()
@@ -701,11 +752,32 @@ IfNode::typeCheck()
   if (cond() && cond()->type() &&
 		  cond()->type()->isBool(cond()->type()->tag()))
       type(new Type(Type::TypeTag::BOOL));
+  else {
+      errMsg("Boolean argument expected", cond());
+      type(new Type(Type::TypeTag::ERROR));
+  }
+  return type();
+}
+
+const Type *
+WhileNode::typeCheck()
+{
+  LOG("");
+  if (cond())
+      cond()->typeCheck();
+
+  if (doStmt())
+      doStmt()->typeCheck();
+
+  if (cond() && cond()->type() &&
+		  cond()->type()->isBool(cond()->type()->tag()))
+      type(new Type(Type::TypeTag::BOOL));
   else
       type(new Type(Type::TypeTag::ERROR));
   return type();
 }
-
+  
+  
 void IfNode::print(ostream& out, int indent) const 
 {
     out << "if (";
@@ -729,6 +801,22 @@ void IfNode::print(ostream& out, int indent) const
     }
 }
 
+
+void WhileNode::print(ostream& out, int indent) const 
+{
+    out << "while (";
+    if(cond() != NULL)
+        cond()->print(out, indent);
+    out << ") ";
+    if(doStmt() != NULL) {
+        doStmt()->print(out, indent + STEP_INDENT);
+        if(doStmt()->stmtNodeKind() != StmtNode::StmtNodeKind::COMPOUND) 
+            endln(out, indent);
+    }
+    else 
+        endln(out, indent);
+}
+
 void IfNode::typePrint(ostream& out, int indent) const 
 {
     out << "if (";
@@ -750,6 +838,22 @@ void IfNode::typePrint(ostream& out, int indent) const
         if(elseStmt()->stmtNodeKind() != StmtNode::StmtNodeKind::COMPOUND) 
             endln(out, indent);
     }
+}
+
+
+void WhileNode::typePrint(ostream& out, int indent) const 
+{
+    out << "while (";
+    if(cond() != NULL)
+        cond()->typePrint(out, indent);
+    out << ") ";
+    if(doStmt() != NULL) {
+        doStmt()->typePrint(out, indent + STEP_INDENT);
+        if(doStmt()->stmtNodeKind() != StmtNode::StmtNodeKind::COMPOUND) 
+            endln(out, indent);
+    }
+    else 
+        endln(out, indent);
 }
 
 void PrimitivePatNode::print(ostream& out, int indent) const 
@@ -787,7 +891,62 @@ void PrimitivePatNode::print(ostream& out, int indent) const
 
 const Type* PrimitivePatNode::typeCheck() {
 	LOG("");
-	return NULL;
+   
+    /*
+    
+    if(event() != NULL) {
+        if(event()->name().compare("any") == 0) {
+            
+        }
+        else {
+            int num_params = 0, i;
+            const vector<VariableEntry*> *parameters = params();
+            vector<Type*> *formal_param = NULL;
+
+      */      /* Need to first check if number of params match number of types in SymTabEntry.
+            * Next check that each parameter is a subtype of formal param in SymTabEntry.*/
+        /*    if (event() && event()->type()) {
+                if ((!parameters && !event()->type()->argTypes()) || (parameters && !parameters->size() && event()->type()->argTypes() && !event()->type()->argTypes()->size())) {
+                    type((Type *)event()->type()->retType());
+                    return type();
+                }
+
+                if (!parameters || !event()->type()->argTypes()) {
+                    cout << "Event : Either parameters or symTabEntry argTypes is null!" << endl;
+                    type((Type *)event()->type()->retType());
+                     return type();
+                }
+
+                if ((int)parameters->size() != event()->type()->arity()) {
+                    cout << "Event : Incorrect number of parameters passed. Call: " << parameters->size() << " Decl: " << event()->type()->arity() << endl;
+                }
+
+          */      /* Even if number of parameters is wrong, we still go ahead with the typeCheck() */
+            /*    if ((int)parameters->size() <= event()->type()->arity())
+                    num_params = parameters->size();
+                else
+                    num_params = event()->type()->arity();
+
+                formal_param = (std::vector<Type *>*)event()->type()->argTypes();
+
+                for (i = 0; i < num_params; i++) {
+                    parameters->at(i)->typeCheck();
+
+                    if(formal_param->at(i)->isSubType((Type *)parameters->at(i)->type())) {
+                        if (!parameters->at(i)->type()->isSubType((Type *)formal_param->at(i)))
+                            parameters->at(i)->initVal()->coercedType(formal_param->at(i));
+                    } else {
+                        cout << "Event : Parameter mismatch........." << endl;
+                    }
+                }
+
+            }
+
+            type((Type *)event()->type()->retType());
+            return type();
+        }
+    }*/
+    return NULL;
 }
 
 void PrimitivePatNode::typePrint(ostream& out, int indent) const 

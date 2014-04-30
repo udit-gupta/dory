@@ -140,6 +140,7 @@ typedef union YYSTYPE
   StmtNode*          stmtVal;
   list<StmtNode*>*   stmtList;
   IfNode*            ifVal;
+  WhileNode*         whileVal;
   CompoundStmtNode*  compoundStmtVal;
   RuleNode*          ruleNode;
 
@@ -151,7 +152,7 @@ typedef union YYSTYPE
 
 
 /* Line 2068 of yacc.c  */
-#line 155 "E--_parser.H"
+#line 156 "E--_parser.H"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

@@ -1,0 +1,20 @@
+int abc(int x);
+event a(int x,int y);
+event b(int x);
+event c(int a,int b,int c);
+
+int z;
+int f,g,w,j,y ;
+
+a(f,g,w,j) : b() -> {
+    z=w;
+    abc(f);
+}
+/*
+a(f,j) : b(y, w) -> z=f;
+*/
+
+
+
+
+

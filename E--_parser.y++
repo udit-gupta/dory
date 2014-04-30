@@ -46,6 +46,7 @@ Type *fun_ret_type;
   StmtNode*          stmtVal;
   list<StmtNode*>*   stmtList;
   IfNode*            ifVal;
+  WhileNode*         whileVal;
   CompoundStmtNode*  compoundStmtVal;
   RuleNode*          ruleNode;
 
@@ -86,7 +87,7 @@ Type *fun_ret_type;
 %type <variableEntry> var_ident
 %type <variableEntries> ident_list
 
-%type <stmtVal> stmt return_stmt fun_call_stmt
+%type <stmtVal> stmt return_stmt fun_call_stmt break_stmt
 %type <stmtList> stmt_star
 
 %type <eventEntry> event_decl event_hdr
@@ -106,6 +107,7 @@ Type *fun_ret_type;
 
 %type <exprVal> expr expr_star assign_expr fun_call     
 %type <ifVal> if_expr_star if_expr
+%type <whileVal> while_expr
 %type <refexpVal> ref_expr
 
 %type <typeList> formal_params formal_param_list formal_list
@@ -400,17 +402,49 @@ event_call:             TOK_IDENT event_params_list {
                             if(cST != NULL) {
                                 SymTab::const_iterator it = cST->begin();
                                 std::vector<string>::const_iterator it1  = $2->begin();
-                                for(; it != cST->end() || it1 != $2->end(); ++it, ++it1) {
-                                    if((*it)->kind() == SymTabEntry::Kind::VARIABLE_KIND) {
-                                        VariableEntry *ve = (VariableEntry*)(*it);
-                                        prm->push_back(new VariableEntry((*it1), ve->varKind(), ve->type()));
+                                //for(; it != cST->end(), it1 != $2->end(); ++it, ++it1) {
+                            
+
+                                if(cST->size() != $2->size()) {
+                                    cout<< "Event Paramter Mismatch !!!!!!"<<endl;
+                                }
+                                else {
+                                    for(; it != cST->end() || it1 != $2->end(); ++it, ++it1) {
+                                        if((*it)->kind() == SymTabEntry::Kind::VARIABLE_KIND) {
+                                            VariableEntry *ve = (VariableEntry*)(*it);
+                                            //prm->push_back(new VariableEntry((*it1), VariableEntry::VarKind::UNDEFINED, (Type *)Type::TypeTag::UNKNOWN));
+                                            prm->push_back(new VariableEntry((*it1), ve->varKind(), ve->type()));
+                                        }
                                     }
                                 }
                             }
+                            $$ = new PrimitivePatNode(ee, prm); 
+                            }
+
+
+
+
+
+
+
+
+
+                        /*        if(cST->size() == $2->size()) {
+                                    for(; it1 != $2->end(); ++it, ++it1) {
+                                        if(it !=cST->end())  {
+                                            prm->push_back(new VariableEntry((*it1), VariableEntry::VarKind::UNDEFINED, (Type *)Type::TypeTag::UNKNOWN));
+                                        }
+                                    }
+                                }
+                                else {
+                                    errMsg("Event Parameter Size MisMatch");
+                                }
+                            }
                             $$ = new PrimitivePatNode(ee, prm, NULL, yylinenum, 0, yyfilename);
-                        };
+                        };*/
+
 event_params_list:      TOK_LPAREN event_params TOK_RPAREN      { $$=$2;                                                    };
-event_params:           {} 
+event_params:           {$$ = new vector<string>();} 
                         |   TOK_IDENT {
                                 $$ = new vector<string>();
                                 if($1 != NULL)
@@ -426,9 +460,11 @@ event_params:           {}
 
 stmt:                   TOK_SEMICOLON                           { $$=NULL;                                                  }
                         |   return_stmt TOK_SEMICOLON           { $$=$1;                                                    }  
+                        |   break_stmt TOK_SEMICOLON            { $$=$1;                                                    }  
                         |   compstmt_star                       { $$=$1;                                                    }
                         |   assign_expr TOK_SEMICOLON           { $$=new ExprStmtNode($1, yylinenum, 0, yyfilename);                                  } 
                         |   if_expr_star                        { $$=$1;                                                    }
+                        |   while_expr                          { $$=$1;                                                    }
                         |   fun_call_stmt                       { $$=$1;                                                    };
 
 compstmt_star:          compstmt { $$=$1; } %prec "reduce" 
@@ -453,6 +489,9 @@ return_stmt:            TOK_RETURN expr {
                                 $$ = new ReturnStmtNode($2, ((FunctionEntry*)ce), yylinenum, 0, yyfilename);
                         };
 
+break_stmt:             TOK_BREAK                       { $$ = new BreakStmtNode(NULL, yylinenum, 0, yyfilename); };
+
+
                 /********** If Expressions  *************/
 
 
@@ -460,6 +499,12 @@ if_expr_star:           if_expr %prec "then" { $$=$1; }
                         |   if_expr TOK_ELSE stmt { $$ = new IfNode(((IfNode*)$1)->cond(), ((IfNode*)$1)->thenStmt(), $3, yylinenum, 0, yyfilename);           
                         };
 if_expr:                TOK_IF expr stmt { $$ = new IfNode($2, $3, NULL, yylinenum, 0, yyfilename); };
+
+                
+                /********** While Expressions  *************/
+
+
+while_expr:             TOK_WHILE expr stmt { $$ = new WhileNode($2, $3, yylinenum, 0, yyfilename); };
 
                 
         /************ Function Invocation *******************/
