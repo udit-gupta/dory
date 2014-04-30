@@ -128,6 +128,7 @@ const Type* VariableEntry::typeCheck()
             return_type = type();
         } else {
             return_type = new Type(Type::TypeTag::ERROR);
+            errMsg("Assignment between incompatible types", initVal());
         }
     }
 
