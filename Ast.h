@@ -34,9 +34,9 @@ class VariableEntry;
      |      |         |          |           |                     |
      |  RefExprNode  OpNode  ValueNode  InvocationNode             |
      |                                                             |
-     |                                      +---------------+------+-----+
-     |                                      |               |            |
-     |                                 ExprStmtNode   CompoundStmtNode IfNode
+     |                                      +---------------+------+-----+---------+
+     |                                      |               |            |         |
+     |                                 ExprStmtNode   CompoundStmtNode IfNode   WhileNode
      |
      |
    +-+------------------+
@@ -389,7 +389,7 @@ class PatNode: public BasePatNode {
 
 class StmtNode: public AstNode {
  public:
-  enum class StmtNodeKind { ILLEGAL=-1, EXPR, IF, COMPOUND, RETURN};
+  enum class StmtNodeKind { ILLEGAL=-1, EXPR, IF, COMPOUND, RETURN, WHILE, BREAK};
  public: 
   StmtNode(StmtNodeKind skm, int line=0, int column=0, string file=""):
     AstNode(AstNode::NodeType::STMT_NODE, line,column,file) { skind_ = skm; };
@@ -438,6 +438,39 @@ class ReturnStmtNode: public StmtNode {
  private:
   ExprNode* expr_;
   FunctionEntry* fun_;
+};
+
+
+class BreakStmtNode: public StmtNode {
+ public:
+  BreakStmtNode(ExprNode *e, int line=0, int column=0, string file=""):
+    StmtNode(StmtNode::StmtNodeKind::BREAK,line,column,file) { expr_ = e;};
+  ~BreakStmtNode() {};
+
+
+    /* TODO: Need to check specifications for break statements carefully and update the code.
+            Currently break simply return int in default case                           */
+
+  const Type* typeCheck();
+  void print(ostream& os, int indent) const {
+    os << "break"; 
+    if(expr_ != NULL) expr_->print(os, indent); else os <<";";
+  }
+
+  void typePrint(ostream& os, int indent) const {
+    os << "break ";
+    if(expr_ != NULL) {
+	    if (expr_->coercedType()) {
+		    os << "(";
+		    expr_->coercedType()->print(os, indent);
+		    os << ")";
+	    }
+	    expr_->typePrint(os, indent); 
+    }
+    else os << "(int);";
+  }
+ private:
+  ExprNode* expr_;
 };
 
 /****************************************************************/
@@ -527,6 +560,33 @@ class IfNode: public StmtNode{
 
   IfNode(const IfNode&);
 };
+
+
+/****************************************************************/
+
+class WhileNode: public StmtNode{
+ public:
+  WhileNode(ExprNode* cond, StmtNode* doStmt, int line=0, int column=0, string file="");
+  ~WhileNode(){};
+  
+  const Type* typeCheck();
+  const ExprNode* cond() const {return cond_;}
+  const StmtNode* doStmt() const  { return do_;};
+  
+  ExprNode* cond() {return cond_;}      
+  StmtNode* doStmt() { return do_;};
+
+  void print(ostream& os, int indent) const;
+  void typePrint(ostream& os, int indent) const;
+
+ private: 
+  ExprNode *cond_;
+  StmtNode *do_;
+
+  WhileNode(const WhileNode&);
+
+};
+
 
 /****************************************************************/
 
