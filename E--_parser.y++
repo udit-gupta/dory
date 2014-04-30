@@ -3,6 +3,7 @@
 #include "Ast.h"
 #include "ParserUtil.h"
 #include "Error.h"
+#include "log.h"
 
 using namespace std;
 
@@ -516,7 +517,8 @@ expr_star:              literal                                 {   $$=new Value
 
 assign_expr:            ref_expr TOK_ASSIGN expr                {   $$=new OpNode(OpNode::OpCode::ASSIGN,$1,$3, yylinenum, 0, yyfilename);            }; 
  
-ref_expr:               TOK_IDENT                               {   SymTabEntry *ce = stm.lookUp($1); $$=new RefExprNode($1, ce, yylinenum, 0, yyfilename);  };
+ref_expr:               TOK_IDENT                               {   SymTabEntry *ce = stm.lookUp($1); LOG("symbol table entry " << (unsigned long)ce);
+                                                                    $$=new RefExprNode($1, ce, yylinenum, 0, yyfilename);  };
 
 
                 /******* Literal Constant Handling *****/

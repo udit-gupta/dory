@@ -285,11 +285,14 @@ OpNode::typeCheck()
         /* They must be of same type. */
         type(arg(0)->type());
       } else {
+        LOG("TypeTag::ERROR");
         /* This should not happen. Return error. */
         type(new Type(Type::TypeTag::ERROR));
       }
-    } else
+    } else {
+      LOG("TypeTag::ERROR");
       type(new Type(Type::TypeTag::ERROR));
+    }
 
     return type();
   }
@@ -299,8 +302,10 @@ OpNode::typeCheck()
 
     if (arg(0)->type()->isNumeric(arg(0)->type()->tag()))
       type(arg(0)->type());
-    else
+    else {
+      LOG("TypeTag::ERROR");
       type(new Type(Type::TypeTag::ERROR));
+    }
 
     return type();
   }
@@ -479,6 +484,7 @@ RefExprNode::typeCheck()
   if (symTabEntry()) {
     type((Type *)symTabEntry()->type());
   } else {
+    LOG("TypeTag::ERROR");
     type(new Type(Type::TypeTag::ERROR));
   }
 
