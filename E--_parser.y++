@@ -15,6 +15,8 @@ extern const OpNode::OpInfo opInfo[];
 /* Global variables for inherited attributes */
 Type *var_type;
 Type *fun_ret_type;
+RuleBlockEntry* rbe = NULL;
+int start_rule_scope = 0;
 
 %}
 
@@ -89,7 +91,7 @@ Type *fun_ret_type;
 %type <stmtVal> stmt return_stmt fun_call_stmt break_stmt
 %type <stmtList> stmt_star
 
-%type <eventEntry> event_decl event_hdr
+%type <eventEntry> event_decl event_hdr event_call_header
 %type <primPatVal> event_call primitive_pat_star primitive_pat
 %type <strVector> event_params event_params_list
 
@@ -358,15 +360,24 @@ func_stmt:              stmt_star { $$ = new CompoundStmtNode($1, yylinenum, 0, 
 
 
 rule_star:              rule {
+			    stm.leaveScope();
+			    stm.insert(rbe);
+			    start_rule_scope = 0;
+
                             SymTabEntry *ce = stm.currentScope();
                             if(ce->kind() == SymTabEntry::Kind::GLOBAL_KIND) 
                                 ((GlobalEntry*)ce)->addRule($1);
                         }
                         |   rule_star rule {
-                                SymTabEntry *ce = stm.currentScope();
-                                if(ce->kind() == SymTabEntry::Kind::GLOBAL_KIND) 
-                                    ((GlobalEntry*)ce)->addRule($2);
+				stm.leaveScope();
+				stm.insert(rbe);
+				start_rule_scope = 0;
+
+				SymTabEntry *ce = stm.currentScope();
+				if(ce->kind() == SymTabEntry::Kind::GLOBAL_KIND)
+					((GlobalEntry*)ce)->addRule($2);
                         };
+
 rule:                   rule_pattern TOK_ARROW stmt{
                             RuleBlockEntry *bE = new RuleBlockEntry();
                             $$ = new RuleNode(bE, $1, $3, yylinenum, 0, yyfilename);
@@ -386,64 +397,59 @@ primitive_pat_star:     primitive_pat                           { $$=$1;        
                                 $1->cond($3);
                                 $$ = $1; 
                         };
-primitive_pat:          event_call                              { $$=$1;                                                    }
-                        |   TOK_ANY                             { $$ = new PrimitivePatNode(new EventEntry("any"), NULL, NULL, yylinenum, 0, yyfilename);   };
+
+primitive_pat:          event_call                              { $$=$1; };
 
 
-                /* Event Invocation */
-event_call:             TOK_IDENT event_params_list { 
-                            SymTabEntry *ste = stm.lookUp($1);
-                            EventEntry *ee = (EventEntry*) ste;
-                            if(ee->kind() == SymTabEntry::Kind::EVENT_KIND) 
-                                ee = (EventEntry*) ste;
-                            vector<VariableEntry*> *prm = new vector<VariableEntry*>();
-                            const SymTab *cST = ee->symTab();
-                            if(cST != NULL) {
-                                SymTab::const_iterator it = cST->begin();
-                                std::vector<string>::const_iterator it1  = $2->begin();
-                                //for(; it != cST->end(), it1 != $2->end(); ++it, ++it1) {
-                            
+/* Event Invocation */
+event_call_header:		TOK_IDENT TOK_LPAREN {
+				EventEntry *epl = static_cast <EventEntry*> (stm.lookUp($1)); //TODO: lookUpScope() ?
+				rbe = new RuleBlockEntry();
 
-                                if(cST->size() != $2->size()) {
-                                    cout<< "Event Paramter Mismatch !!!!!!"<<endl;
-                                }
-                                else {
-                                    for(; it != cST->end() || it1 != $2->end(); ++it, ++it1) {
-                                        if((*it)->kind() == SymTabEntry::Kind::VARIABLE_KIND) {
-                                            VariableEntry *ve = (VariableEntry*)(*it);
-                                            //prm->push_back(new VariableEntry((*it1), VariableEntry::VarKind::UNDEFINED, (Type *)Type::TypeTag::UNKNOWN));
-                                            prm->push_back(new VariableEntry((*it1), ve->varKind(), ve->type()));
-                                        }
-                                    }
-                                }
-                            }
-                            $$ = new PrimitivePatNode(ee, prm); 
-                            }
+				if(!start_rule_scope) {
+					stm.enterScope(rbe);
+					start_rule_scope = 1;
+				}
 
+				$$ = epl;
+			};
 
+event_call:             event_call_header event_params_list TOK_RPAREN {
+				std::vector<VariableEntry*>* vent = new std::vector<VariableEntry*>();
+				std::vector<string>::iterator it;
+				int param_count = 0, count = 0;
 
+				if ($1 && $1->symTab()) {
+					if ($1->symTab()->size() > (int)$2->size())
+						param_count = $2->size();
+					else
+						param_count = $1->symTab()->size();
 
+					SymTab::iterator it_sym = $1->symTab()->begin();
 
+					for (it = $2->begin(), it_sym = $1->symTab()->begin(); it != $2->end(), it_sym != $1->symTab()->end(); ++it, ++it_sym) {
+						if (count < param_count)
+							vent->push_back(new VariableEntry(*it, VariableEntry::VarKind::PARAM_VAR, (*it_sym)->type()));
+						count++;
+					}
+				}
 
+				$$ = new PrimitivePatNode($1, vent, nullptr, yylinenum, 0, yyfilename);
+                        }
+			| TOK_ANY {
+				EventEntry *epl = static_cast <EventEntry*> (stm.lookUp("any")); //TODO: lookUpScope() ?
+				rbe = new RuleBlockEntry();
 
+				$$ = new PrimitivePatNode(epl, nullptr, nullptr, yylinenum, 0, yyfilename);
+				if(!start_rule_scope) {
+					stm.enterScope(rbe);
+					start_rule_scope = 1;
+				}
+			};
 
+event_params_list:      event_params      { $$=$1; };
 
-                        /*        if(cST->size() == $2->size()) {
-                                    for(; it1 != $2->end(); ++it, ++it1) {
-                                        if(it !=cST->end())  {
-                                            prm->push_back(new VariableEntry((*it1), VariableEntry::VarKind::UNDEFINED, (Type *)Type::TypeTag::UNKNOWN));
-                                        }
-                                    }
-                                }
-                                else {
-                                    errMsg("Event Parameter Size MisMatch");
-                                }
-                            }
-                            $$ = new PrimitivePatNode(ee, prm, NULL, yylinenum, 0, yyfilename);
-                        };*/
-
-event_params_list:      TOK_LPAREN event_params TOK_RPAREN      { $$=$2;                                                    };
-event_params:           {$$ = new vector<string>();} 
+event_params:           { $$ = new vector<string>(); }
                         |   TOK_IDENT {
                                 $$ = new vector<string>();
                                 if($1 != NULL)
