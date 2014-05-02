@@ -2,6 +2,7 @@
 #include "Value.h"
 #include "ParserUtil.h"
 #include "log.h"
+#include "MemAllocUtil.h"
 
 /*************
 
@@ -59,6 +60,13 @@ const Type* GlobalEntry::typeCheck()
     }
 
     return NULL;
+}
+
+void GlobalEntry::memAlloc()
+{
+    memAllocST(0,0);
+
+    return;
 }
 
 void EventEntry::print(ostream& out, int indent) const
@@ -135,6 +143,11 @@ const Type* VariableEntry::typeCheck()
     return return_type;
 }
 
+void VariableEntry::memAlloc()
+{
+    return;
+}
+
 void FunctionEntry::print(ostream& out, int indent) const 
 {
     out << type()->retType()->fullName() << " " << name();
@@ -181,6 +194,11 @@ const Type* FunctionEntry::typeCheck()
     if (body())
 	    body()->typeCheck();
     return NULL;
+}
+
+void FunctionEntry::memAlloc()
+{
+    return;
 }
 
 void BlockEntry::print(ostream& out, int indent) const

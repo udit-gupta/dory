@@ -86,6 +86,13 @@ class SymTabEntry: public ProgramElem {
   virtual const Type* typeCheck() { return NULL; };
   virtual void typePrint(ostream& os, int indent=0) const { return; };
 
+  virtual void memAlloc() { return; };
+
+  virtual void memAllocST(int first=0, int last=0) const {
+    if (symTab() != nullptr)
+      symTab()->memAllocST(first, last);
+  }
+
  private:
   string name_;
   Kind kind_;
