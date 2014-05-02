@@ -37,7 +37,7 @@ class GlobalEntry: public SymTabEntry {
 
   void typePrint(ostream&, int indent=0) const;
 
-  void memAlloc();
+  void memAlloc(int reset_AR);
 
  private:
   vector<RuleNode*> rules_;
@@ -54,7 +54,7 @@ class BlockEntry: public SymTabEntry {
 
   void typePrint(ostream&, int indent=0) const;
 
-  void memAlloc() { return; };
+  void memAlloc(int reset_AR) { return; };
 };
 
 class RuleBlockEntry: public BlockEntry {
@@ -65,7 +65,7 @@ class RuleBlockEntry: public BlockEntry {
 
   const Type* typeCheck();
 
-  void memAlloc() { return; };
+  void memAlloc(int reset_AR) { return; };
 };
 
 /****************************************************************
@@ -103,7 +103,7 @@ class VariableEntry: public SymTabEntry {
 
   void typePrint(ostream&, int indent=0) const;
 
-  void memAlloc();
+  void memAlloc(int reset_AR);
 
  private:
   VarKind vkind_;
@@ -123,7 +123,7 @@ class ClassEntry: public SymTabEntry {
 
   void typePrint(ostream&, int indent=0) const;
 
-  void memAlloc() { return; };
+  void memAlloc(int reset_AR) { return; };
 };
 
 class FunctionEntry: public SymTabEntry {
@@ -145,7 +145,7 @@ class FunctionEntry: public SymTabEntry {
 
   void typePrint(ostream&, int indent=0) const;
 
-  void memAlloc();
+  void memAlloc(int reset_AR);
 
  private:
   CompoundStmtNode* body_;
@@ -163,7 +163,7 @@ class EventEntry: public SymTabEntry {
 
   void typePrint(ostream&, int indent=0) const;
 
-  void memAlloc() { return; };
+  void memAlloc(int reset_AR);
 };  
 
 #endif

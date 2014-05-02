@@ -32,7 +32,7 @@ static int alignment_required(Type *var_type, int current_offset)
 	/* TODO: Does string need alignment? What is size? */
 
 	if (current_offset % INT_FLOAT_ALIGN_BOUNDARY)
-	    offset = current_offset % INT_FLOAT_ALIGN_BOUNDARY;
+	    offset = INT_FLOAT_ALIGN_BOUNDARY - (current_offset % INT_FLOAT_ALIGN_BOUNDARY);
     }
 
     return offset;
@@ -86,7 +86,7 @@ int memAllocUtil(Type *var_type, enum EntryKind entry_kind, int reset_AR)
 
 	    return_offset = offset_from_data;
 	    offset_from_data += type_size;
-		
+
 	    break;
 	case FUNCTION_PARAMETER:
 	    /* These should be at a negative offset from the base pointer. */

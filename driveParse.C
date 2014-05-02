@@ -213,6 +213,7 @@ main(int argc, char *argv[], char *envp[]) {
 //	ge->print(cout);
 	ge->typeCheck();
 	ge->typePrint(cout);
+	ge->memAlloc(0);
   }
 #endif
 }

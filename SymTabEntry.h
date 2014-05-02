@@ -86,11 +86,11 @@ class SymTabEntry: public ProgramElem {
   virtual const Type* typeCheck() { return NULL; };
   virtual void typePrint(ostream& os, int indent=0) const { return; };
 
-  virtual void memAlloc() { return; };
+  virtual void memAlloc(int reset_AR) { return; };
 
-  virtual void memAllocST(int first=0, int last=0) const {
+  virtual void memAllocST(int first=0, int last=0, int reset_AR=0) const {
     if (symTab() != nullptr)
-      symTab()->memAllocST(first, last);
+      symTab()->memAllocST(first, last, reset_AR);
   }
 
  private:

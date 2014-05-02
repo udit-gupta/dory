@@ -167,7 +167,7 @@ SymTab::typeST(int first, int last) const {
 }
 
 void 
-SymTab::memAllocST(int first, int last) const {
+SymTab::memAllocST(int first, int last, int reset_AR) const {
   int i; SymTab::const_iterator it = begin();
 
   if ((first == 0) && (last == 0))
@@ -177,7 +177,10 @@ SymTab::memAllocST(int first, int last) const {
        (it != end()) && (i < last); i++, ++it)  {
     SymTabEntry *ste = (SymTabEntry *)(*it);
     if (i >= first) {
-        ste->memAlloc();
+	if (i == first)
+	    ste->memAlloc(reset_AR);
+	else
+	    ste->memAlloc(0);
     }
   }
 }
