@@ -210,9 +210,10 @@ main(int argc, char *argv[], char *envp[]) {
   GlobalEntry *ge = (GlobalEntry*)(stm.currentScope());
   if (ge != NULL) {
 	cout << "Finished parsing, here is the AST\n";
-//	ge->print(cout);
+	ge->print(cout);
 	ge->typeCheck();
 	ge->typePrint(cout);
+	ge->memAlloc(0);
   }
 #endif
 }

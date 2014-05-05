@@ -640,13 +640,16 @@ InvocationNode::typeCheck()
       return type();
     }
 
-    if ((int)parameters->size() != symTabEntry()->type()->arity()) {
+    if (parameters && (int)parameters->size() != symTabEntry()->type()->arity()) {
         char *ival = (char *)malloc(10);
 	sprintf(ival, "%d", symTabEntry()->type()->arity());
 	string message = ival;
 	message.append(" arguments expected for ");
 	message.append(symTabEntry()->name());
-	errMsg(message, parameters->at(0));
+	if (parameters->size() > 0)
+		errMsg(message, parameters->at(0));
+	else
+		errMsg(message, symTabEntry());
     }
 
     /* Even if number of parameters is wrong, we still go ahead with the typeCheck() */
@@ -892,9 +895,10 @@ void PrimitivePatNode::print(ostream& out, int indent) const
 const Type* PrimitivePatNode::typeCheck() {
 	LOG("");
    
-    /*
-    
     if(event() != NULL) {
+	if (cond())
+		cond()->typeCheck();
+
         if(event()->name().compare("any") == 0) {
             
         }
@@ -903,9 +907,9 @@ const Type* PrimitivePatNode::typeCheck() {
             const vector<VariableEntry*> *parameters = params();
             vector<Type*> *formal_param = NULL;
 
-      */      /* Need to first check if number of params match number of types in SymTabEntry.
+            /* Need to first check if number of params match number of types in SymTabEntry.
             * Next check that each parameter is a subtype of formal param in SymTabEntry.*/
-        /*    if (event() && event()->type()) {
+            if (event() && event()->type()) {
                 if ((!parameters && !event()->type()->argTypes()) || (parameters && !parameters->size() && event()->type()->argTypes() && !event()->type()->argTypes()->size())) {
                     type((Type *)event()->type()->retType());
                     return type();
@@ -921,8 +925,8 @@ const Type* PrimitivePatNode::typeCheck() {
                     cout << "Event : Incorrect number of parameters passed. Call: " << parameters->size() << " Decl: " << event()->type()->arity() << endl;
                 }
 
-          */      /* Even if number of parameters is wrong, we still go ahead with the typeCheck() */
-            /*    if ((int)parameters->size() <= event()->type()->arity())
+                /* Even if number of parameters is wrong, we still go ahead with the typeCheck() */
+                if ((int)parameters->size() <= event()->type()->arity())
                     num_params = parameters->size();
                 else
                     num_params = event()->type()->arity();
@@ -945,7 +949,7 @@ const Type* PrimitivePatNode::typeCheck() {
             type((Type *)event()->type()->retType());
             return type();
         }
-    }*/
+    }
     return NULL;
 }
 

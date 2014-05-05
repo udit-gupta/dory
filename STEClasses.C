@@ -2,6 +2,7 @@
 #include "Value.h"
 #include "ParserUtil.h"
 #include "log.h"
+#include "MemAllocUtil.h"
 
 /*************
 
@@ -61,6 +62,13 @@ const Type* GlobalEntry::typeCheck()
     return NULL;
 }
 
+void GlobalEntry::memAlloc(int reset_AR)
+{
+    memAllocST(0, 0, reset_AR);
+
+    return;
+}
+
 void EventEntry::print(ostream& out, int indent) const
 {
     out << "event " << name();
@@ -77,6 +85,13 @@ const Type* EventEntry::typeCheck()
 {
     LOG("");
     return NULL;
+}
+
+void EventEntry::memAlloc(int reset_AT)
+{
+    this->memAllocST(0, this->type()->arity(), 1);
+
+    return;
 }
 
 void ClassEntry::print(ostream& out, int indent) const 
@@ -135,6 +150,24 @@ const Type* VariableEntry::typeCheck()
     return return_type;
 }
 
+void VariableEntry::memAlloc(int reset_AR)
+{
+    if (varKind() == VariableEntry::GLOBAL_VAR) {
+	offSet(memAllocUtil(type(), EntryKind::GLOBAL, 0));
+	LOG("Allocation of GLOBAL name: " << name() << ", offSet: " << offSet());
+    } else if (varKind() == VariableEntry::LOCAL_VAR) {
+	offSet(memAllocUtil(type(), EntryKind::LOCAL, reset_AR));
+	LOG("Allocation of LOCAL, name: " << name() << ", offSet:" << offSet());
+    } else if (varKind() == VariableEntry::PARAM_VAR) {
+	offSet(memAllocUtil(type(), EntryKind::FUNCTION_PARAMETER, reset_AR));
+	LOG("Allocation of PARAM, name: " << name() << ", offSet: " << offSet());
+    } else {
+	LOG("Allocation failed for, name: " << name() << ", VarKind not set! Cannot know where to allocate this.");
+    }
+
+    return;
+}
+
 void FunctionEntry::print(ostream& out, int indent) const 
 {
     out << type()->retType()->fullName() << " " << name();
@@ -181,6 +214,16 @@ const Type* FunctionEntry::typeCheck()
     if (body())
 	    body()->typeCheck();
     return NULL;
+}
+
+void FunctionEntry::memAlloc(int reset_AR)
+{
+    if (this->type()->arity())
+	this->memAllocST(0, this->type()->arity(), 1);
+    else
+	this->memAllocST(this->type()->arity(), 100000, 1);
+
+    return;
 }
 
 void BlockEntry::print(ostream& out, int indent) const
