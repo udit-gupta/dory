@@ -29,6 +29,10 @@ ExprNode::ExprNode(const ExprNode& e) : AstNode(e)
     ExprNode::coercedType_ = new Type(*e.coercedType());
 }
 
+void ExprNode::codeGen()
+{
+}
+
 /****************************************************************/
 extern const OpNode::OpInfo opInfo[] = {
   // print name, arity, paren_flag, fixity, arg types, out type, constraints
@@ -396,6 +400,10 @@ OpNode::typeCheck()
   return type();
 }
 
+void OpNode::codeGen()
+{
+}
+
 /*************************************** Below this , I need to implement my own stuff ************************************************/
 
 /*******        Here, I neeed to initialize my constructors as per the requirements            ********/
@@ -414,6 +422,10 @@ ExprNode::ExprNode(refExprNode)
        RefExprNode::sym_ = refExprNode.symTabEntry();
 }
 
+void RefExprNode::codeGen()
+{
+}
+
 InvocationNode::InvocationNode(const SymTabEntry *ste, vector<ExprNode*>* param, int line, int column, string file):
 ExprNode::ExprNode(ExprNode::ExprNodeType::INV_NODE, NULL, line, column, file)
 {
@@ -428,6 +440,10 @@ ExprNode::ExprNode(invcNode)
     InvocationNode::ste_ = invcNode.symTabEntry();
 }
 
+void InvocationNode::codeGen()
+{
+}
+
 IfNode::IfNode(ExprNode* cond, StmtNode* thenStmt, StmtNode* elseStmt, int line, int column, string file):
 StmtNode(StmtNode::StmtNodeKind::IF, line, column, file) 
 {
@@ -436,11 +452,19 @@ StmtNode(StmtNode::StmtNodeKind::IF, line, column, file)
     IfNode::else_ = elseStmt;
 }
 
+void IfNode::codeGen()
+{
+}
+
 WhileNode::WhileNode(ExprNode* cond, StmtNode* doStmt, int line, int column, string file):
 StmtNode(StmtNode::StmtNodeKind::WHILE, line, column, file) 
 {
     WhileNode::cond_ = cond;
     WhileNode::do_ = doStmt;
+}
+
+void WhileNode::codeGen()
+{
 }
 
 PrimitivePatNode::PrimitivePatNode(EventEntry* ee, vector<VariableEntry*>* params, ExprNode* c, int line, int column, string file):
@@ -451,11 +475,19 @@ BasePatNode(BasePatNode::PatNodeKind::PRIMITIVE, line, column, file)
     PrimitivePatNode::cond_ = c;
 }
 
+void PrimitivePatNode::codeGen()
+{
+}
+
 PatNode::PatNode(PatNodeKind pk, BasePatNode *p1, BasePatNode*p2, int line, int column, string file):
 BasePatNode(pk, line, column, file)
 {
     PatNode::pat1_ = p1;
     PatNode::pat2_ = p2;
+}
+
+void PatNode::codeGen()
+{
 }
 
 RuleNode::RuleNode(BlockEntry *re, BasePatNode* pat, StmtNode* reaction, int line, int column, string file):
@@ -464,6 +496,10 @@ AstNode(AstNode::NodeType::RULE_NODE, line, column, file)
     RuleNode::rste_ = re;
     RuleNode::pat_ = pat;
     RuleNode::reaction_ = reaction;
+}
+
+void RuleNode::codeGen()
+{
 }
 
 /*****************        Add printing Logic Here for Each Node     *****************/
@@ -489,6 +525,10 @@ void ValueNode::typePrint(ostream& out, int indent) const
     if (type())
         type()->print(out, indent);
    // cout << "Value:" << value()->ival() << endl;
+}
+
+void ValueNode::codeGen()
+{
 }
 
 void RefExprNode::print(ostream& out, int indent) const
@@ -572,6 +612,10 @@ const Type* CompoundStmtNode::typeCheck() {
         }
     }
     return NULL;
+}
+
+void CompoundStmtNode::codeGen()
+{
 }
 
 void InvocationNode::print(ostream& out, int indent) const 
@@ -695,6 +739,9 @@ ExprStmtNode::typeCheck()
     return type();
 }
 
+void ExprStmtNode::codeGen()
+{
+}
 
 const Type *
 ReturnStmtNode::typeCheck()
@@ -724,6 +771,10 @@ ReturnStmtNode::typeCheck()
   return type();
 }
 
+void ReturnStmtNode::codeGen()
+{
+}
+
 const Type *
 BreakStmtNode::typeCheck()
 {
@@ -737,6 +788,10 @@ BreakStmtNode::typeCheck()
   }
 
   return type();
+}
+
+void BreakStmtNode::codeGen()
+{
 }
 
 const Type *
@@ -779,7 +834,6 @@ WhileNode::typeCheck()
       type(new Type(Type::TypeTag::ERROR));
   return type();
 }
-  
   
 void IfNode::print(ostream& out, int indent) const 
 {
