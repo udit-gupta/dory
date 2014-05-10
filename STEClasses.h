@@ -4,6 +4,7 @@
 #include "SymTab.h"
 #include "SymTabEntry.h"
 #include "Ast.h"
+#include "Reg.h"
 
 class StmtNode;
 class RuleNode;
@@ -96,6 +97,9 @@ class VariableEntry: public SymTabEntry {
   int offSet() const { return offSet_;} ;
   void offSet(int o) {offSet_ = o;};
 
+  int reg() const {return reg_;};
+  void reg(int reg) {reg_ = reg; };
+
   const ExprNode* initVal() const { return initVal_;}
   ExprNode* initVal() { return initVal_;};
   void initVal(ExprNode *init) { initVal_ = init;};
@@ -112,6 +116,7 @@ class VariableEntry: public SymTabEntry {
  private:
   VarKind vkind_;
   int offSet_;
+  int reg_;
   ExprNode* initVal_;
 };
 

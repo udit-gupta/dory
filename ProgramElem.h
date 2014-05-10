@@ -6,17 +6,21 @@
 
 #include <string>
 #include "Type.h"
+#include "Reg.h"
 
 extern int yylineno, yycolumnno;
 extern const char* yyfilename;
 
 class ProgramElem {
  public:
+
   ProgramElem(Type* t=NULL, int line=0, int column=0, string file="") {
     type_ = t;
     line_ = (line == 0) ?  yylineno : line;
     column_ = (column == 0) ? yycolumnno : column;
     file_ = file == "" ? string(yyfilename) : file;
+	reg_ = -1;
+	regType_ = REG_INT;
   }
 
   ProgramElem(const ProgramElem& pe) {
@@ -50,11 +54,19 @@ class ProgramElem {
 	return *this;
   };
 
+  void setReg(int reg, RegType regType) {
+	  reg_ = reg;
+	  regType_ = regType;
+  }
+
  private:
   int line_; 
   int column_;
   string file_;
   Type* type_;
+  // reg_ = -1 for not assigned
+  int reg_;
+  RegType regType_;
 };
 
 #endif

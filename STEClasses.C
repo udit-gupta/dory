@@ -69,6 +69,9 @@ void GlobalEntry::memAlloc(int reset_AR)
     return;
 }
 
+void GlobalEntry::codeGen() {
+}
+
 void EventEntry::print(ostream& out, int indent) const
 {
     out << "event " << name();
