@@ -8,7 +8,7 @@ endif
 FLEX = flex
 BISON = bison
 
-demo:	driveParse.o E--_lexer.o E--_parser.o Ast.o STEClasses.o SymTabMgr.o Value.o Type.o SymTabEntry.o Error.o ParserUtil.o SymTab.o MemAllocUtil.o CodeGen.o Reg.o
+demo:	driveParse.o E--_lexer.o E--_parser.o Ast.o STEClasses.o SymTabMgr.o Value.o Type.o SymTabEntry.o Error.o ParserUtil.o SymTab.o MemAllocUtil.o Reg.o Instruction.o IntermediateCodeGen.o
 	$(CXX) -o $@ $^ -lfl
 
 E--_lexer.o:	E--_lexer.C E--.tab.h
@@ -29,7 +29,9 @@ ParserUtil.o: ParserUtil.h ParserUtil.C
 SymTab.o: SymTab.h SymTab.C
 MemAllocUtil.o: MemAllocUtil.h MemAllocUtil.C
 Reg.o: Reg.h Reg.C
-CodeGen.o: CodeGen.h CodeGen.C
+#CodeGen.o: CodeGen.h CodeGen.C
+Instruction.o: Instruction.h Instruction.C
+IntermediateCodeGen.o: IntermediateCodeGen.h IntermediateCodeGen.C
 
 clean:
 	-echo "Removing all object files!"
