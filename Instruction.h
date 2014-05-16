@@ -51,13 +51,13 @@ class Instruction {
     ~Instruction() {};
 
     void operand_src1(int reg, int imm, int type);
-    struct Operand * operand_src1(void);
+    Operand * operand_src1(void);
 
     void operand_src2(int reg, int imm, int type);
-    struct Operand * operand_src2(void);
+    Operand * operand_src2(void);
 
     void operand_dest(int reg, int imm, int type);
-    struct Operand * operand_dest(void);
+    Operand * operand_dest(void);
 
     void opcode(Mnemonic opcode);
     Mnemonic opcode(void);
@@ -69,9 +69,9 @@ class Instruction {
 
   private:
     Mnemonic opcode_;
-    struct Operand src1_;
-    struct Operand src2_;
-    struct Operand dest_;
+    Operand src1_;
+    Operand src2_;
+    Operand dest_;
     int label_;
 };
 
