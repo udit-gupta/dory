@@ -1,6 +1,8 @@
 #ifndef REG_H
 #define REG_H
 
+#define MAX_REGISTERS	1000
+
 enum RegType {VREG_INT = 0,
 	VREG_FLOAT,
 	REG_INT,
