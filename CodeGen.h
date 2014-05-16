@@ -1,7 +1,6 @@
 #ifndef CODE_GEN_H
 #define CODE_GEN_H
 
-#include "list.h"
 #include "Reg.h"
 
 enum Mnemonic {
@@ -34,11 +33,6 @@ struct Instr {
 	Operand dest;
 	Operand src1;
 	Operand src2;
-};
-
-struct InstrList {
-	Instr instr;
-	list_head instrList;
 };
 
 #endif

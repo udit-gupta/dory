@@ -1,4 +1,7 @@
 #include "CodeGen.h"
+#include <vector>
 
-struct list_head *instrHead;
+using namespace std;
+
+vector<Instr*> intrlist;
 
