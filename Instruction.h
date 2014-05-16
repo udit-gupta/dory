@@ -33,6 +33,10 @@ class Instruction {
     };
 
     class Operand {
+      public:
+        Operand() {
+            type = NIL;
+        }
         int reg;
         int imm;
         int type; // can be one of OpType or RegType enums
