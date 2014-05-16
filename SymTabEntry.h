@@ -4,6 +4,8 @@
 #include "SymTab.h"
 #include "Value.h"
 #include "ProgramElem.h"
+#include "IntermediateCodeGen.h"
+#include "Instruction.h"
 
 class SymTabEntry;
 class ExprNode;
@@ -91,6 +93,13 @@ class SymTabEntry: public ProgramElem {
   virtual void memAllocST(int first=0, int last=0, int reset_AR=0) const {
     if (symTab() != nullptr)
       symTab()->memAllocST(first, last, reset_AR);
+  }
+
+  virtual void codeGen(IntermediateCodeGen * list) { return; };
+
+  virtual void codeGenST(int first=0, int last=0, IntermediateCodeGen *list=NULL) const {
+    if (symTab() != nullptr)
+	symTab()->codeGenST(first, last, list);
   }
 
  private:

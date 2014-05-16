@@ -5,6 +5,8 @@
 #include "Value.h"
 #include "ProgramElem.h"
 #include "SymTabEntry.h"
+#include "IntermediateCodeGen.h"
+#include "Instruction.h"
 
 class BlockEntry;
 //class EFSA;
@@ -68,7 +70,7 @@ class AstNode: public ProgramElem {
   virtual const Type* typeCheck() {return NULL;};
   virtual void typePrint(ostream& os, int indent=0) const { return; };
   virtual void print(ostream& os, int indent=0) const=0;
-  virtual void codeGen() {return;};
+  virtual void codeGen(IntermediateCodeGen *list) { return; };
 
   virtual void renameRV(string prefix) {}; // new names start with given prefix
   virtual bool operator==(const AstNode&) const { return false; };
@@ -115,7 +117,7 @@ class ExprNode: public AstNode {
 
   const Type* typeCheck() {return NULL;};
   void typePrint(ostream& os, int indent=0) const { return; };
-  virtual void codeGen()=0;
+  virtual void codeGen(IntermediateCodeGen *list)=0;
 
  private:
   ExprNodeType exprType_;
@@ -143,7 +145,7 @@ class RefExprNode: public ExprNode {
 
   const Type* typeCheck();
   void typePrint(ostream& os, int indent=0) const;
-  void codeGen();
+  void codeGen(IntermediateCodeGen *list);
 
  private:
   string ext_;
@@ -203,7 +205,7 @@ class OpNode: public ExprNode {
 
   const Type* typeCheck();
   void typePrint(ostream& os, int indent=0) const;
-  void codeGen();
+  void codeGen(IntermediateCodeGen *list);
   
  private: 
   unsigned int arity_;
@@ -227,7 +229,7 @@ class ValueNode: public ExprNode {
 
   const Type* typeCheck();
   void typePrint(ostream& os, int indent=0) const;
-  void codeGen();
+  void codeGen(IntermediateCodeGen *list);
 
  private:
   /* val_ field is already included in ExprNode, so no new data members */
@@ -260,7 +262,7 @@ class InvocationNode: public ExprNode {
 
   const Type* typeCheck();
   void typePrint(ostream& os, int indent=0) const;
-  void codeGen();
+  void codeGen(IntermediateCodeGen *list);
 
  private:
   vector<ExprNode*>* params_;
@@ -302,7 +304,7 @@ class BasePatNode: public AstNode {
   virtual bool hasAnyOrOther() const=0;
   virtual bool isNegatable() const {
     return ((!hasSeqOps()) && (!hasNeg())); }
-  virtual void codeGen()=0;
+  virtual void codeGen(IntermediateCodeGen *list)=0;
 
  private:
   PatNodeKind patKind_;
@@ -347,7 +349,7 @@ class PrimitivePatNode: public BasePatNode {
   void print(ostream& os, int indent=0) const; 
 
   void  typePrint(ostream& os, int indent) const;
-  void codeGen();
+  void codeGen(IntermediateCodeGen *list);
 
  private:
 
@@ -383,7 +385,7 @@ class PatNode: public BasePatNode {
 
   void  typePrint(ostream& os, int indent) const;
   const Type* typeCheck();
-  void codeGen();
+  void codeGen(IntermediateCodeGen *list);
 
  private: 
   PatNode(const PatNode&);
@@ -411,7 +413,7 @@ class StmtNode: public AstNode {
   void print(ostream& os, int indent) const = 0;
 
   void typePrint(ostream& os, int indent) const = 0;
-  virtual void codeGen()=0;
+  virtual void codeGen(IntermediateCodeGen *list)=0;
  private:
   StmtNodeKind skind_;
 };
@@ -443,7 +445,7 @@ class ReturnStmtNode: public StmtNode {
     }
     else os << "NULL";
   };
-  void codeGen();
+  void codeGen(IntermediateCodeGen *list);
 
  private:
   ExprNode* expr_;
@@ -479,7 +481,7 @@ class BreakStmtNode: public StmtNode {
     }
     else os << "(int);";
   }
-  void codeGen();
+  void codeGen(IntermediateCodeGen *list);
  private:
   ExprNode* expr_;
 };
@@ -508,7 +510,7 @@ class ExprStmtNode: public StmtNode {
 	    expr_->typePrint(os, indent);
     }
   };
-  void codeGen();
+  void codeGen(IntermediateCodeGen *list);
 
  private:
   ExprNode* expr_;
@@ -536,7 +538,7 @@ class CompoundStmtNode: public StmtNode{
 
   void  typePrintWithoutBraces(ostream& os, int indent) const;
   void  typePrint(ostream& os, int indent) const;
-  void codeGen();
+  void codeGen(IntermediateCodeGen *list);
 
  private:
   CompoundStmtNode(const CompoundStmtNode&);
@@ -566,7 +568,7 @@ class IfNode: public StmtNode{
 
   void print(ostream& os, int indent) const;
   void  typePrint(ostream& os, int indent) const;
-  void codeGen();
+  void codeGen(IntermediateCodeGen *list);
 
  private: 
   ExprNode *cond_;
@@ -592,7 +594,7 @@ class WhileNode: public StmtNode{
 
   void print(ostream& os, int indent) const;
   void typePrint(ostream& os, int indent) const;
-  void codeGen();
+  void codeGen(IntermediateCodeGen *list);
 
  private: 
   ExprNode *cond_;
@@ -626,7 +628,7 @@ class RuleNode: public AstNode {
 
   const Type* typeCheck();
   void  typePrint(ostream& os, int indent) const;
-  void codeGen();
+  void codeGen(IntermediateCodeGen *list);
 
  private:
   BlockEntry    *rste_;

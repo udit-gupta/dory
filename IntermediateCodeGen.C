@@ -5,17 +5,17 @@
 #define INT_REGISTER_PREFIX	"R"
 #define FLOAT_REGISTER_PREFIX	"F"
 
-std::list<Instruction *> IntermediateCode::instructionList(void)
+std::list<Instruction *> IntermediateCodeGen::instructionList(void)
 {
     return instrList_;
 }
 
-void IntermediateCode::addInstruction(Instruction * instr)
+void IntermediateCodeGen::addInstruction(Instruction * instr)
 {
     instrList_.push_back(instr);
 }
 
-void IntermediateCode::printInstructionList(void)
+void IntermediateCodeGen::printInstructionList(void)
 {
     list<Instruction *>::const_iterator it;
 

@@ -3,6 +3,8 @@
 #include "ParserUtil.h"
 #include "log.h"
 #include "MemAllocUtil.h"
+#include "IntermediateCodeGen.h"
+#include "Instruction.h"
 
 /*************
 
@@ -69,7 +71,18 @@ void GlobalEntry::memAlloc(int reset_AR)
     return;
 }
 
-void GlobalEntry::codeGen() {
+void GlobalEntry::codeGen(IntermediateCodeGen * list)
+{
+    LOG("");
+
+    const vector<RuleNode*> pr = GlobalEntry::rules();
+    IntermediateCodeGen * instrList = new IntermediateCodeGen();
+
+    codeGenST(0, 0, instrList);
+
+    for(vector<RuleNode*>::const_iterator it = pr.begin(); it != pr.end(); it++) {
+	(*it)->codeGen(instrList);
+    }
 }
 
 void EventEntry::print(ostream& out, int indent) const
@@ -97,6 +110,13 @@ void EventEntry::memAlloc(int reset_AT)
     return;
 }
 
+void EventEntry::codeGen(IntermediateCodeGen * list)
+{
+    LOG("");
+
+    return;
+}
+
 void ClassEntry::print(ostream& out, int indent) const 
 {
     out << "class " << name();
@@ -111,6 +131,13 @@ const Type* ClassEntry::typeCheck()
 {
     LOG("");
     return NULL;
+}
+
+void ClassEntry::codeGen(IntermediateCodeGen * list)
+{
+    LOG("");
+
+    return;
 }
 
 void VariableEntry::print(ostream& out, int indent) const
@@ -167,6 +194,13 @@ void VariableEntry::memAlloc(int reset_AR)
     } else {
 	LOG("Allocation failed for, name: " << name() << ", VarKind not set! Cannot know where to allocate this.");
     }
+
+    return;
+}
+
+void VariableEntry::codeGen(IntermediateCodeGen * list)
+{
+    LOG("");
 
     return;
 }
@@ -229,6 +263,13 @@ void FunctionEntry::memAlloc(int reset_AR)
     return;
 }
 
+void FunctionEntry::codeGen(IntermediateCodeGen * list)
+{
+    LOG("");
+
+    return;
+}
+
 void BlockEntry::print(ostream& out, int indent) const
 {
     printST(out, indent, '{', '}', true);
@@ -246,8 +287,22 @@ const Type* BlockEntry::typeCheck()
     return NULL;
 }
 
+void BlockEntry::codeGen(IntermediateCodeGen * list)
+{
+    LOG("");
+
+    return;
+}
+
 const Type* RuleBlockEntry::typeCheck() {
 	LOG("");
 	typeST(0, 0);
 	return NULL;
+}
+
+void RuleBlockEntry::codeGen(IntermediateCodeGen * list)
+{
+    LOG("");
+
+    return;
 }

@@ -5,6 +5,8 @@
 #include "SymTabEntry.h"
 #include "Ast.h"
 #include "Reg.h"
+#include "IntermediateCodeGen.h"
+#include "Instruction.h"
 
 class StmtNode;
 class RuleNode;
@@ -13,6 +15,7 @@ class PatNode;
 class VariableEntry;
 class OpNode;
 class PrimitivePatNode;
+class IntermediateCodeGen;
 extern string newName(const string&);
 
 /****************************************************************
@@ -39,7 +42,7 @@ class GlobalEntry: public SymTabEntry {
   void typePrint(ostream&, int indent=0) const;
 
   void memAlloc(int reset_AR);
-  void codeGen();
+  void codeGen(IntermediateCodeGen * list);
 
  private:
   vector<RuleNode*> rules_;
@@ -57,7 +60,7 @@ class BlockEntry: public SymTabEntry {
   void typePrint(ostream&, int indent=0) const;
 
   void memAlloc(int reset_AR) { return; };
-  void codeGen();
+  void codeGen(IntermediateCodeGen * list);
 };
 
 class RuleBlockEntry: public BlockEntry {
@@ -69,7 +72,7 @@ class RuleBlockEntry: public BlockEntry {
   const Type* typeCheck();
 
   void memAlloc(int reset_AR) { return; };
-  void codeGen();
+  void codeGen(IntermediateCodeGen * list);
 };
 
 /****************************************************************
@@ -111,7 +114,7 @@ class VariableEntry: public SymTabEntry {
   void typePrint(ostream&, int indent=0) const;
 
   void memAlloc(int reset_AR);
-  void codeGen();
+  void codeGen(IntermediateCodeGen * list);
 
  private:
   VarKind vkind_;
@@ -133,7 +136,7 @@ class ClassEntry: public SymTabEntry {
   void typePrint(ostream&, int indent=0) const;
 
   void memAlloc(int reset_AR) { return; };
-  void codeGen();
+  void codeGen(IntermediateCodeGen * list);
 };
 
 class FunctionEntry: public SymTabEntry {
@@ -156,7 +159,7 @@ class FunctionEntry: public SymTabEntry {
   void typePrint(ostream&, int indent=0) const;
 
   void memAlloc(int reset_AR);
-  void codeGen();
+  void codeGen(IntermediateCodeGen * list);
 
  private:
   CompoundStmtNode* body_;
@@ -175,7 +178,7 @@ class EventEntry: public SymTabEntry {
   void typePrint(ostream&, int indent=0) const;
 
   void memAlloc(int reset_AR);
-  void codeGen();
+  void codeGen(IntermediateCodeGen * list);
 };  
 
 #endif

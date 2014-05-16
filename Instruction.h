@@ -8,6 +8,8 @@
 
 using namespace std;
 
+class Instruction;
+
 class Instruction {
   public:
     enum Mnemonic {

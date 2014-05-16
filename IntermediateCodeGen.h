@@ -9,12 +9,12 @@
 
 using namespace std;
 
-class IntermediateCode {
+class IntermediateCodeGen {
   public:
 
-    IntermediateCode() {};
+    IntermediateCodeGen() {};
 
-    ~IntermediateCode() {};
+    ~IntermediateCodeGen() {};
 
     std::list<Instruction *> instructionList(void);
 

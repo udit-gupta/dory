@@ -4,6 +4,9 @@
 #include <string>
 #include <hash_fun.h>
 #include <ext/hash_map>
+#include "IntermediateCodeGen.h"
+#include "Instruction.h"
+
 using namespace std;
 
 class SymTabEntry;
@@ -67,7 +70,7 @@ class SymTab {
   void typeST(int first, int last) const;
 
   void memAllocST(int first, int last, int reset_AR) const;
-  void codeGenST(int first, int last) const;
+  void codeGenST(int first, int last, IntermediateCodeGen *list) const;
 
   virtual void typePrintST(ostream& os,int ind=0,char ldelim='{',char rdelim='}',
 					   bool linebreaks=true, int first=0, int last=0) const;

@@ -1,6 +1,7 @@
 #include "all.h"
 #include "SymTab.h"
 #include "SymTabEntry.h"
+#include "IntermediateCodeGen.h"
 
 SymTab::iterator&
 SymTab::iterator::operator++ () {
@@ -181,6 +182,25 @@ SymTab::memAllocST(int first, int last, int reset_AR) const {
 	    ste->memAlloc(reset_AR);
 	else
 	    ste->memAlloc(0);
+    }
+  }
+}
+
+void 
+SymTab::codeGenST(int first, int last, IntermediateCodeGen *list) const {
+  int i; SymTab::const_iterator it = begin();
+
+  if ((first == 0) && (last == 0))
+    last = 1000000;
+
+  for (i=0, it=begin();
+       (it != end()) && (i < last); i++, ++it)  {
+    SymTabEntry *ste = (SymTabEntry *)(*it);
+    if (i >= first) {
+	if (i == first)
+	    ste->codeGen(list);
+	else
+	    ste->codeGen(list);
     }
   }
 }

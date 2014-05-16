@@ -29,7 +29,7 @@ ExprNode::ExprNode(const ExprNode& e) : AstNode(e)
     ExprNode::coercedType_ = new Type(*e.coercedType());
 }
 
-void ExprNode::codeGen()
+void ExprNode::codeGen(IntermediateCodeGen *instrList)
 {
 }
 
@@ -400,8 +400,16 @@ OpNode::typeCheck()
   return type();
 }
 
-void OpNode::codeGen()
+void OpNode::codeGen(IntermediateCodeGen *instrList)
 {
+//    LOG("");
+
+//    for (unsigned int i = 0; i < arity_; i++) {
+//        if (arg(i))
+//            arg(i)->codeGen();
+//    }
+
+
 }
 
 /*************************************** Below this , I need to implement my own stuff ************************************************/
@@ -422,8 +430,9 @@ ExprNode::ExprNode(refExprNode)
        RefExprNode::sym_ = refExprNode.symTabEntry();
 }
 
-void RefExprNode::codeGen()
+void RefExprNode::codeGen(IntermediateCodeGen *instrList)
 {
+    return;
 }
 
 InvocationNode::InvocationNode(const SymTabEntry *ste, vector<ExprNode*>* param, int line, int column, string file):
@@ -440,7 +449,7 @@ ExprNode::ExprNode(invcNode)
     InvocationNode::ste_ = invcNode.symTabEntry();
 }
 
-void InvocationNode::codeGen()
+void InvocationNode::codeGen(IntermediateCodeGen *instrList)
 {
 }
 
@@ -452,7 +461,7 @@ StmtNode(StmtNode::StmtNodeKind::IF, line, column, file)
     IfNode::else_ = elseStmt;
 }
 
-void IfNode::codeGen()
+void IfNode::codeGen(IntermediateCodeGen *instrList)
 {
 }
 
@@ -463,7 +472,7 @@ StmtNode(StmtNode::StmtNodeKind::WHILE, line, column, file)
     WhileNode::do_ = doStmt;
 }
 
-void WhileNode::codeGen()
+void WhileNode::codeGen(IntermediateCodeGen *instrList)
 {
 }
 
@@ -475,7 +484,7 @@ BasePatNode(BasePatNode::PatNodeKind::PRIMITIVE, line, column, file)
     PrimitivePatNode::cond_ = c;
 }
 
-void PrimitivePatNode::codeGen()
+void PrimitivePatNode::codeGen(IntermediateCodeGen *instrList)
 {
 }
 
@@ -486,7 +495,7 @@ BasePatNode(pk, line, column, file)
     PatNode::pat2_ = p2;
 }
 
-void PatNode::codeGen()
+void PatNode::codeGen(IntermediateCodeGen *instrList)
 {
 }
 
@@ -498,7 +507,7 @@ AstNode(AstNode::NodeType::RULE_NODE, line, column, file)
     RuleNode::reaction_ = reaction;
 }
 
-void RuleNode::codeGen()
+void RuleNode::codeGen(IntermediateCodeGen *instrList)
 {
 }
 
@@ -527,7 +536,7 @@ void ValueNode::typePrint(ostream& out, int indent) const
    // cout << "Value:" << value()->ival() << endl;
 }
 
-void ValueNode::codeGen()
+void ValueNode::codeGen(IntermediateCodeGen *instrList)
 {
 }
 
@@ -614,7 +623,7 @@ const Type* CompoundStmtNode::typeCheck() {
     return NULL;
 }
 
-void CompoundStmtNode::codeGen()
+void CompoundStmtNode::codeGen(IntermediateCodeGen *instrList)
 {
 }
 
@@ -739,7 +748,7 @@ ExprStmtNode::typeCheck()
     return type();
 }
 
-void ExprStmtNode::codeGen()
+void ExprStmtNode::codeGen(IntermediateCodeGen *instrList)
 {
 }
 
@@ -771,7 +780,7 @@ ReturnStmtNode::typeCheck()
   return type();
 }
 
-void ReturnStmtNode::codeGen()
+void ReturnStmtNode::codeGen(IntermediateCodeGen *instrList)
 {
 }
 
@@ -790,7 +799,7 @@ BreakStmtNode::typeCheck()
   return type();
 }
 
-void BreakStmtNode::codeGen()
+void BreakStmtNode::codeGen(IntermediateCodeGen *instrList)
 {
 }
 

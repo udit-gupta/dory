@@ -214,7 +214,7 @@ main(int argc, char *argv[], char *envp[]) {
 	ge->typeCheck();
 	ge->typePrint(cout);
 	ge->memAlloc(0);
-	ge->codeGen();
+	ge->codeGen(NULL);
   }
 #endif
 }

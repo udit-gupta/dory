@@ -8,7 +8,7 @@ endif
 FLEX = flex
 BISON = bison
 
-demo:	driveParse.o E--_lexer.o E--_parser.o Ast.o STEClasses.o SymTabMgr.o Value.o Type.o SymTabEntry.o Error.o ParserUtil.o SymTab.o MemAllocUtil.o Reg.o Instruction.o IntermediateCodeGen.o
+demo:	driveParse.o E--_lexer.o E--_parser.o Ast.o STEClasses.o SymTabMgr.o Value.o Type.o IntermediateCodeGen.o SymTabEntry.o Error.o ParserUtil.o SymTab.o MemAllocUtil.o Reg.o Instruction.o
 	$(CXX) -o $@ $^ -lfl
 
 E--_lexer.o:	E--_lexer.C E--.tab.h
