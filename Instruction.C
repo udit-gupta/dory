@@ -95,6 +95,15 @@ string * Instruction::funLabel(void)
     return funLabel_;
 }
 
+int Instruction::isFunLabel(void)
+{
+    return label_function_;
+}
+
+/*****************************************************************************
+ *				LABEL FUNCTIONS				     *
+ *****************************************************************************/
+
 int Instruction::Label::label_num_ = 0;
 
 int Instruction::Label::get_label(void)

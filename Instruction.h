@@ -83,6 +83,8 @@ class Instruction {
     void funLabel(string * label_name);
     string * funLabel(void);
 
+    int isFunLabel(void);
+
     const string name(Mnemonic opcode);
 
   private:

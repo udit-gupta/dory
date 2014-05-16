@@ -28,7 +28,10 @@ void IntermediateCodeGen::printInstructionList(void)
 	/* Printing the LABEL */
 	if ((*it)->name((*it)->opcode()).empty() &&
 		((*it)->opcode() == Instruction::Mnemonic::LABEL)) {
-	    cout << DEFAULT_LABEL_PREFIX << (*it)->label() << ":" << endl;
+	    if (!(*it)->isFunLabel())
+		cout << DEFAULT_LABEL_PREFIX << (*it)->label() << ":" << endl;
+	    else
+		cout << (*it)->funLabel() << ":" << endl;
 	    continue;
 	}
 
@@ -36,7 +39,10 @@ void IntermediateCodeGen::printInstructionList(void)
 
 	/* TODO: Add special handling for JMPC, JMPI, JMPCI. */
 	if ((*it)->opcode() == Instruction::Mnemonic::JMP) {
-	    cout << " " << DEFAULT_LABEL_PREFIX << (*it)->label() << endl;
+	    if (!(*it)->isFunLabel())
+		cout << " " << DEFAULT_LABEL_PREFIX << (*it)->label() << endl;
+	    else
+		cout << " " << DEFAULT_LABEL_PREFIX << (*it)->funLabel() << endl;
 	    continue;
 	}
 
