@@ -1,6 +1,8 @@
 #ifndef INTERMEDIATE_CODE_H
 #define INTERMEDIATE_CODE_H
 
+#include <cassert>
+#include <string>
 #include "Reg.h"
 #include "Instruction.h"
 #include <list>
