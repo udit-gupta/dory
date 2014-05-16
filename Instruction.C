@@ -1,3 +1,6 @@
+/* vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab
+ */
+
 #include "Instruction.h"
 #include "log.h"
 
@@ -20,9 +23,9 @@ const char * instructionName[] = {
 const string Instruction::name(Mnemonic opcode)
 {
     if ((opcode >= ADD) && (opcode <= ERROR))
-	return string(instructionName[opcode]);
+        return string(instructionName[opcode]);
     else
-	return string();
+        return string();
 }
 
 void Instruction::operand_src1(int reg, int imm, int type)

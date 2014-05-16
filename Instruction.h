@@ -1,3 +1,6 @@
+/* vim: tabstop=4:softtabstop=4:shiftwidth=4:expandtab
+ */
+
 #ifndef INSTRUCTION_H
 #define INSTRUCTION_H
 #include <string>
@@ -9,30 +12,30 @@ class Instruction {
   public:
     enum Mnemonic {
         ADD, SUB, DIV, MUL, MOD, AND, OR, XOR,
-	FADD, FSUB, FDIV, FMUL,
-	NEG, FNEG,
-	UGT, UGE, GT, GE, EQ, NE,
-	FGT, FGE, FEQ, FNE,
-	PRTS, PRTI, PRTF,
-	JMP, JMPC, JMPI, JMPCI,
-	MOVL, MOVS, MOVI, MOVF,
-	MOVIF, MIVFI, // MIV?
-	STI, STF,
-	LDI, LDF,
-	IN, INI, INF,
-	ERROR, LABEL
+        FADD, FSUB, FDIV, FMUL,
+        NEG, FNEG,
+        UGT, UGE, GT, GE, EQ, NE,
+        FGT, FGE, FEQ, FNE,
+        PRTS, PRTI, PRTF,
+        JMP, JMPC, JMPI, JMPCI,
+        MOVL, MOVS, MOVI, MOVF,
+        MOVIF, MIVFI, // MIV?
+        STI, STF,
+        LDI, LDF,
+        IN, INI, INF,
+        ERROR, LABEL
     };
 
     enum OpType {
         IMM = REG_TYPE_COUNT,
-	NIL,
-	OP_TYPE_COUNT
+        NIL,
+        OP_TYPE_COUNT
     };
 
-    struct Operand {
+    class Operand {
         int reg;
-	int imm;
-	int type; // can be one of OpType or RegType enums
+        int imm;
+        int type; // can be one of OpType or RegType enums
     };
 
     Instruction() {};
