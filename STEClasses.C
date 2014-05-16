@@ -75,14 +75,24 @@ void GlobalEntry::codeGen(IntermediateCodeGen * list)
 {
     LOG("");
 
+    Instruction *initial_jmp = NULL;
     const vector<RuleNode*> pr = GlobalEntry::rules();
+
     IntermediateCodeGen * instrList = new IntermediateCodeGen();
+
+    /* Code to create first "JMP L_MAIN:" label */
+    initial_jmp = new Instruction(Instruction::Mnemonic::JMP);
+    initial_jmp->funLabel(new string("L_MAIN"));
+
+    instrList->addInstruction(initial_jmp);
 
     codeGenST(0, 0, instrList);
 
     for(vector<RuleNode*>::const_iterator it = pr.begin(); it != pr.end(); it++) {
 	(*it)->codeGen(instrList);
     }
+
+    instrList->printInstructionList();
 }
 
 void EventEntry::print(ostream& out, int indent) const

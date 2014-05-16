@@ -24,14 +24,16 @@ void IntermediateCodeGen::printInstructionList(void)
 	return;
     }
 
+    cout << endl;
+
     for (it = instrList_.begin(); it != instrList_.end(); it++) {
 	/* Printing the LABEL */
 	if ((*it)->name((*it)->opcode()).empty() &&
 		((*it)->opcode() == Instruction::Mnemonic::LABEL)) {
 	    if (!(*it)->isFunLabel())
-		cout << DEFAULT_LABEL_PREFIX << (*it)->label() << ":" << endl;
+		cout << DEFAULT_LABEL_PREFIX << (*it)->label() << ": ";
 	    else
-		cout << (*it)->funLabel() << ":" << endl;
+		cout << (*it)->funLabel()->c_str() << ": ";
 	    continue;
 	}
 
@@ -42,7 +44,7 @@ void IntermediateCodeGen::printInstructionList(void)
 	    if (!(*it)->isFunLabel())
 		cout << " " << DEFAULT_LABEL_PREFIX << (*it)->label() << endl;
 	    else
-		cout << " " << DEFAULT_LABEL_PREFIX << (*it)->funLabel() << endl;
+		cout << " " << (*it)->funLabel()->c_str() << endl;
 	    continue;
 	}
 
