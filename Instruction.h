@@ -44,10 +44,23 @@ class Instruction {
         int type; // can be one of OpType or RegType enums
     };
 
-    Instruction() {};
+    class Label {
+      public:
+	static int label_num_;
+
+	Label() {};
+	~Label() {};
+
+	int get_label(void);
+    };
+
+    Instruction() {
+	label_function_ = 0;
+    };
 
     Instruction(Mnemonic opcode) {
         opcode_ = opcode;
+	label_function_ = 0;
     };
 
     ~Instruction() {};
@@ -67,6 +80,9 @@ class Instruction {
     void label(int label);
     int label(void);
 
+    void funLabel(string * label_name);
+    string * funLabel(void);
+
     const string name(Mnemonic opcode);
 
   private:
@@ -75,6 +91,8 @@ class Instruction {
     Operand src2_;
     Operand dest_;
     int label_;
+    int label_function_;    //Use funLabel_ instead of default label_
+    string * funLabel_;
 };
 
 #endif // INSTRUCTION_H

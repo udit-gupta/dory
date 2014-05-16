@@ -83,3 +83,21 @@ int Instruction::label(void)
 {
     return label_;
 }
+
+void Instruction::funLabel(string * label_name)
+{
+    label_function_ = 1;
+    funLabel_ = new string(label_name->c_str());
+}
+
+string * Instruction::funLabel(void)
+{
+    return funLabel_;
+}
+
+int Instruction::Label::label_num_ = 0;
+
+int Instruction::Label::get_label(void)
+{
+    return Label::label_num_++;
+}
