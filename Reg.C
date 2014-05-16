@@ -1,6 +1,8 @@
 #include "Reg.h"
 #include "log.h"
 
+using namespace std;
+
 static int reg_int_i = 0;
 static int reg_float_i = 0;
 

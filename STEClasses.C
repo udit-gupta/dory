@@ -272,8 +272,8 @@ void FunctionEntry::memAlloc(int reset_AR)
 {
     if (this->type()->arity())
 	this->memAllocST(0, this->type()->arity(), 1);
-    else
-	this->memAllocST(this->type()->arity(), 100000, 1);
+
+    this->memAllocST(this->type()->arity(), 100000, 1);
 
     return;
 }
