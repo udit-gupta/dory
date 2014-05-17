@@ -402,14 +402,15 @@ OpNode::typeCheck()
 
 void OpNode::codeGen(IntermediateCodeGen *instrList)
 {
-//    LOG("");
+    LOG("");
 
-//    for (unsigned int i = 0; i < arity_; i++) {
-//        if (arg(i))
-//            arg(i)->codeGen();
-//    }
+    /* TODO: Complete this function */
+    for (unsigned int i = 0; i < arity_; i++) {
+        if (arg(i))
+            arg(i)->codeGen(instrList);
+    }
 
-
+    return;
 }
 
 /*************************************** Below this , I need to implement my own stuff ************************************************/
@@ -432,6 +433,15 @@ ExprNode::ExprNode(refExprNode)
 
 void RefExprNode::codeGen(IntermediateCodeGen *instrList)
 {
+    LOG("");
+
+    if (reg() == -1) {
+	if (type()->isIntegral(type()->tag()))
+	    setReg(get_vreg_int(), VREG_INT);
+	else
+	    setReg(get_vreg_float(), VREG_FLOAT);
+    }
+
     return;
 }
 
@@ -538,6 +548,9 @@ void ValueNode::typePrint(ostream& out, int indent) const
 
 void ValueNode::codeGen(IntermediateCodeGen *instrList)
 {
+    /* TODO: We don't need registers for this? Immediates? */
+
+    return;
 }
 
 void RefExprNode::print(ostream& out, int indent) const
