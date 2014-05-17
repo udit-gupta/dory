@@ -435,11 +435,15 @@ void RefExprNode::codeGen(IntermediateCodeGen *instrList)
 {
     LOG("");
 
-    if (reg() == -1) {
-	if (type()->isIntegral(type()->tag()))
-	    setReg(get_vreg_int(), VREG_INT);
-	else
-	    setReg(get_vreg_float(), VREG_FLOAT);
+    if (getReg() == -1) {
+	if (symTabEntry() && (symTabEntry()->getReg() > -1)) {
+	    setReg(symTabEntry()->getReg(), reg_type());
+	} else {
+	    if (type()->isIntegral(type()->tag()))
+		setReg(get_vreg_int(), VREG_INT);
+	    else
+		setReg(get_vreg_float(), VREG_FLOAT);
+	}
     }
 
     return;
