@@ -48,16 +48,6 @@ void IntermediateCodeGen::printInstructionList(void)
 	    continue;
 	}
 
-	if (!((*it)->operand_dest()->type == Instruction::OpType::NIL)) {
-	    assert((*it)->operand_dest()->type < REG_TYPE_COUNT);
-
-	    if ((*it)->operand_dest()->type == VREG_INT ||
-		    (*it)->operand_dest()->type == REG_INT)
-		cout << " " << INT_REGISTER_PREFIX << (*it)->operand_dest()->reg;
-	    else
-		cout << " " << FLOAT_REGISTER_PREFIX << (*it)->operand_dest()->reg;
-	}
-
 	if (!((*it)->operand_src1()->type == Instruction::OpType::NIL)) {
 	    assert((*it)->operand_src1()->type < Instruction::OpType::OP_TYPE_COUNT);
 
@@ -80,6 +70,16 @@ void IntermediateCodeGen::printInstructionList(void)
 		cout << " " << INT_REGISTER_PREFIX << (*it)->operand_src2()->reg;
 	    else
 		cout << " " << FLOAT_REGISTER_PREFIX << (*it)->operand_src2()->reg;
+	}
+
+	if (!((*it)->operand_dest()->type == Instruction::OpType::NIL)) {
+	    assert((*it)->operand_dest()->type < REG_TYPE_COUNT);
+
+	    if ((*it)->operand_dest()->type == VREG_INT ||
+		    (*it)->operand_dest()->type == REG_INT)
+		cout << " " << INT_REGISTER_PREFIX << (*it)->operand_dest()->reg;
+	    else
+		cout << " " << FLOAT_REGISTER_PREFIX << (*it)->operand_dest()->reg;
 	}
 
 	cout << endl;

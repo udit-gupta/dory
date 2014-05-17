@@ -71,14 +71,14 @@ void GlobalEntry::memAlloc(int reset_AR)
     return;
 }
 
-void GlobalEntry::codeGen(IntermediateCodeGen * list)
+void GlobalEntry::codeGen(IntermediateCodeGen * instrList)
 {
     LOG("");
 
+    assert(instrList);
+
     Instruction *initial_jmp = NULL;
     const vector<RuleNode*> pr = GlobalEntry::rules();
-
-    IntermediateCodeGen * instrList = new IntermediateCodeGen();
 
     /* Code to create first "JMP L_MAIN:" label */
     initial_jmp = new Instruction(Instruction::Mnemonic::JMP);
@@ -92,7 +92,7 @@ void GlobalEntry::codeGen(IntermediateCodeGen * list)
 	(*it)->codeGen(instrList);
     }
 
-    instrList->printInstructionList();
+    return;
 }
 
 void EventEntry::print(ostream& out, int indent) const

@@ -9,6 +9,8 @@
 #include "STEClasses.h"
 #include "SymTab.h"
 #include "Value.h"
+#include "IntermediateCodeGen.h"
+#include "Instruction.h"
 
 using namespace std;
 
@@ -208,13 +210,15 @@ main(int argc, char *argv[], char *envp[]) {
   yyparse();
   stm.leaveToScope(SymTabEntry::Kind::GLOBAL_KIND);
   GlobalEntry *ge = (GlobalEntry*)(stm.currentScope());
+  IntermediateCodeGen * instrList = new IntermediateCodeGen();
   if (ge != NULL) {
 	cout << "Finished parsing, here is the AST\n";
 	ge->print(cout);
 	ge->typeCheck();
 	ge->typePrint(cout);
 	ge->memAlloc(0);
-	ge->codeGen(NULL);
+	ge->codeGen(instrList);
+	instrList->printInstructionList();
   }
 #endif
 }
