@@ -213,9 +213,9 @@ void VariableEntry::codeGen(IntermediateCodeGen * list)
     LOG("");
 
     if (type()->isIntegral(type()->tag()))
-	reg(get_vreg_int(), VREG_INT);
+	setReg(get_vreg_int(), VREG_INT);
     else
-	reg(get_vreg_float(), VREG_FLOAT);
+	setReg(get_vreg_float(), VREG_FLOAT);
 
     return;
 }

@@ -59,6 +59,8 @@ class ProgramElem {
 	  regType_ = regType;
   }
 
+  enum RegType reg_type(void) { return regType_; };
+
  private:
   int line_; 
   int column_;

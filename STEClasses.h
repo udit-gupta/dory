@@ -100,14 +100,6 @@ class VariableEntry: public SymTabEntry {
   int offSet() const { return offSet_;} ;
   void offSet(int o) {offSet_ = o;};
 
-  int reg() const {return reg_;};
-  void reg(int reg, enum RegType reg_type) {
-	  reg_ = reg;
-	  reg_type_ = reg_type;
-  };
-
-  enum RegType reg_type(void) { return reg_type_; };
-
   const ExprNode* initVal() const { return initVal_;}
   ExprNode* initVal() { return initVal_;};
   void initVal(ExprNode *init) { initVal_ = init;};
@@ -124,8 +116,6 @@ class VariableEntry: public SymTabEntry {
  private:
   VarKind vkind_;
   int offSet_;
-  int reg_;
-  enum RegType reg_type_; 
   ExprNode* initVal_;
 };
 
