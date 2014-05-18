@@ -250,7 +250,7 @@ OpNode::typeCheck()
   LOG("");
 
   LOG("_arity = " << arity_);
-  assert(arity_ < 3);
+  assert(arity_ <= MAX_OP_ARITY);
 
   for (unsigned int i = 0; i < arity_; i++) {
     if (arg(i))
@@ -408,6 +408,7 @@ void OpNode::codeGen(IntermediateCodeGen *instrList)
     LOG("");
 
     bool isInt;
+    bool isSigned;
     Instruction *instr = new Instruction();
     Value *immediate = NULL;
     Value *immediate0 = NULL;
@@ -429,6 +430,12 @@ void OpNode::codeGen(IntermediateCodeGen *instrList)
                 isInt = true;
     else
                 isInt = false;
+
+    if ((isInt && coercedType() && Type::isSigned(coercedType()->tag())) ||
+                    (isInt && (Type::isSigned(type()->tag()))))
+                isSigned = true;
+    else
+                isSigned = false;
 
     if (isInt)
 	    setReg(get_vreg_int(), VREG_INT);
@@ -605,6 +612,230 @@ void OpNode::codeGen(IntermediateCodeGen *instrList)
     	    instr->operand_dest(arg(0)->getReg(), NULL, arg(0)->reg_type());
             instr->operand_src1(arg(1)->getReg(), NULL, arg(1)->reg_type());
     	    instrList->addInstruction(instr);
+	    return;
+    case static_cast<int>(OpNode::OpCode::EQ):
+	    /* Step 1: MOVI 1 to actual destReg */
+	    immediate0 = new Value(0, Type::TypeTag::INT);
+	    immediate1 = new Value(1, Type::TypeTag::INT);
+	    movInstr = new Instruction(Instruction::Mnemonic::MOVI);
+	    movInstr->operand_src1(-1, immediate1, Instruction::OpType::IMM);
+    	    movInstr->operand_dest(getReg(), NULL, reg_type());
+
+	    instrList->addInstruction(movInstr);
+
+	    /* Step 2: JMPC EQ arg(0) arg(1) newLabel */
+	    newLabel = Instruction::Label::get_label();
+	    jmpcInstr = new Instruction(Instruction::Mnemonic::JMPC);
+	    jmpcInstr->relational_op(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::EQ));
+	    jmpcInstr->operand_src1(arg(0)->getReg(), NULL, arg(0)->reg_type());
+	    jmpcInstr->operand_src2(arg(1)->getReg(), NULL, arg(1)->reg_type());
+	    jmpcInstr->label(newLabel);
+
+	    instrList->addInstruction(jmpcInstr);
+
+	    /* Step 3: MOVI 0 to actual destReg */
+	    mov1Instr = new Instruction(Instruction::Mnemonic::MOVI);
+	    mov1Instr->operand_src1(-1, immediate0, Instruction::OpType::IMM);
+    	    mov1Instr->operand_dest(getReg(), NULL, reg_type());
+
+	    instrList->addInstruction(mov1Instr);
+
+	    /* Step 4: Label newLabel */
+	    newLabelInstr = new Instruction(Instruction::Mnemonic::LABEL);
+	    newLabelInstr->label(newLabel);
+
+	    instrList->addInstruction(newLabelInstr);
+
+	    return;
+    case static_cast<int>(OpNode::OpCode::NE):
+	    /* Step 1: MOVI 1 to actual destReg */
+	    immediate0 = new Value(0, Type::TypeTag::INT);
+	    immediate1 = new Value(1, Type::TypeTag::INT);
+	    movInstr = new Instruction(Instruction::Mnemonic::MOVI);
+	    movInstr->operand_src1(-1, immediate1, Instruction::OpType::IMM);
+    	    movInstr->operand_dest(getReg(), NULL, reg_type());
+
+	    instrList->addInstruction(movInstr);
+
+	    /* Step 2: JMPC NE arg(0) arg(1) newLabel */
+	    newLabel = Instruction::Label::get_label();
+	    jmpcInstr = new Instruction(Instruction::Mnemonic::JMPC);
+	    jmpcInstr->relational_op(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::NE));
+	    jmpcInstr->operand_src1(arg(0)->getReg(), NULL, arg(0)->reg_type());
+	    jmpcInstr->operand_src2(arg(1)->getReg(), NULL, arg(1)->reg_type());
+	    jmpcInstr->label(newLabel);
+
+	    instrList->addInstruction(jmpcInstr);
+
+	    /* Step 3: MOVI 0 to actual destReg */
+	    mov1Instr = new Instruction(Instruction::Mnemonic::MOVI);
+	    mov1Instr->operand_src1(-1, immediate0, Instruction::OpType::IMM);
+    	    mov1Instr->operand_dest(getReg(), NULL, reg_type());
+
+	    instrList->addInstruction(mov1Instr);
+
+	    /* Step 4: Label newLabel */
+	    newLabelInstr = new Instruction(Instruction::Mnemonic::LABEL);
+	    newLabelInstr->label(newLabel);
+
+	    instrList->addInstruction(newLabelInstr);
+
+	    return;
+    case static_cast<int>(OpNode::OpCode::GE):
+	    /* Step 1: MOVI 1 to actual destReg */
+	    immediate0 = new Value(0, Type::TypeTag::INT);
+	    immediate1 = new Value(1, Type::TypeTag::INT);
+	    movInstr = new Instruction(Instruction::Mnemonic::MOVI);
+	    movInstr->operand_src1(-1, immediate1, Instruction::OpType::IMM);
+    	    movInstr->operand_dest(getReg(), NULL, reg_type());
+
+	    instrList->addInstruction(movInstr);
+
+	    /* Step 2: JMPC GE arg(0) arg(1) newLabel */
+	    newLabel = Instruction::Label::get_label();
+	    jmpcInstr = new Instruction(Instruction::Mnemonic::JMPC);
+
+	    if (isInt && !isSigned)
+	        jmpcInstr->relational_op(Instruction::Mnemonic::UGE);
+	    else
+	    	jmpcInstr->relational_op(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::GE));
+
+	    jmpcInstr->operand_src1(arg(1)->getReg(), NULL, arg(1)->reg_type());
+	    jmpcInstr->operand_src2(arg(0)->getReg(), NULL, arg(0)->reg_type());
+	    jmpcInstr->label(newLabel);
+
+	    instrList->addInstruction(jmpcInstr);
+
+	    /* Step 3: MOVI 0 to actual destReg */
+	    mov1Instr = new Instruction(Instruction::Mnemonic::MOVI);
+	    mov1Instr->operand_src1(-1, immediate0, Instruction::OpType::IMM);
+    	    mov1Instr->operand_dest(getReg(), NULL, reg_type());
+
+	    instrList->addInstruction(mov1Instr);
+
+	    /* Step 4: Label newLabel */
+	    newLabelInstr = new Instruction(Instruction::Mnemonic::LABEL);
+	    newLabelInstr->label(newLabel);
+
+	    instrList->addInstruction(newLabelInstr);
+
+	    return;
+    case static_cast<int>(OpNode::OpCode::GT):
+	    /* Step 1: MOVI 1 to actual destReg */
+	    immediate0 = new Value(0, Type::TypeTag::INT);
+	    immediate1 = new Value(1, Type::TypeTag::INT);
+	    movInstr = new Instruction(Instruction::Mnemonic::MOVI);
+	    movInstr->operand_src1(-1, immediate1, Instruction::OpType::IMM);
+    	    movInstr->operand_dest(getReg(), NULL, reg_type());
+
+	    instrList->addInstruction(movInstr);
+
+	    /* Step 2: JMPC GE arg(0) arg(1) newLabel */
+	    newLabel = Instruction::Label::get_label();
+	    jmpcInstr = new Instruction(Instruction::Mnemonic::JMPC);
+
+	    if (isInt && !isSigned)
+	        jmpcInstr->relational_op(Instruction::Mnemonic::UGT);
+	    else
+	    	jmpcInstr->relational_op(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::GT));
+
+	    jmpcInstr->operand_src1(arg(1)->getReg(), NULL, arg(1)->reg_type());
+	    jmpcInstr->operand_src2(arg(0)->getReg(), NULL, arg(0)->reg_type());
+	    jmpcInstr->label(newLabel);
+
+	    instrList->addInstruction(jmpcInstr);
+
+	    /* Step 3: MOVI 0 to actual destReg */
+	    mov1Instr = new Instruction(Instruction::Mnemonic::MOVI);
+	    mov1Instr->operand_src1(-1, immediate0, Instruction::OpType::IMM);
+    	    mov1Instr->operand_dest(getReg(), NULL, reg_type());
+
+	    instrList->addInstruction(mov1Instr);
+
+	    /* Step 4: Label newLabel */
+	    newLabelInstr = new Instruction(Instruction::Mnemonic::LABEL);
+	    newLabelInstr->label(newLabel);
+
+	    instrList->addInstruction(newLabelInstr);
+
+	    return;
+    case static_cast<int>(OpNode::OpCode::LE):
+	    /* Step 1: MOVI 1 to actual destReg */
+	    immediate0 = new Value(0, Type::TypeTag::INT);
+	    immediate1 = new Value(1, Type::TypeTag::INT);
+	    movInstr = new Instruction(Instruction::Mnemonic::MOVI);
+	    movInstr->operand_src1(-1, immediate1, Instruction::OpType::IMM);
+    	    movInstr->operand_dest(getReg(), NULL, reg_type());
+
+	    instrList->addInstruction(movInstr);
+
+	    /* Step 2: JMPC GE arg(0) arg(1) newLabel */
+	    newLabel = Instruction::Label::get_label();
+	    jmpcInstr = new Instruction(Instruction::Mnemonic::JMPC);
+
+	    if (isInt && !isSigned)
+	        jmpcInstr->relational_op(Instruction::Mnemonic::UGE);
+	    else
+	    	jmpcInstr->relational_op(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::GE));
+
+	    jmpcInstr->operand_src1(arg(0)->getReg(), NULL, arg(0)->reg_type());
+	    jmpcInstr->operand_src2(arg(1)->getReg(), NULL, arg(1)->reg_type());
+	    jmpcInstr->label(newLabel);
+
+	    instrList->addInstruction(jmpcInstr);
+
+	    /* Step 3: MOVI 0 to actual destReg */
+	    mov1Instr = new Instruction(Instruction::Mnemonic::MOVI);
+	    mov1Instr->operand_src1(-1, immediate0, Instruction::OpType::IMM);
+    	    mov1Instr->operand_dest(getReg(), NULL, reg_type());
+
+	    instrList->addInstruction(mov1Instr);
+
+	    /* Step 4: Label newLabel */
+	    newLabelInstr = new Instruction(Instruction::Mnemonic::LABEL);
+	    newLabelInstr->label(newLabel);
+
+	    instrList->addInstruction(newLabelInstr);
+
+	    return;
+    case static_cast<int>(OpNode::OpCode::LT):
+	    /* Step 1: MOVI 1 to actual destReg */
+	    immediate0 = new Value(0, Type::TypeTag::INT);
+	    immediate1 = new Value(1, Type::TypeTag::INT);
+	    movInstr = new Instruction(Instruction::Mnemonic::MOVI);
+	    movInstr->operand_src1(-1, immediate1, Instruction::OpType::IMM);
+    	    movInstr->operand_dest(getReg(), NULL, reg_type());
+
+	    instrList->addInstruction(movInstr);
+
+	    /* Step 2: JMPC GE arg(0) arg(1) newLabel */
+	    newLabel = Instruction::Label::get_label();
+	    jmpcInstr = new Instruction(Instruction::Mnemonic::JMPC);
+
+	    if (isInt && !isSigned)
+	        jmpcInstr->relational_op(Instruction::Mnemonic::UGT);
+	    else
+	    	jmpcInstr->relational_op(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::GT));
+
+	    jmpcInstr->operand_src1(arg(0)->getReg(), NULL, arg(0)->reg_type());
+	    jmpcInstr->operand_src2(arg(1)->getReg(), NULL, arg(1)->reg_type());
+	    jmpcInstr->label(newLabel);
+
+	    instrList->addInstruction(jmpcInstr);
+
+	    /* Step 3: MOVI 0 to actual destReg */
+	    mov1Instr = new Instruction(Instruction::Mnemonic::MOVI);
+	    mov1Instr->operand_src1(-1, immediate0, Instruction::OpType::IMM);
+    	    mov1Instr->operand_dest(getReg(), NULL, reg_type());
+
+	    instrList->addInstruction(mov1Instr);
+
+	    /* Step 4: Label newLabel */
+	    newLabelInstr = new Instruction(Instruction::Mnemonic::LABEL);
+	    newLabelInstr->label(newLabel);
+
+	    instrList->addInstruction(newLabelInstr);
+
 	    return;
     default:
 	    LOG("No such OpCode exists!");
