@@ -1177,6 +1177,13 @@ void CompoundStmtNode::codeGen(IntermediateCodeGen *instrList)
 {
     LOG("");
 
+    const list<StmtNode*>* stmts = CompoundStmtNode::stmts();
+    if(stmts != NULL && stmts->size() > 0) {
+        for(std::list<StmtNode*>::const_iterator it = stmts->begin(); it != stmts->end(); it++) {
+            (*it)->codeGen(instrList);
+        }
+    }
+    return;
 }
 
 void InvocationNode::print(ostream& out, int indent) const 
@@ -1304,6 +1311,10 @@ void ExprStmtNode::codeGen(IntermediateCodeGen *instrList)
 {
     LOG("");
 
+    if (expr_)
+	    expr_->codeGen(instrList);
+
+    return;
 }
 
 const Type *
