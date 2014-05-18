@@ -5,6 +5,7 @@
 #define INSTRUCTION_H
 
 #include <string>
+#include <cassert>
 #include "Reg.h"
 #include "Value.h"
 
@@ -58,16 +59,18 @@ class Instruction {
 	Label() {};
 	~Label() {};
 
-	int get_label(void);
+	static int get_label(void);
     };
 
     Instruction() {
 	label_function_ = 0;
+	rel_ = Mnemonic::ERROR;
     };
 
     Instruction(Mnemonic opcode) {
         opcode_ = opcode;
 	label_function_ = 0;
+	rel_ = Mnemonic::ERROR;
     };
 
     ~Instruction() {};
@@ -92,6 +95,9 @@ class Instruction {
 
     int isFunLabel(void);
 
+    void relational_op(Mnemonic rel);
+    Mnemonic relational_op(void);
+
     const string name(Mnemonic opcode);
 
     static Mnemonic typedMnemonic(bool isInt, Mnemonic intOpcode);
@@ -104,6 +110,7 @@ class Instruction {
     int label_;
     int label_function_;    //Use funLabel_ instead of default label_
     string funLabel_;
+    Mnemonic rel_;	    //Only for Conditional JMPs
 };
 
 #endif // INSTRUCTION_H

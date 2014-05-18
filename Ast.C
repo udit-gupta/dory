@@ -416,11 +416,16 @@ void OpNode::codeGen(IntermediateCodeGen *instrList)
             arg(i)->codeGen(instrList);
     }
 
-    if ((coercedType() && Type::isIntegral(coercedType()->tag())) ||
-                    (Type::isIntegral(type()->tag())))
+    if ((coercedType() && (Type::isIntegral(coercedType()->tag()) || Type::isBool(coercedType()->tag()))) ||
+                    ((Type::isIntegral(type()->tag()) || Type::isBool(type()->tag()))))
                 isInt = true;
     else
                 isInt = false;
+
+    if (isInt)
+	    setReg(get_vreg_int(), VREG_INT);
+    else
+	    setReg(get_vreg_float(), VREG_FLOAT);
 
     switch(static_cast<int>(opCode())) {
     case static_cast<int>(OpNode::OpCode::PLUS):
@@ -438,35 +443,48 @@ void OpNode::codeGen(IntermediateCodeGen *instrList)
     case static_cast<int>(OpNode::OpCode::DIV):
 	    instr->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::DIV));
 	    instr->operand_src2(arg(1)->getReg(), NULL, arg(1)->reg_type());
+	    break;
     case static_cast<int>(OpNode::OpCode::MOD):
 	    instr->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::MOD));
 	    instr->operand_src2(arg(1)->getReg(), NULL, arg(1)->reg_type());
+	    break;
     case static_cast<int>(OpNode::OpCode::UMINUS):
 	    instr->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::NEG));
+	    break;
     case static_cast<int>(OpNode::OpCode::BITAND):
 	    instr->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::AND));
 	    instr->operand_src2(arg(1)->getReg(), NULL, arg(1)->reg_type());
+	    break;
     case static_cast<int>(OpNode::OpCode::BITOR):
 	    instr->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::OR));
 	    instr->operand_src2(arg(1)->getReg(), NULL, arg(1)->reg_type());
+	    break;
     case static_cast<int>(OpNode::OpCode::BITXOR):
 	    instr->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::XOR));
 	    instr->operand_src2(arg(1)->getReg(), NULL, arg(1)->reg_type());
+	    break;
     case static_cast<int>(OpNode::OpCode::BITNOT):
 	    instr->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::XOR));
 	    immediate = new Value(-1, Type::TypeTag::INT);
 	    instr->operand_src2(-1, immediate, Instruction::OpType::IMM);
 	    break;
+    case static_cast<int>(OpNode::OpCode::AND):
+	    /* AND the arg(0) with arg(1). If 0, then result is 0, else result is 1 */
+	    instr->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::AND));
+	    instr->operand_src2(arg(1)->getReg(), NULL, arg(1)->reg_type());
+	    break;
+    case static_cast<int>(OpNode::OpCode::ASSIGN):
+	    instr->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::STI));
+    	    instr->operand_dest(arg(0)->getReg(), NULL, arg(0)->reg_type());
+            instr->operand_src1(arg(1)->getReg(), NULL, arg(1)->reg_type());
+    	    instrList->addInstruction(instr);
+	    return;
     default:
 	    LOG("No such OpCode exists!");
-	    break;
+	    return;
     }
 
-    if (isInt)
-            instr->operand_dest(get_vreg_int(), NULL, VREG_INT);
-    else
-            instr->operand_dest(get_vreg_float(), NULL, VREG_FLOAT);
-
+    instr->operand_dest(getReg(), NULL, reg_type());
     instr->operand_src1(arg(0)->getReg(), NULL, arg(0)->reg_type());
 
     instrList->addInstruction(instr);

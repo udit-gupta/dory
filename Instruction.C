@@ -100,6 +100,20 @@ int Instruction::isFunLabel(void)
     return label_function_;
 }
 
+void Instruction::relational_op(Mnemonic rel)
+{
+    assert(rel == Mnemonic::GE || rel == Mnemonic::GT || rel == Mnemonic::EQ || rel == Mnemonic::NE ||
+		    rel == Mnemonic::FGE || rel == Mnemonic::FGT || rel == Mnemonic::FEQ || rel == Mnemonic::FNE);
+
+    if (opcode_ == Mnemonic::JMPC || opcode_ == Mnemonic::JMPCI)
+	rel_ = rel;
+}
+
+Instruction::Mnemonic Instruction::relational_op(void)
+{
+    return rel_;
+}
+
 Instruction::Mnemonic Instruction::typedMnemonic(bool isInt, Mnemonic intOpcode) {
     switch(intOpcode) {
     case Instruction::Mnemonic::ADD: return isInt ? Instruction::Mnemonic::ADD : Instruction::Mnemonic::FADD;
