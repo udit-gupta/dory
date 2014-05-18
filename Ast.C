@@ -31,6 +31,9 @@ ExprNode::ExprNode(const ExprNode& e) : AstNode(e)
 
 void ExprNode::codeGen(IntermediateCodeGen *instrList)
 {
+    LOG("");
+
+    return;
 }
 
 /****************************************************************/
@@ -962,6 +965,8 @@ ExprNode::ExprNode(invcNode)
 
 void InvocationNode::codeGen(IntermediateCodeGen *instrList)
 {
+    LOG("");
+
 }
 
 IfNode::IfNode(ExprNode* cond, StmtNode* thenStmt, StmtNode* elseStmt, int line, int column, string file):
@@ -974,6 +979,8 @@ StmtNode(StmtNode::StmtNodeKind::IF, line, column, file)
 
 void IfNode::codeGen(IntermediateCodeGen *instrList)
 {
+    LOG("");
+
 }
 
 WhileNode::WhileNode(ExprNode* cond, StmtNode* doStmt, int line, int column, string file):
@@ -985,6 +992,8 @@ StmtNode(StmtNode::StmtNodeKind::WHILE, line, column, file)
 
 void WhileNode::codeGen(IntermediateCodeGen *instrList)
 {
+    LOG("");
+
 }
 
 PrimitivePatNode::PrimitivePatNode(EventEntry* ee, vector<VariableEntry*>* params, ExprNode* c, int line, int column, string file):
@@ -997,6 +1006,8 @@ BasePatNode(BasePatNode::PatNodeKind::PRIMITIVE, line, column, file)
 
 void PrimitivePatNode::codeGen(IntermediateCodeGen *instrList)
 {
+    LOG("");
+
 }
 
 PatNode::PatNode(PatNodeKind pk, BasePatNode *p1, BasePatNode*p2, int line, int column, string file):
@@ -1008,6 +1019,8 @@ BasePatNode(pk, line, column, file)
 
 void PatNode::codeGen(IntermediateCodeGen *instrList)
 {
+    LOG("");
+
 }
 
 RuleNode::RuleNode(BlockEntry *re, BasePatNode* pat, StmtNode* reaction, int line, int column, string file):
@@ -1020,6 +1033,8 @@ AstNode(AstNode::NodeType::RULE_NODE, line, column, file)
 
 void RuleNode::codeGen(IntermediateCodeGen *instrList)
 {
+    LOG("");
+
 }
 
 /*****************        Add printing Logic Here for Each Node     *****************/
@@ -1056,15 +1071,12 @@ void ValueNode::codeGen(IntermediateCodeGen *instrList)
 
     Instruction *instrMov = new Instruction();
 
-    if(Type::isIntegral(value()->type()->tag())) {
+    if (Type::isIntegral(value()->type()->tag()) || Type::isBool(value()->type()->tag())) {
             setReg(get_vreg_int(), VREG_INT);
             instrMov->opcode(Instruction::Mnemonic::MOVI);
     } else if (Type::isString(value()->type()->tag())) {
             setReg(get_vreg_int(), VREG_INT);
     	    instrMov->opcode(Instruction::Mnemonic::MOVS);
-    } else if (Type::isBool(value()->type()->tag())) {
-            setReg(get_vreg_int(), VREG_INT);
-    	    instrMov->opcode(Instruction::Mnemonic::MOVI);
     } else {
             setReg(get_vreg_float(), VREG_FLOAT);
             instrMov->opcode(Instruction::Mnemonic::MOVF);
@@ -1163,6 +1175,8 @@ const Type* CompoundStmtNode::typeCheck() {
 
 void CompoundStmtNode::codeGen(IntermediateCodeGen *instrList)
 {
+    LOG("");
+
 }
 
 void InvocationNode::print(ostream& out, int indent) const 
@@ -1288,6 +1302,8 @@ ExprStmtNode::typeCheck()
 
 void ExprStmtNode::codeGen(IntermediateCodeGen *instrList)
 {
+    LOG("");
+
 }
 
 const Type *
@@ -1320,6 +1336,8 @@ ReturnStmtNode::typeCheck()
 
 void ReturnStmtNode::codeGen(IntermediateCodeGen *instrList)
 {
+    LOG("");
+
 }
 
 const Type *
@@ -1339,6 +1357,8 @@ BreakStmtNode::typeCheck()
 
 void BreakStmtNode::codeGen(IntermediateCodeGen *instrList)
 {
+    LOG("");
+
 }
 
 const Type *

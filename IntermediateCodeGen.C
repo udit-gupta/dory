@@ -48,45 +48,45 @@ void IntermediateCodeGen::printInstructionList(void)
 	    continue;
 	}
 
-	if (!((*it)->operand_src1()->type == Instruction::OpType::NIL)) {
+	if ((*it)->operand_src1() && !((*it)->operand_src1()->type == Instruction::OpType::NIL)) {
 	    assert((*it)->operand_src1()->type < Instruction::OpType::OP_TYPE_COUNT);
 
-	    if ((*it)->operand_src1()->type == Instruction::OpType::IMM)
+	    if ((*it)->operand_src1()->type == Instruction::OpType::IMM) {
 		if ((*it)->operand_src1()->immediate()->type()->tag() == Type::TypeTag::STRING)
 		    cout << " " << (*it)->operand_src1()->immediate()->sval();
-		if ((*it)->operand_src1()->immediate()->type()->tag() == Type::TypeTag::BOOL)
+		else if ((*it)->operand_src1()->immediate()->type()->tag() == Type::TypeTag::BOOL)
 		    cout << " " << (*it)->operand_src1()->immediate()->bval();
-		if ((*it)->operand_src1()->immediate()->type()->tag() == Type::TypeTag::DOUBLE)
+		else if ((*it)->operand_src1()->immediate()->type()->tag() == Type::TypeTag::DOUBLE)
 		    cout << " " << (*it)->operand_src1()->immediate()->dval();
-		if ((*it)->operand_src1()->immediate()->type()->tag() == Type::isIntegral((*it)->operand_src1()->immediate()->type()->tag()))
+		else
 		    cout << " " << (*it)->operand_src1()->immediate()->ival();
-	    else if ((*it)->operand_src1()->type == VREG_INT ||
+	    } else if ((*it)->operand_src1()->type == VREG_INT ||
 		    (*it)->operand_src1()->type == REG_INT)
 		cout << " " << INT_REGISTER_PREFIX << (*it)->operand_src1()->reg;
 	    else
 		cout << " " << FLOAT_REGISTER_PREFIX << (*it)->operand_src1()->reg;
 	}
 
-	if (!((*it)->operand_src2()->type == Instruction::OpType::NIL)) {
+	if ((*it)->operand_src2() && !((*it)->operand_src2()->type == Instruction::OpType::NIL)) {
 	    assert((*it)->operand_src2()->type < Instruction::OpType::OP_TYPE_COUNT);
 
-	    if ((*it)->operand_src2()->type == Instruction::OpType::IMM)
-		if ((*it)->operand_src1()->immediate()->type()->tag() == Type::TypeTag::STRING)
-		    cout << " " << (*it)->operand_src1()->immediate()->sval();
-		if ((*it)->operand_src1()->immediate()->type()->tag() == Type::TypeTag::BOOL)
-		    cout << " " << (*it)->operand_src1()->immediate()->bval();
-		if ((*it)->operand_src1()->immediate()->type()->tag() == Type::TypeTag::DOUBLE)
-		    cout << " " << (*it)->operand_src1()->immediate()->dval();
-		if (Type::isIntegral((*it)->operand_src1()->immediate()->type()->tag()))
-		    cout << " " << (*it)->operand_src1()->immediate()->ival();
-	    else if ((*it)->operand_src2()->type == VREG_INT ||
+	    if ((*it)->operand_src2()->type == Instruction::OpType::IMM) {
+		if ((*it)->operand_src2()->immediate()->type()->tag() == Type::TypeTag::STRING)
+		    cout << " " << (*it)->operand_src2()->immediate()->sval();
+		else if ((*it)->operand_src2()->immediate()->type()->tag() == Type::TypeTag::BOOL)
+		    cout << " " << (*it)->operand_src2()->immediate()->bval();
+		else if ((*it)->operand_src2()->immediate()->type()->tag() == Type::TypeTag::DOUBLE)
+		    cout << " " << (*it)->operand_src2()->immediate()->dval();
+		else
+		    cout << " " << (*it)->operand_src2()->immediate()->ival();
+	    } else if ((*it)->operand_src2()->type == VREG_INT ||
 		    (*it)->operand_src2()->type == REG_INT)
 		cout << " " << INT_REGISTER_PREFIX << (*it)->operand_src2()->reg;
 	    else
 		cout << " " << FLOAT_REGISTER_PREFIX << (*it)->operand_src2()->reg;
 	}
 
-	if (!((*it)->operand_dest()->type == Instruction::OpType::NIL)) {
+	if ((*it)->operand_dest() && !((*it)->operand_dest()->type == Instruction::OpType::NIL)) {
 	    assert((*it)->operand_dest()->type < REG_TYPE_COUNT);
 
 	    if ((*it)->operand_dest()->type == VREG_INT ||

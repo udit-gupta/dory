@@ -212,10 +212,36 @@ void VariableEntry::codeGen(IntermediateCodeGen * list)
 {
     LOG("");
 
-    if (type()->isIntegral(type()->tag()))
+    int isInt, regPtr = -1;
+    Instruction *instr = NULL;
+    Instruction *instrAddOffset = NULL;
+    Value *immediate = NULL;
+
+    if (type()->isIntegral(type()->tag())) {
 	setReg(get_vreg_int(), VREG_INT);
-    else
+	isInt = 1;
+    } else {
 	setReg(get_vreg_float(), VREG_FLOAT);
+	isInt = 0;
+    }
+
+    if (initVal() && varKind() == VariableEntry::VarKind::GLOBAL_VAR) {
+	initVal()->codeGen(list);
+
+	instrAddOffset = new Instruction();
+        instrAddOffset->opcode(Instruction::Mnemonic::ADD);
+        instrAddOffset->operand_src1(get_vreg_global(), NULL, VREG_INT);
+	immediate = new Value(offSet(), Type::TypeTag::INT);
+	instrAddOffset->operand_src2(-1, immediate, Instruction::OpType::IMM);
+	regPtr = get_vreg_int();
+	instrAddOffset->operand_dest(regPtr, NULL, VREG_INT);
+	list->addInstruction(instrAddOffset);
+
+	instr = new Instruction(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::STI));
+	instr->operand_dest(regPtr, NULL, VREG_INT);
+	instr->operand_src1(initVal()->getReg(), NULL, initVal()->reg_type());
+	list->addInstruction(instr);
+    }
 
     return;
 }

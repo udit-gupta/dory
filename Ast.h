@@ -117,7 +117,7 @@ class ExprNode: public AstNode {
 
   const Type* typeCheck() {return NULL;};
   void typePrint(ostream& os, int indent=0) const { return; };
-  virtual void codeGen(IntermediateCodeGen *list)=0;
+  void codeGen(IntermediateCodeGen *list);
 
  private:
   ExprNodeType exprType_;
