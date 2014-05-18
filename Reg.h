@@ -11,6 +11,9 @@ enum RegType {VREG_INT = 0,
 
 int get_vreg_int();
 int get_vreg_float();
+int get_vreg_global();
+int get_vreg_sp();
+int get_vreg_bp();
 
 #endif
 

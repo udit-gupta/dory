@@ -21,7 +21,7 @@ class Instruction {
         PRTS, PRTI, PRTF,
         JMP, JMPC, JMPI, JMPCI,
         MOVL, MOVS, MOVI, MOVF,
-        MOVIF, MIVFI, // MIV?
+        MOVIF, MOVFI,
         STI, STF,
         LDI, LDF,
         IN, INI, INF,
@@ -80,12 +80,14 @@ class Instruction {
     void label(int label);
     int label(void);
 
-    void funLabel(string * label_name);
-    string * funLabel(void);
+    void funLabel(string label_name);
+    string funLabel(void);
 
     int isFunLabel(void);
 
     const string name(Mnemonic opcode);
+
+    static Mnemonic typedMnemonic(bool isInt, Mnemonic intOpcode) const;
 
   private:
     Mnemonic opcode_;
@@ -94,7 +96,7 @@ class Instruction {
     Operand dest_;
     int label_;
     int label_function_;    //Use funLabel_ instead of default label_
-    string * funLabel_;
+    string funLabel_;
 };
 
 #endif // INSTRUCTION_H

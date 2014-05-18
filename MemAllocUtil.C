@@ -19,7 +19,68 @@ static int offset_from_data = 0;
 static int neg_offset_from_bp = 0;
 static int pos_offset_from_bp = 0;
 
+int memAllocUtil(Type *var_type, enum EntryKind entry_kind, int reset_AR)
+{
+    int return_offset = 0;
+    //int type_size = 0;
 
+    if (!var_type) {
+	LOG("Type is NULL!");
+	return return_offset;
+    }
+
+//    type_size = size_of_type(var_type);
+
+    switch(entry_kind) {
+	case GLOBAL:
+//	    offset_from_data += alignment_required(var_type, offset_from_data);
+
+	    return_offset = offset_from_data;
+//	    offset_from_data += type_size;
+	    offset_from_data += 1;
+
+	    break;
+	case LOCAL:
+	    /* These should be at a negative offset from the base pointer. */
+
+	    /* First check if base pointer reset is required */
+	    if (reset_AR)
+		neg_offset_from_bp = 0;
+//		neg_offset_from_bp = -(RETURN_VALUE_SIZE + RETURN_ADDR_SIZE);
+
+//	    neg_offset_from_bp += -(alignment_required(var_type,
+//			neg_offset_from_bp));
+
+	    return_offset = neg_offset_from_bp;
+//	    neg_offset_from_bp += -(type_size);
+	    neg_offset_from_bp += -(1);
+
+	    break;
+	case FUNCTION_PARAMETER:
+	    /* These should be at a positive offset from the base pointer. */
+
+	    /* First check if base pointer reset is required */
+	    if (reset_AR)
+		pos_offset_from_bp = RETURN_VALUE_SIZE + RETURN_ADDR_SIZE + RBP_SIZE + 1;
+//		pos_offset_from_bp = 0;
+
+//	    pos_offset_from_bp += alignment_required(var_type,
+//			pos_offset_from_bp);
+
+	    return_offset = pos_offset_from_bp;
+//	    pos_offset_from_bp += type_size;
+	    pos_offset_from_bp += 1;
+
+	    break;
+	default:
+	    LOG("Incorrect Entry Kind!");
+	    break;
+    }
+
+    return return_offset;
+}
+
+#if 0
 static int alignment_required(Type *var_type, int current_offset)
 {
     int offset = 0;
@@ -123,3 +184,5 @@ int memAllocUtil(Type *var_type, enum EntryKind entry_kind, int reset_AR)
 
     return return_offset;
 }
+#endif
+

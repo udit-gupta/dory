@@ -82,7 +82,7 @@ void GlobalEntry::codeGen(IntermediateCodeGen * instrList)
 
     /* Code to create first "JMP L_MAIN:" label */
     initial_jmp = new Instruction(Instruction::Mnemonic::JMP);
-    initial_jmp->funLabel(new string("L_MAIN"));
+    initial_jmp->funLabel("begin");
 
     instrList->addInstruction(initial_jmp);
 

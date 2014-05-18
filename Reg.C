@@ -3,7 +3,14 @@
 
 using namespace std;
 
-static int reg_int_i = 0;
+enum {
+        GLOBAL_DATA = 0,
+        SP,
+        BP,
+        VREG_COUNT
+};
+
+static int reg_int_i = VREG_COUNT;
 static int reg_float_i = 0;
 
 int get_vreg_int() {
@@ -17,4 +24,17 @@ int get_vreg_float() {
 		LOG("Warning: Out of Float Registers.");
 	return reg_float_i ++;
 }
+
+int get_vreg_global() {
+        return GLOBAL_DATA;
+}
+
+int get_vreg_sp() {
+        return SP;
+}
+
+int get_vreg_bp() {
+        return BP;
+}
+
 

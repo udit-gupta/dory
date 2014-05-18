@@ -33,7 +33,7 @@ void IntermediateCodeGen::printInstructionList(void)
 	    if (!(*it)->isFunLabel())
 		cout << DEFAULT_LABEL_PREFIX << (*it)->label() << ": ";
 	    else
-		cout << (*it)->funLabel()->c_str() << ": ";
+		cout << (*it)->funLabel() << ": ";
 	    continue;
 	}
 
@@ -44,7 +44,7 @@ void IntermediateCodeGen::printInstructionList(void)
 	    if (!(*it)->isFunLabel())
 		cout << " " << DEFAULT_LABEL_PREFIX << (*it)->label() << endl;
 	    else
-		cout << " " << (*it)->funLabel()->c_str() << endl;
+		cout << " " << (*it)->funLabel() << endl;
 	    continue;
 	}
 

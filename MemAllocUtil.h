@@ -9,8 +9,11 @@ using namespace std;
 
 class Type;
 
-#define RETURN_VALUE_SIZE 4
-#define RETURN_ADDR_SIZE 4
+//#define RETURN_VALUE_SIZE 4
+//#define RETURN_ADDR_SIZE 4
+#define RETURN_VALUE_SIZE 1
+#define RETURN_ADDR_SIZE 1
+#define RBP_SIZE 1
 #define INT_FLOAT_ALIGN_BOUNDARY 4
 
 /*
