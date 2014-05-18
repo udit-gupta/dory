@@ -3,8 +3,10 @@
 
 #ifndef INSTRUCTION_H
 #define INSTRUCTION_H
+
 #include <string>
 #include "Reg.h"
+#include "Value.h"
 
 using namespace std;
 
@@ -39,8 +41,13 @@ class Instruction {
         Operand() {
             type = NIL;
         }
+
+	const Value * immediate(void) {
+	    return imm;
+	};
+
         int reg;
-        int imm;
+        const Value * imm;
         int type; // can be one of OpType or RegType enums
     };
 
@@ -65,13 +72,13 @@ class Instruction {
 
     ~Instruction() {};
 
-    void operand_src1(int reg, int imm, int type);
+    void operand_src1(int reg, const Value * imm, int type);
     Operand * operand_src1(void);
 
-    void operand_src2(int reg, int imm, int type);
+    void operand_src2(int reg, const Value * imm, int type);
     Operand * operand_src2(void);
 
-    void operand_dest(int reg, int imm, int type);
+    void operand_dest(int reg, const Value * imm, int type);
     Operand * operand_dest(void);
 
     void opcode(Mnemonic opcode);
@@ -87,7 +94,7 @@ class Instruction {
 
     const string name(Mnemonic opcode);
 
-    static Mnemonic typedMnemonic(bool isInt, Mnemonic intOpcode) const;
+    static Mnemonic typedMnemonic(bool isInt, Mnemonic intOpcode);
 
   private:
     Mnemonic opcode_;

@@ -52,7 +52,14 @@ void IntermediateCodeGen::printInstructionList(void)
 	    assert((*it)->operand_src1()->type < Instruction::OpType::OP_TYPE_COUNT);
 
 	    if ((*it)->operand_src1()->type == Instruction::OpType::IMM)
-		cout << " " << (*it)->operand_src1()->imm;
+		if ((*it)->operand_src1()->immediate()->type()->tag() == Type::TypeTag::STRING)
+		    cout << " " << (*it)->operand_src1()->immediate()->sval();
+		if ((*it)->operand_src1()->immediate()->type()->tag() == Type::TypeTag::BOOL)
+		    cout << " " << (*it)->operand_src1()->immediate()->bval();
+		if ((*it)->operand_src1()->immediate()->type()->tag() == Type::TypeTag::DOUBLE)
+		    cout << " " << (*it)->operand_src1()->immediate()->dval();
+		if ((*it)->operand_src1()->immediate()->type()->tag() == Type::isIntegral((*it)->operand_src1()->immediate()->type()->tag()))
+		    cout << " " << (*it)->operand_src1()->immediate()->ival();
 	    else if ((*it)->operand_src1()->type == VREG_INT ||
 		    (*it)->operand_src1()->type == REG_INT)
 		cout << " " << INT_REGISTER_PREFIX << (*it)->operand_src1()->reg;
@@ -64,7 +71,14 @@ void IntermediateCodeGen::printInstructionList(void)
 	    assert((*it)->operand_src2()->type < Instruction::OpType::OP_TYPE_COUNT);
 
 	    if ((*it)->operand_src2()->type == Instruction::OpType::IMM)
-		cout << " " << (*it)->operand_src2()->imm;
+		if ((*it)->operand_src1()->immediate()->type()->tag() == Type::TypeTag::STRING)
+		    cout << " " << (*it)->operand_src1()->immediate()->sval();
+		if ((*it)->operand_src1()->immediate()->type()->tag() == Type::TypeTag::BOOL)
+		    cout << " " << (*it)->operand_src1()->immediate()->bval();
+		if ((*it)->operand_src1()->immediate()->type()->tag() == Type::TypeTag::DOUBLE)
+		    cout << " " << (*it)->operand_src1()->immediate()->dval();
+		if (Type::isIntegral((*it)->operand_src1()->immediate()->type()->tag()))
+		    cout << " " << (*it)->operand_src1()->immediate()->ival();
 	    else if ((*it)->operand_src2()->type == VREG_INT ||
 		    (*it)->operand_src2()->type == REG_INT)
 		cout << " " << INT_REGISTER_PREFIX << (*it)->operand_src2()->reg;

@@ -409,50 +409,65 @@ void OpNode::codeGen(IntermediateCodeGen *instrList)
 
     bool isInt;
     Instruction *instr = new Instruction();
+    Value *immediate = NULL;
 
     for (unsigned int i = 0; i < arity_; i++) {
         if (arg(i))
             arg(i)->codeGen(instrList);
     }
 
-    if ((coercedType() && Type::IsIntegral(coercedType()->tag())) ||
-                    (Type::IsIntegral(type()->tag())))
+    if ((coercedType() && Type::isIntegral(coercedType()->tag())) ||
+                    (Type::isIntegral(type()->tag())))
                 isInt = true;
     else
                 isInt = false;
 
-    switch(opCode) {
-            case OpNode::Opcode::PLUS: instr->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::ADD));
-                                       instr->operand_src2(arg(1)->getReg(), 0, arg(1)->reg_type());
-                                       break;
-            case OpNode::Opcode::MINUS: instr->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::MINUS));
-                                       instr->operand_src2(arg(1)->getReg(), 0, arg(1)->reg_type());
-                                       break;
-            case OpNode::Opcode::MULT: instr->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::MUL));
-                                       instr->operand_src2(arg(1)->getReg(), 0, arg(1)->reg_type());
-                                       break;
-            case OpNode::Opcode::DIV:  instr->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::DIV));
-                                       instr->operand_src2(arg(1)->getReg(), 0, arg(1)->reg_type());
-            case OpNode::Opcode::MOD:  instr->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::MOD));
-                                       instr->operand_src2(arg(1)->getReg(), 0, arg(1)->reg_type());
-            case OpNode::Opcode::UMINUS: instr->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::NEG));
-            case OpNode::Opcode::BITAND: instr->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::AND));
-                                       instr->operand_src2(arg(1)->getReg(), 0, arg(1)->reg_type());
-            case OpNode::Opcode::BITOR: instr->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::OR));
-                                       instr->operand_src2(arg(1)->getReg(), 0, arg(1)->reg_type());
-            case OpNode::Opcode::BITXOR: instr->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::XOR));
-                                       instr->operand_src2(arg(1)->getReg(), 0, arg(1)->reg_type());
-            case OpNode::Opcode::BITNOT: instr->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::XOR));
-                                       instr->operand_src2(-1, -1, Instruction::OpType::IMM);
-                                       break;
+    switch(static_cast<int>(opCode())) {
+    case static_cast<int>(OpNode::OpCode::PLUS):
+	    instr->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::ADD));
+	    instr->operand_src2(arg(1)->getReg(), NULL, arg(1)->reg_type());
+	    break;
+    case static_cast<int>(OpNode::OpCode::MINUS):
+	    instr->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::SUB));
+	    instr->operand_src2(arg(1)->getReg(), NULL, arg(1)->reg_type());
+	    break;
+    case static_cast<int>(OpNode::OpCode::MULT):
+	    instr->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::MUL));
+	    instr->operand_src2(arg(1)->getReg(), NULL, arg(1)->reg_type());
+	    break;
+    case static_cast<int>(OpNode::OpCode::DIV):
+	    instr->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::DIV));
+	    instr->operand_src2(arg(1)->getReg(), NULL, arg(1)->reg_type());
+    case static_cast<int>(OpNode::OpCode::MOD):
+	    instr->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::MOD));
+	    instr->operand_src2(arg(1)->getReg(), NULL, arg(1)->reg_type());
+    case static_cast<int>(OpNode::OpCode::UMINUS):
+	    instr->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::NEG));
+    case static_cast<int>(OpNode::OpCode::BITAND):
+	    instr->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::AND));
+	    instr->operand_src2(arg(1)->getReg(), NULL, arg(1)->reg_type());
+    case static_cast<int>(OpNode::OpCode::BITOR):
+	    instr->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::OR));
+	    instr->operand_src2(arg(1)->getReg(), NULL, arg(1)->reg_type());
+    case static_cast<int>(OpNode::OpCode::BITXOR):
+	    instr->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::XOR));
+	    instr->operand_src2(arg(1)->getReg(), NULL, arg(1)->reg_type());
+    case static_cast<int>(OpNode::OpCode::BITNOT):
+	    instr->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::XOR));
+	    immediate = new Value(-1, Type::TypeTag::INT);
+	    instr->operand_src2(-1, immediate, Instruction::OpType::IMM);
+	    break;
+    default:
+	    LOG("No such OpCode exists!");
+	    break;
     }
 
     if (isInt)
-            instr->operand_dest(get_vreg_int(), 0, VREG_INT);
+            instr->operand_dest(get_vreg_int(), NULL, VREG_INT);
     else
-            instr->operand_dest(get_vreg_float(), 0, VREG_FLOAT);
+            instr->operand_dest(get_vreg_float(), NULL, VREG_FLOAT);
 
-    instr->operand_src1(arg(0)->getReg(), 0, arg(0)->reg_type());
+    instr->operand_src1(arg(0)->getReg(), NULL, arg(0)->reg_type());
 
     instrList->addInstruction(instr);
 
@@ -482,7 +497,8 @@ void RefExprNode::codeGen(IntermediateCodeGen *instrList)
     LOG("");
 
     bool isInt;
-    int regPtr;
+    int regPtr = -1;
+    Value *immediate = NULL;
 
     /* Register already allocated. */
 //    if (getReg() > -1)
@@ -500,7 +516,7 @@ void RefExprNode::codeGen(IntermediateCodeGen *instrList)
                 setReg(get_vreg_float(), VREG_FLOAT);*/
     }
 
-    VariableEntry *var = dynamic_cast<VariableEntry*>(symTabEntry());
+    const VariableEntry *var = dynamic_cast<const VariableEntry*>(symTabEntry());
 
     Instruction *instrAddOffset = new Instruction();
     Instruction *instrLoadData = new Instruction();
@@ -508,28 +524,31 @@ void RefExprNode::codeGen(IntermediateCodeGen *instrList)
     switch(var->varKind()) {
     case VariableEntry::VarKind::GLOBAL_VAR:
             instrAddOffset->opcode(Instruction::Mnemonic::ADD);
-            instrAddOffset->operand_src1(get_vreg_global(), 0, VREG_INT);
-            instrAddOffset->operand_src2(-1, var->offSet(), Instruction::OpType::IMM);
+            instrAddOffset->operand_src1(get_vreg_global(), NULL, VREG_INT);
+	    immediate = new Value(var->offSet(), Type::TypeTag::INT);
+            instrAddOffset->operand_src2(-1, immediate, Instruction::OpType::IMM);
             regPtr = get_vreg_int();
-            instrAddOffset->operand_dest(regPtr, 0, VREG_INT);
+            instrAddOffset->operand_dest(regPtr, NULL, VREG_INT);
             break;
     case VariableEntry::VarKind::LOCAL_VAR:
             instrAddOffset->opcode(Instruction::Mnemonic::SUB);
-            instrAddOffset->operand_src1(get_vreg_bp(), 0, VREG_INT);
-            instrAddOffset->operand_src2(-1, -var->offSet(), Instruction::OpType::IMM);
+            instrAddOffset->operand_src1(get_vreg_bp(), NULL, VREG_INT);
+	    immediate = new Value(-var->offSet(), Type::TypeTag::INT);
+            instrAddOffset->operand_src2(-1, immediate, Instruction::OpType::IMM);
             regPtr = get_vreg_int();
-            instrAddOffset->operand_dest(regPtr, 0, VREG_INT);
+            instrAddOffset->operand_dest(regPtr, NULL, VREG_INT);
             break;
     case VariableEntry::VarKind::PARAM_VAR:
             instrAddOffset->opcode(Instruction::Mnemonic::ADD);
-            instrAddOffset->operand_src1(get_vreg_bp(), 0, VREG_INT);
-            instrAddOffset->operand_src2(-1, var->offSet(), Instruction::OpType::IMM);
+            instrAddOffset->operand_src1(get_vreg_bp(), NULL, VREG_INT);
+	    immediate = new Value(var->offSet(), Type::TypeTag::INT);
+            instrAddOffset->operand_src2(-1, immediate, Instruction::OpType::IMM);
             regPtr = get_vreg_int();
-            instrAddOffset->operand_dest(regPtr, 0, VREG_INT);
+            instrAddOffset->operand_dest(regPtr, NULL, VREG_INT);
             break;
     default:
             LOG("PANIC PANIC!");
-            break;
+            return;
     }
 
     if(coercedType())
@@ -537,13 +556,13 @@ void RefExprNode::codeGen(IntermediateCodeGen *instrList)
     else
             isInt = Type::isIntegral(type()->tag());
 
-    if(isInt) {
+    if(isInt)
             instrLoadData->opcode(Instruction::Mnemonic::LDI);
     else
             instrLoadData->opcode(Instruction::Mnemonic::LDF);
 
-    instrLoadData->operand_dest(getReg(), 0, reg_type());
-    instrLoadData->operand_src1(regPtr, 0, VREG_INT);
+    instrLoadData->operand_dest(getReg(), NULL, reg_type());
+    instrLoadData->operand_src1(regPtr, NULL, VREG_INT);
 
     instrList->addInstruction(instrAddOffset);
     instrList->addInstruction(instrLoadData);
@@ -661,17 +680,22 @@ void ValueNode::codeGen(IntermediateCodeGen *instrList)
 
     Instruction *instrMov = new Instruction();
 
-    /* TODO: Handle strings :(  */
     if(Type::isIntegral(value()->type()->tag())) {
             setReg(get_vreg_int(), VREG_INT);
             instrMov->opcode(Instruction::Mnemonic::MOVI);
+    } else if (Type::isString(value()->type()->tag())) {
+            setReg(get_vreg_int(), VREG_INT);
+    	    instrMov->opcode(Instruction::Mnemonic::MOVS);
+    } else if (Type::isBool(value()->type()->tag())) {
+            setReg(get_vreg_int(), VREG_INT);
+    	    instrMov->opcode(Instruction::Mnemonic::MOVI);
     } else {
             setReg(get_vreg_float(), VREG_FLOAT);
             instrMov->opcode(Instruction::Mnemonic::MOVF);
     }
 
-    instrMov->operand_src1(-1, value(), Instruction:OpType::IMM);
-    instrMov->operand_dest(getReg(), 0, reg_type());
+    instrMov->operand_src1(-1, (const Value *)value(), Instruction::OpType::IMM);
+    instrMov->operand_dest(getReg(), NULL, reg_type());
 
     instrList->addInstruction(instrMov);
 
