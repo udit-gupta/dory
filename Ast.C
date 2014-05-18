@@ -496,10 +496,10 @@ void OpNode::codeGen(IntermediateCodeGen *instrList)
 
 	    instrList->addInstruction(movInstr);
 
-	    /* Step 3: JMPC NE tempReg 0 newLabel */
+	    /* Step 3: JMPC EQ tempReg 0 newLabel */
 	    newLabel = Instruction::Label::get_label();
 	    jmpcInstr = new Instruction(Instruction::Mnemonic::JMPC);
-	    jmpcInstr->relational_op(Instruction::Mnemonic::NE);
+	    jmpcInstr->relational_op(Instruction::Mnemonic::EQ);
 	    jmpcInstr->operand_src1(tempReg, NULL, VREG_INT);
 	    jmpcInstr->operand_src2(-1, immediate0, Instruction::OpType::IMM);
 	    jmpcInstr->label(newLabel);
@@ -515,6 +515,85 @@ void OpNode::codeGen(IntermediateCodeGen *instrList)
 	    instrList->addInstruction(mov1Instr);
 
 	    /* Step 5: Label newLabel */
+	    newLabelInstr = new Instruction(Instruction::Mnemonic::LABEL);
+	    newLabelInstr->label(newLabel);
+
+	    instrList->addInstruction(newLabelInstr);
+
+	    return;
+    case static_cast<int>(OpNode::OpCode::OR):
+	    /* OR the arg(0) with arg(1). If 0, then result is 0, else result is 1 */
+	    tempReg = get_vreg_int();
+
+	    /* Step 1: Perform a bitwise OR of the two operands. */
+	    instr->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::OR));
+	    instr->operand_src2(arg(1)->getReg(), NULL, arg(1)->reg_type());
+    	    instr->operand_src1(arg(0)->getReg(), NULL, arg(0)->reg_type());
+	    instr->operand_dest(tempReg, NULL, VREG_INT);
+
+	    instrList->addInstruction(instr);
+
+	    /* Step 2: MOVI 0 to actual destReg */
+	    immediate0 = new Value(0, Type::TypeTag::INT);
+	    movInstr = new Instruction(Instruction::Mnemonic::MOVI);
+	    movInstr->operand_src1(-1, immediate0, Instruction::OpType::IMM);
+    	    movInstr->operand_dest(getReg(), NULL, reg_type());
+
+	    instrList->addInstruction(movInstr);
+
+	    /* Step 3: JMPC EQ tempReg 0 newLabel */
+	    newLabel = Instruction::Label::get_label();
+	    jmpcInstr = new Instruction(Instruction::Mnemonic::JMPC);
+	    jmpcInstr->relational_op(Instruction::Mnemonic::EQ);
+	    jmpcInstr->operand_src1(tempReg, NULL, VREG_INT);
+	    jmpcInstr->operand_src2(-1, immediate0, Instruction::OpType::IMM);
+	    jmpcInstr->label(newLabel);
+
+	    instrList->addInstruction(jmpcInstr);
+
+	    /* Step 4: MOVI 1 to actual destReg */
+	    immediate1 = new Value(1, Type::TypeTag::INT);
+	    mov1Instr = new Instruction(Instruction::Mnemonic::MOVI);
+	    mov1Instr->operand_src1(-1, immediate1, Instruction::OpType::IMM);
+    	    mov1Instr->operand_dest(getReg(), NULL, reg_type());
+
+	    instrList->addInstruction(mov1Instr);
+
+	    /* Step 5: Label newLabel */
+	    newLabelInstr = new Instruction(Instruction::Mnemonic::LABEL);
+	    newLabelInstr->label(newLabel);
+
+	    instrList->addInstruction(newLabelInstr);
+
+	    return;
+    case static_cast<int>(OpNode::OpCode::NOT):
+	    /* Step 1: MOVI 1 to actual destReg */
+	    immediate0 = new Value(0, Type::TypeTag::INT);
+	    immediate1 = new Value(1, Type::TypeTag::INT);
+	    movInstr = new Instruction(Instruction::Mnemonic::MOVI);
+	    movInstr->operand_src1(-1, immediate1, Instruction::OpType::IMM);
+    	    movInstr->operand_dest(getReg(), NULL, reg_type());
+
+	    instrList->addInstruction(movInstr);
+
+	    /* Step 2: JMPC EQ arg(0) 0 newLabel */
+	    newLabel = Instruction::Label::get_label();
+	    jmpcInstr = new Instruction(Instruction::Mnemonic::JMPC);
+	    jmpcInstr->relational_op(Instruction::Mnemonic::EQ);
+	    jmpcInstr->operand_src1(arg(0)->getReg(), NULL, VREG_INT);
+	    jmpcInstr->operand_src2(-1, immediate0, Instruction::OpType::IMM);
+	    jmpcInstr->label(newLabel);
+
+	    instrList->addInstruction(jmpcInstr);
+
+	    /* Step 3: MOVI 0 to actual destReg */
+	    mov1Instr = new Instruction(Instruction::Mnemonic::MOVI);
+	    mov1Instr->operand_src1(-1, immediate0, Instruction::OpType::IMM);
+    	    mov1Instr->operand_dest(getReg(), NULL, reg_type());
+
+	    instrList->addInstruction(mov1Instr);
+
+	    /* Step 4: Label newLabel */
 	    newLabelInstr = new Instruction(Instruction::Mnemonic::LABEL);
 	    newLabelInstr->label(newLabel);
 
