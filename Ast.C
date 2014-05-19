@@ -981,6 +981,57 @@ void IfNode::codeGen(IntermediateCodeGen *instrList)
 {
     LOG("");
 
+    Instruction *jmpcInstr = NULL;
+    Instruction *jmpInstr = NULL;
+    Instruction *labelInstr = NULL;
+    Instruction *labelInstr2 = NULL;
+    Value * immediate0 = NULL;
+    int newLabelElse = -1;
+    int newLabelNext = -1;
+
+    if (cond()) {
+	    cond()->codeGen(instrList);
+
+	    newLabelElse = Instruction::Label::get_label();
+    	    immediate0 = new Value(0, Type::TypeTag::INT);
+	    jmpcInstr = new Instruction(Instruction::Mnemonic::JMPC);
+	    jmpcInstr->relational_op(Instruction::Mnemonic::EQ);
+	    jmpcInstr->operand_src2(-1, immediate0, Instruction::OpType::IMM);
+	    jmpcInstr->operand_src1(cond()->getReg(), NULL, cond()->reg_type());
+	    jmpcInstr->label(newLabelElse);
+
+	    instrList->addInstruction(jmpcInstr);
+
+	    if (!elseStmt())
+	    	newLabelNext = newLabelElse;
+	    else
+		newLabelNext = Instruction::Label::get_label();
+
+	    if (thenStmt()) {
+		thenStmt()->codeGen(instrList);
+
+		jmpInstr = new Instruction(Instruction::Mnemonic::JMP);
+		jmpInstr->label(newLabelNext);
+
+		instrList->addInstruction(jmpInstr);
+	    }
+
+	    labelInstr = new Instruction(Instruction::Mnemonic::LABEL);
+	    labelInstr->label(newLabelElse);
+
+	    instrList->addInstruction(labelInstr);
+
+	    if (elseStmt()) {
+		elseStmt()->codeGen(instrList);
+
+	        labelInstr2 = new Instruction(Instruction::Mnemonic::LABEL);
+	        labelInstr2->label(newLabelNext);
+
+	        instrList->addInstruction(labelInstr2);
+	    }
+    }
+
+    return;
 }
 
 WhileNode::WhileNode(ExprNode* cond, StmtNode* doStmt, int line, int column, string file):
