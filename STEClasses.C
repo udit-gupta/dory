@@ -308,6 +308,98 @@ void FunctionEntry::codeGen(IntermediateCodeGen * list)
 {
     LOG("");
 
+    int i, tempReg;
+    std::vector<int> regParamList;
+    int regForStack = get_vreg_int();
+    int regBP = get_vreg_int();
+    int regRetAddr = get_vreg_int();
+    int regRetValue = get_vreg_int();
+    Value *immediate1 = new Value(1, Type::TypeTag::INT);
+    Value *popImm = NULL;
+    Instruction * functionLabel = NULL;
+    Instruction * getParam = NULL;
+    Instruction * getRetAddr = NULL;
+    Instruction * getRetValue = NULL;
+    Instruction * getBP = NULL;
+    Instruction * incrSP = NULL;
+    Instruction * popAllSP = NULL;
+    Instruction * jmpRetAddr = NULL;
+
+    /* Function Label */
+    functionLabel = new Instruction(Instruction::Mnemonic::LABEL);
+    functionLabel->funLabel(name());
+
+    list->addInstruction(functionLabel);
+
+    /* TODO: Get BP Properly */
+    incrSP = new Instruction(Instruction::Mnemonic::ADD);
+    incrSP->operand_src1(get_vreg_sp(), NULL, VREG_INT);
+    incrSP->operand_src2(-1, immediate1, Instruction::OpType::IMM);
+    incrSP->operand_dest(regForStack, NULL, VREG_INT);
+
+    list->addInstruction(incrSP);
+
+    getBP = new Instruction(Instruction::Mnemonic::LDI);
+    getBP->operand_src1(regForStack, NULL, VREG_INT);
+    getBP->operand_dest(regBP, NULL, VREG_INT);
+
+    list->addInstruction(getBP);
+
+    /* Get Return Address */
+    list->addInstruction(incrSP);
+
+    getRetAddr = new Instruction(Instruction::Mnemonic::LDI);
+    getRetAddr->operand_src1(regForStack, NULL, VREG_INT);
+    getRetAddr->operand_dest(regRetAddr, NULL, VREG_INT);
+
+    list->addInstruction(getRetAddr);
+
+    /* Get Return Value */
+    list->addInstruction(incrSP);
+
+    getRetValue = new Instruction(Instruction::Mnemonic::LDI);
+    getRetValue->operand_src1(regForStack, NULL, VREG_INT);
+    getRetValue->operand_dest(regRetValue, NULL, VREG_INT);
+
+    list->addInstruction(getRetValue);
+
+    /* Get all Parameters */
+    for (i = 0; i < type()->arity(); i++) {
+	list->addInstruction(incrSP);
+
+	tempReg = get_vreg_int();
+	regParamList.push_back(tempReg);
+	getParam = new Instruction(Instruction::Mnemonic::LDI);
+	getParam->operand_src1(regForStack, NULL, VREG_INT);
+	getParam->operand_dest(tempReg, NULL, VREG_INT);
+
+	list->addInstruction(getParam);
+    }
+
+    /* XXX TODO: Code to add local variables to STACK */
+
+    /* Call Function Body's CodeGen */
+    if (body())
+	body()->typeCheck();
+
+    /* Pop stuff off stack by Adding num_local + num_params + 3
+     * XXX TODO: Add code for adding local variables to stack
+     * For now Only adding num_params + 3
+     */
+    popImm = new Value(type()->arity() + 3, Type::TypeTag::INT);
+    popAllSP = new Instruction(Instruction::Mnemonic::ADD);
+    popAllSP->operand_src1(get_vreg_sp(), NULL, VREG_INT);
+    popAllSP->operand_src2(-1, popImm, Instruction::OpType::IMM);
+    popAllSP->operand_dest(get_vreg_sp(), NULL, VREG_INT);
+
+    list->addInstruction(popAllSP);
+
+    /* JMPI to return address */
+    jmpRetAddr = new Instruction(Instruction::Mnemonic::JMPI);
+    jmpRetAddr->operand_dest(regRetAddr, NULL, VREG_INT);
+
+    list->addInstruction(jmpRetAddr);
+
     return;
 }
 
