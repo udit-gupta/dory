@@ -508,7 +508,7 @@ void OpNode::codeGen(IntermediateCodeGen *instrList)
 	    instrList->addInstruction(instr);
 
 	    /* Move the LHS to a temporary register */
-	    movInstr->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::MOVI));
+	    movInstr = new Instruction(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::MOVI));
 	    movInstr->operand_src1(arg(0)->getReg(), NULL, arg(0)->reg_type());
 	    movInstr->operand_dest(tempRegMain, NULL, arg(0)->reg_type());
 
@@ -516,7 +516,7 @@ void OpNode::codeGen(IntermediateCodeGen *instrList)
 
 	    /* Move immediate 2 to a temporary register */
 	    immediate = new Value(2, Type::TypeTag::INT);
-	    movImmInstr->opcode(Instruction::Mnemonic::MOVI);
+	    movImmInstr = new Instruction(Instruction::Mnemonic::MOVI);
 	    movImmInstr->operand_src1(-1, immediate, Instruction::OpType::IMM);
 	    movImmInstr->operand_dest(tempRegImm, NULL, VREG_INT);
 
@@ -590,7 +590,7 @@ void OpNode::codeGen(IntermediateCodeGen *instrList)
 	    instrList->addInstruction(instr);
 
 	    /* Move the LHS to a temporary register */
-	    movInstr->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::MOVI));
+	    movInstr = new Instruction(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::MOVI));
 	    movInstr->operand_src1(arg(0)->getReg(), NULL, arg(0)->reg_type());
 	    movInstr->operand_dest(tempRegMain, NULL, arg(0)->reg_type());
 
@@ -598,7 +598,7 @@ void OpNode::codeGen(IntermediateCodeGen *instrList)
 
 	    /* Move immediate 2 to a temporary register */
 	    immediate = new Value(2, Type::TypeTag::INT);
-	    movImmInstr->opcode(Instruction::Mnemonic::MOVI);
+	    movImmInstr = new Instruction(Instruction::Mnemonic::MOVI);
 	    movImmInstr->operand_src1(-1, immediate, Instruction::OpType::IMM);
 	    movImmInstr->operand_dest(tempRegImm, NULL, VREG_INT);
 

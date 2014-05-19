@@ -49,7 +49,7 @@ void IntermediateCodeGen::printInstructionList(void)
 
 	if ((*it)->opcode() == Instruction::Mnemonic::JMPC ||
 		(*it)->opcode() == Instruction::Mnemonic::JMPCI)
-	    cout << (*it)->name((*it)->relational_op());
+	    cout << " " << (*it)->name((*it)->relational_op());
 
 	if ((*it)->operand_src1() && !((*it)->operand_src1()->type == Instruction::OpType::NIL)) {
 	    assert((*it)->operand_src1()->type < Instruction::OpType::OP_TYPE_COUNT);

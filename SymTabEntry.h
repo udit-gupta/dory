@@ -97,9 +97,13 @@ class SymTabEntry: public ProgramElem {
 
   virtual void codeGen(IntermediateCodeGen * list) { return; };
 
-  virtual void codeGenST(int first=0, int last=0, IntermediateCodeGen *list=NULL) const {
+  virtual int codeGenST(int first=0, int last=0, IntermediateCodeGen *list=NULL) const {
+    int count = 0;
+
     if (symTab() != nullptr)
-	symTab()->codeGenST(first, last, list);
+	count = symTab()->codeGenST(first, last, list);
+
+    return count;
   }
 
  private:

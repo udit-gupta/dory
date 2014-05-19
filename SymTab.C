@@ -186,9 +186,10 @@ SymTab::memAllocST(int first, int last, int reset_AR) const {
   }
 }
 
-void 
+int 
 SymTab::codeGenST(int first, int last, IntermediateCodeGen *list) const {
   int i; SymTab::const_iterator it = begin();
+  int count = 0;
 
   if ((first == 0) && (last == 0))
     last = 1000000;
@@ -197,10 +198,10 @@ SymTab::codeGenST(int first, int last, IntermediateCodeGen *list) const {
        (it != end()) && (i < last); i++, ++it)  {
     SymTabEntry *ste = (SymTabEntry *)(*it);
     if (i >= first) {
-	if (i == first)
-	    ste->codeGen(list);
-	else
-	    ste->codeGen(list);
+	count++;
+        ste->codeGen(list);
     }
   }
+
+  return count;
 }

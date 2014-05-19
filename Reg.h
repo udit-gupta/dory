@@ -14,6 +14,7 @@ int get_vreg_float();
 int get_vreg_global();
 int get_vreg_sp();
 int get_vreg_bp();
+int get_vreg_temp_stack();
 
 #endif
 

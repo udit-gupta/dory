@@ -7,6 +7,7 @@ enum {
         GLOBAL_DATA = 0,
         SP,
         BP,
+        TEMP_STACK,
         VREG_COUNT
 };
 
@@ -37,4 +38,6 @@ int get_vreg_bp() {
         return BP;
 }
 
-
+int get_vreg_temp_stack() {
+        return TEMP_STACK;
+}
