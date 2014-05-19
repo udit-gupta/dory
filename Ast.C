@@ -417,11 +417,20 @@ void OpNode::codeGen(IntermediateCodeGen *instrList)
     Value *immediate0 = NULL;
     Value *immediate1 = NULL;
     int tempReg = -1;
+    int tempRegMain = -1;
+    int tempRegImm = -1;
     int newLabel = -1;
+    int newBeginLabel = -1;
     Instruction *movInstr = NULL;
+    Instruction *movImmInstr = NULL;
+    Instruction *movFinalInstr = NULL;
     Instruction *jmpcInstr = NULL;
+    Instruction *jmpInstr = NULL;
     Instruction *mov1Instr = NULL;
     Instruction *newLabelInstr = NULL;
+    Instruction *newLabelInstr2 = NULL;
+    Instruction *mulordivInstr = NULL;
+    Instruction *subInstr = NULL;
 
     for (unsigned int i = 0; i < arity_; i++) {
         if (arg(i))
@@ -486,6 +495,170 @@ void OpNode::codeGen(IntermediateCodeGen *instrList)
 	    immediate = new Value(-1, Type::TypeTag::INT);
 	    instr->operand_src2(-1, immediate, Instruction::OpType::IMM);
 	    break;
+    case static_cast<int>(OpNode::OpCode::SHL):
+	    tempReg = get_vreg_int();
+	    tempRegMain = get_vreg_int();
+	    tempRegImm = get_vreg_int();
+
+	    /* Move the RHS to a temporary register */
+	    instr->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::MOVI));
+	    instr->operand_src1(arg(1)->getReg(), NULL, arg(1)->reg_type());
+	    instr->operand_dest(tempReg, NULL, VREG_INT);
+
+	    instrList->addInstruction(instr);
+
+	    /* Move the LHS to a temporary register */
+	    movInstr->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::MOVI));
+	    movInstr->operand_src1(arg(0)->getReg(), NULL, arg(0)->reg_type());
+	    movInstr->operand_dest(tempRegMain, NULL, arg(0)->reg_type());
+
+	    instrList->addInstruction(movInstr);
+
+	    /* Move immediate 2 to a temporary register */
+	    immediate = new Value(2, Type::TypeTag::INT);
+	    movImmInstr->opcode(Instruction::Mnemonic::MOVI);
+	    movImmInstr->operand_src1(-1, immediate, Instruction::OpType::IMM);
+	    movImmInstr->operand_dest(tempRegImm, NULL, VREG_INT);
+
+	    instrList->addInstruction(movImmInstr);
+
+	    /* Begin label for this SHL loop */
+	    newBeginLabel = Instruction::Label::get_label();
+	    newLabelInstr = new Instruction(Instruction::Mnemonic::LABEL);
+	    newLabelInstr->label(newBeginLabel);
+
+	    instrList->addInstruction(newLabelInstr);
+
+	    /* JMPC for checking if the RHS is 0 yet. */
+	    immediate0 = new Value(0, Type::TypeTag::INT);
+	    newLabel = Instruction::Label::get_label();
+	    jmpcInstr = new Instruction(Instruction::Mnemonic::JMPC);
+	    jmpcInstr->relational_op(Instruction::Mnemonic::EQ);
+	    jmpcInstr->operand_src1(tempReg, NULL, VREG_INT);
+	    jmpcInstr->operand_src2(-1, immediate0, Instruction::OpType::IMM);
+	    jmpcInstr->label(newLabel);
+
+	    instrList->addInstruction(jmpcInstr);
+
+	    /* Multiply LHS with 2. */
+    	    mulordivInstr = new Instruction(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::MUL));
+	    mulordivInstr->operand_src1(tempRegImm, NULL, VREG_INT);
+	    mulordivInstr->operand_src2(tempRegMain, NULL, arg(0)->reg_type());
+	    mulordivInstr->operand_dest(tempRegMain, NULL, arg(0)->reg_type());
+
+	    instrList->addInstruction(mulordivInstr);
+
+	    /* Decrement RHS by 1. */
+	    immediate1 = new Value(1, Type::TypeTag::INT);
+	    subInstr = new Instruction(Instruction::Mnemonic::SUB);
+	    subInstr->operand_src1(tempReg, NULL, VREG_INT);
+	    subInstr->operand_src2(-1, immediate1, Instruction::OpType::IMM);
+	    subInstr->operand_dest(tempReg, NULL, VREG_INT);
+
+	    instrList->addInstruction(subInstr);
+
+	    /* JMP to beginning of SHL loop to check if done. */
+	    jmpInstr = new Instruction(Instruction::Mnemonic::JMP);
+	    jmpInstr->label(newBeginLabel);
+
+	    instrList->addInstruction(jmpInstr);
+
+	    /* Loop Exit Label. */
+	    newLabelInstr2 = new Instruction(Instruction::Mnemonic::LABEL);
+	    newLabelInstr2->label(newLabel);
+
+	    instrList->addInstruction(newLabelInstr2);
+
+	    /* Final move of result into destination register. */
+	    movFinalInstr = new Instruction(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::MOVI));
+	    movFinalInstr->operand_src1(tempRegMain, NULL, arg(0)->reg_type());
+	    movFinalInstr->operand_dest(getReg(), NULL, reg_type());
+
+	    instrList->addInstruction(movFinalInstr);
+
+	    return;
+    case static_cast<int>(OpNode::OpCode::SHR):
+	    tempReg = get_vreg_int();
+	    tempRegMain = get_vreg_int();
+	    tempRegImm = get_vreg_int();
+
+	    /* Move the RHS to a temporary register */
+	    instr->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::MOVI));
+	    instr->operand_src1(arg(1)->getReg(), NULL, arg(1)->reg_type());
+	    instr->operand_dest(tempReg, NULL, VREG_INT);
+
+	    instrList->addInstruction(instr);
+
+	    /* Move the LHS to a temporary register */
+	    movInstr->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::MOVI));
+	    movInstr->operand_src1(arg(0)->getReg(), NULL, arg(0)->reg_type());
+	    movInstr->operand_dest(tempRegMain, NULL, arg(0)->reg_type());
+
+	    instrList->addInstruction(movInstr);
+
+	    /* Move immediate 2 to a temporary register */
+	    immediate = new Value(2, Type::TypeTag::INT);
+	    movImmInstr->opcode(Instruction::Mnemonic::MOVI);
+	    movImmInstr->operand_src1(-1, immediate, Instruction::OpType::IMM);
+	    movImmInstr->operand_dest(tempRegImm, NULL, VREG_INT);
+
+	    instrList->addInstruction(movImmInstr);
+
+	    /* Begin label for this SHR loop */
+	    newBeginLabel = Instruction::Label::get_label();
+	    newLabelInstr = new Instruction(Instruction::Mnemonic::LABEL);
+	    newLabelInstr->label(newBeginLabel);
+
+	    instrList->addInstruction(newLabelInstr);
+
+	    /* JMPC for checking if the RHS is 0 yet. */
+	    immediate0 = new Value(0, Type::TypeTag::INT);
+	    newLabel = Instruction::Label::get_label();
+	    jmpcInstr = new Instruction(Instruction::Mnemonic::JMPC);
+	    jmpcInstr->relational_op(Instruction::Mnemonic::EQ);
+	    jmpcInstr->operand_src1(tempReg, NULL, VREG_INT);
+	    jmpcInstr->operand_src2(-1, immediate0, Instruction::OpType::IMM);
+	    jmpcInstr->label(newLabel);
+
+	    instrList->addInstruction(jmpcInstr);
+
+	    /* Multiply LHS with 2. */
+    	    mulordivInstr = new Instruction(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::DIV));
+	    mulordivInstr->operand_src1(tempRegImm, NULL, VREG_INT);
+	    mulordivInstr->operand_src2(tempRegMain, NULL, arg(0)->reg_type());
+	    mulordivInstr->operand_dest(tempRegMain, NULL, arg(0)->reg_type());
+
+	    instrList->addInstruction(mulordivInstr);
+
+	    /* Decrement RHS by 1. */
+	    immediate1 = new Value(1, Type::TypeTag::INT);
+	    subInstr = new Instruction(Instruction::Mnemonic::SUB);
+	    subInstr->operand_src1(tempReg, NULL, VREG_INT);
+	    subInstr->operand_src2(-1, immediate1, Instruction::OpType::IMM);
+	    subInstr->operand_dest(tempReg, NULL, VREG_INT);
+
+	    instrList->addInstruction(subInstr);
+
+	    /* JMP to beginning of SHR loop to check if done. */
+	    jmpInstr = new Instruction(Instruction::Mnemonic::JMP);
+	    jmpInstr->label(newBeginLabel);
+
+	    instrList->addInstruction(jmpInstr);
+
+	    /* Loop Exit Label. */
+	    newLabelInstr2 = new Instruction(Instruction::Mnemonic::LABEL);
+	    newLabelInstr2->label(newLabel);
+
+	    instrList->addInstruction(newLabelInstr2);
+
+	    /* Final move of result into destination register. */
+	    movFinalInstr = new Instruction(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::MOVI));
+	    movFinalInstr->operand_src1(tempRegMain, NULL, arg(0)->reg_type());
+	    movFinalInstr->operand_dest(getReg(), NULL, reg_type());
+
+	    instrList->addInstruction(movFinalInstr);
+
+	    return;
     case static_cast<int>(OpNode::OpCode::AND):
 	    /* AND the arg(0) with arg(1). If 0, then result is 0, else result is 1 */
 	    tempReg = get_vreg_int();
