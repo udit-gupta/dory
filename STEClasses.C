@@ -363,6 +363,8 @@ void FunctionEntry::codeGen(IntermediateCodeGen * list)
 
     list->addInstruction(getRetValue);
 
+    setReturnValueRegister(regRetValue);	// To be used by return statement node
+
     /* Get all Parameters */
     for (i = 0; i < type()->arity(); i++) {
 	list->addInstruction(incrSP);
