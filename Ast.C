@@ -989,46 +989,47 @@ void IfNode::codeGen(IntermediateCodeGen *instrList)
     int newLabelElse = -1;
     int newLabelNext = -1;
 
-    if (cond()) {
-	    cond()->codeGen(instrList);
+    if (!cond())
+	return;
 
-	    newLabelElse = Instruction::Label::get_label();
-    	    immediate0 = new Value(0, Type::TypeTag::INT);
-	    jmpcInstr = new Instruction(Instruction::Mnemonic::JMPC);
-	    jmpcInstr->relational_op(Instruction::Mnemonic::EQ);
-	    jmpcInstr->operand_src2(-1, immediate0, Instruction::OpType::IMM);
-	    jmpcInstr->operand_src1(cond()->getReg(), NULL, cond()->reg_type());
-	    jmpcInstr->label(newLabelElse);
+    cond()->codeGen(instrList);
 
-	    instrList->addInstruction(jmpcInstr);
+    newLabelElse = Instruction::Label::get_label();
+    immediate0 = new Value(0, Type::TypeTag::INT);
+    jmpcInstr = new Instruction(Instruction::Mnemonic::JMPC);
+    jmpcInstr->relational_op(Instruction::Mnemonic::EQ);
+    jmpcInstr->operand_src2(-1, immediate0, Instruction::OpType::IMM);
+    jmpcInstr->operand_src1(cond()->getReg(), NULL, cond()->reg_type());
+    jmpcInstr->label(newLabelElse);
 
-	    if (!elseStmt())
-	    	newLabelNext = newLabelElse;
-	    else
-		newLabelNext = Instruction::Label::get_label();
+    instrList->addInstruction(jmpcInstr);
 
-	    if (thenStmt()) {
-		thenStmt()->codeGen(instrList);
+    if (!elseStmt())
+    	newLabelNext = newLabelElse;
+    else
+	newLabelNext = Instruction::Label::get_label();
 
-		jmpInstr = new Instruction(Instruction::Mnemonic::JMP);
-		jmpInstr->label(newLabelNext);
+    if (thenStmt()) {
+	thenStmt()->codeGen(instrList);
 
-		instrList->addInstruction(jmpInstr);
-	    }
+	jmpInstr = new Instruction(Instruction::Mnemonic::JMP);
+	jmpInstr->label(newLabelNext);
 
-	    labelInstr = new Instruction(Instruction::Mnemonic::LABEL);
-	    labelInstr->label(newLabelElse);
+	instrList->addInstruction(jmpInstr);
+    }
 
-	    instrList->addInstruction(labelInstr);
+    labelInstr = new Instruction(Instruction::Mnemonic::LABEL);
+    labelInstr->label(newLabelElse);
 
-	    if (elseStmt()) {
-		elseStmt()->codeGen(instrList);
+    instrList->addInstruction(labelInstr);
 
-	        labelInstr2 = new Instruction(Instruction::Mnemonic::LABEL);
-	        labelInstr2->label(newLabelNext);
+    if (elseStmt()) {
+	elseStmt()->codeGen(instrList);
 
-	        instrList->addInstruction(labelInstr2);
-	    }
+        labelInstr2 = new Instruction(Instruction::Mnemonic::LABEL);
+        labelInstr2->label(newLabelNext);
+
+        instrList->addInstruction(labelInstr2);
     }
 
     return;
@@ -1045,6 +1046,50 @@ void WhileNode::codeGen(IntermediateCodeGen *instrList)
 {
     LOG("");
 
+    int newStartLabel = -1;
+    int newExitLabel = -1;
+    Instruction *startLabel = NULL;
+    Instruction *exitLabel = NULL;
+    Instruction *jmpcInstr = NULL;
+    Instruction *jmpInstr = NULL;
+    Value * immediate0 = NULL;
+
+    if (!cond())
+	return;
+
+    newStartLabel = Instruction::Label::get_label();
+    startLabel = new Instruction(Instruction::Mnemonic::LABEL);
+    startLabel->label(newStartLabel);
+
+    instrList->addInstruction(startLabel);
+
+    cond()->codeGen(instrList);
+    
+    newExitLabel = Instruction::Label::get_label();
+    immediate0 = new Value(0, Type::TypeTag::INT);
+    jmpcInstr = new Instruction(Instruction::Mnemonic::JMPC);
+    jmpcInstr->relational_op(Instruction::Mnemonic::EQ);
+    jmpcInstr->operand_src2(-1, immediate0, Instruction::OpType::IMM);
+    jmpcInstr->operand_src1(cond()->getReg(), NULL, cond()->reg_type());
+    jmpcInstr->label(newExitLabel);
+    
+    instrList->addInstruction(jmpcInstr);
+    
+    if (doStmt()) {
+        doStmt()->codeGen(instrList);
+    
+        jmpInstr = new Instruction(Instruction::Mnemonic::JMP);
+        jmpInstr->label(newStartLabel);
+    
+        instrList->addInstruction(jmpInstr);
+    }
+    
+    exitLabel = new Instruction(Instruction::Mnemonic::LABEL);
+    exitLabel->label(newExitLabel);
+    
+    instrList->addInstruction(exitLabel);
+
+    return;
 }
 
 PrimitivePatNode::PrimitivePatNode(EventEntry* ee, vector<VariableEntry*>* params, ExprNode* c, int line, int column, string file):
@@ -1086,6 +1131,14 @@ void RuleNode::codeGen(IntermediateCodeGen *instrList)
 {
     LOG("");
 
+    /* TODO: This is mostly incomplete, complete this. */
+    if (pat())
+	pat()->codeGen(instrList);
+
+    if (reaction())
+	reaction()->codeGen(instrList);
+
+    return;
 }
 
 /*****************        Add printing Logic Here for Each Node     *****************/
