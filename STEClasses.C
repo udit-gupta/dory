@@ -346,23 +346,33 @@ void FunctionEntry::codeGen(IntermediateCodeGen * list)
     std::vector<int> regLocalList;
     int regBP = get_vreg_int();
     int regRetAddr = get_vreg_int();
-    int regRetValue = get_vreg_int();
+    int newFuncRetLabel = -1;
+    //int regRetValue = get_vreg_int();
     Value *immediate1 = new Value(1, Type::TypeTag::INT);
     Value *popImm = NULL;
+    Value *getParamImm = NULL;
     Instruction * functionLabel = NULL;
-//    Instruction * getParam = NULL;
+    Instruction * funcRetLabel = NULL;
+    Instruction * getParam = NULL;
     Instruction * getRetAddr = NULL;
     Instruction * getRetValue = NULL;
     Instruction * getBP = NULL;
     Instruction * incrSP = NULL;
     Instruction * popAllSP = NULL;
     Instruction * jmpRetAddr = NULL;
+    Instruction * sp2bp = NULL;
 
     /* Function Label */
     functionLabel = new Instruction(Instruction::Mnemonic::LABEL);
     functionLabel->funLabel(name());
 
     list->addInstruction(functionLabel);
+
+    /* BP = SP */
+    sp2bp = new Instruction(Instruction::Mnemonic::MOVI);
+    sp2bp->operand_src1(get_vreg_sp(), NULL, VREG_INT);
+    sp2bp->operand_dest(get_vreg_bp(), NULL, VREG_INT);
+    list->addInstruction(sp2bp);
 
     /* TODO: Get BP Properly */
     incrSP = new Instruction(Instruction::Mnemonic::ADD);
@@ -390,19 +400,24 @@ void FunctionEntry::codeGen(IntermediateCodeGen * list)
     /* Get Return Value */
     list->addInstruction(incrSP);
 
-    getRetValue = new Instruction(Instruction::Mnemonic::LDI);
-    getRetValue->operand_src1(get_vreg_temp_stack(), NULL, VREG_INT);
-    getRetValue->operand_dest(regRetValue, NULL, VREG_INT);
-
-    list->addInstruction(getRetValue);
-
-    setReturnValueRegister(regRetValue);	// To be used by return statement node
+//    getRetValue = new Instruction(Instruction::Mnemonic::LDI);
+//    getRetValue->operand_src1(get_vreg_temp_stack(), NULL, VREG_INT);
+//    getRetValue->operand_dest(regRetValue, NULL, VREG_INT);
+//
+//    list->addInstruction(getRetValue);
+//
+//    setReturnValueRegister(regRetValue);	// To be used by return statement node
 
     /* Get all Parameters */
-    if (this->type()->arity())
-	this->codeGenST(0, this->type()->arity());
+//    if (this->type()->arity())
+//        this->codeGenST(0, this->type()->arity());
 
     int num_local_var = this->codeGenST(this->type()->arity(), 100000);
+    getParamImm = new Value(num_local_var, Type::TypeTag::INT);
+    getParam = new Instruction(Instruction::Mnemonic::ADD);
+    getParam->operand_src1(get_vreg_sp(), NULL, VREG_INT);
+    getParam->operand_src2(-1, getParamImm, Instruction::OpType::IMM);
+    getParam->operand_dest(get_vreg_sp(), NULL, VREG_INT);
 //    for (i = 0; i < type()->arity(); i++) {
 //	list->addInstruction(incrSP);
 //
@@ -417,15 +432,24 @@ void FunctionEntry::codeGen(IntermediateCodeGen * list)
 
     /* XXX TODO: Code to add local variables to STACK */
 
-    /* Call Function Body's CodeGen */
-    if (body())
-	body()->codeGen(list);
+    newFuncRetLabel = Instruction::Label::get_label();
+    setReturnLabel(newFuncRetLabel);
 
+    /* Call Function Body's CodeGen */
+    if (body()) {
+	body()->codeGen(list);
+    }
+
+    funcRetLabel = new Instruction(Instruction::Mnemonic::LABEL);
+    funcRetLabel->label(newFuncRetLabel);
+
+    list->addInstruction(functionLabel);
     /* Pop stuff off stack by Adding num_local + num_params + 3
      * XXX TODO: Add code for adding local variables to stack
      * For now Only adding num_params + 3
      */
-    popImm = new Value(num_local_var + type()->arity() + 3, Type::TypeTag::INT);
+
+    popImm = new Value(num_local_var + /*type()->arity() + 1*/ + 2, Type::TypeTag::INT);
     popAllSP = new Instruction(Instruction::Mnemonic::ADD);
     popAllSP->operand_src1(get_vreg_sp(), NULL, VREG_INT);
     popAllSP->operand_src2(-1, popImm, Instruction::OpType::IMM);

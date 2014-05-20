@@ -1694,6 +1694,36 @@ ReturnStmtNode::typeCheck()
 void ReturnStmtNode::codeGen(IntermediateCodeGen *instrList)
 {
     LOG("");
+    int regPtr = -1;
+    Value *immediate = NULL;
+
+    Instruction *instrAddOffset = new Instruction();
+    Instruction *instr;
+
+    expr_->codeGen(instrList);
+
+    instrAddOffset->opcode(Instruction::Mnemonic::ADD);
+    instrAddOffset->operand_src1(get_vreg_bp(), NULL, VREG_INT);
+    immediate = new Value(3, Type::TypeTag::INT);
+    instrAddOffset->operand_src2(-1, immediate, Instruction::OpType::IMM);
+    regPtr = get_vreg_int();
+    instrAddOffset->operand_dest(regPtr, NULL, VREG_INT);
+
+    if(expr_->coercedType())
+            isInt = Type::isIntegral(expr_->coercedType()->tag());
+    else
+            isInt = Type::isIntegral(expr_->type()->tag());
+
+    if(isInt)
+            instr->opcode(Instruction::Mnemonic::LDI);
+    else
+            instr->opcode(Instruction::Mnemonic::LDF);
+
+    instr->operand_src1(expr_->getReg(), NULL, expr_->reg_type());
+    instr->operand_dest(regPtr, NULL, VREG_INT);
+    
+    instrList->addInstruction(instrAddOffset);
+    instrList->addInstruction(instr);
 
 }
 

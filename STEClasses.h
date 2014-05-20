@@ -149,7 +149,9 @@ class FunctionEntry: public SymTabEntry {
   void body(CompoundStmtNode* n) { body_ = n;};
 
   void setReturnValueRegister(int reg) { returnValueReg_ = reg; };
+  void setReturnLabel(int label) { return returnLabel_ = label; };
   int getReturnValueRegister(void) { return returnValueReg_; };
+  void getReturnLabel(void) { return returnLabel_; };
 
   void print(ostream& os, int indent) const;
 
@@ -163,6 +165,7 @@ class FunctionEntry: public SymTabEntry {
  private:
   CompoundStmtNode* body_;
   int returnValueReg_;
+  int returnLabel_;
 };
 
 class EventEntry: public SymTabEntry {
