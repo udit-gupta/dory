@@ -876,8 +876,8 @@ void OpNode::codeGen(IntermediateCodeGen *instrList)
 	    else
 	    	jmpcInstr->relational_op(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::GE));
 
-	    jmpcInstr->operand_src1(arg(1)->getReg(), NULL, arg(1)->reg_type());
-	    jmpcInstr->operand_src2(arg(0)->getReg(), NULL, arg(0)->reg_type());
+	    jmpcInstr->operand_src1(arg(0)->getReg(), NULL, arg(0)->reg_type());
+	    jmpcInstr->operand_src2(arg(1)->getReg(), NULL, arg(1)->reg_type());
 	    jmpcInstr->label(newLabel);
 
 	    instrList->addInstruction(jmpcInstr);
@@ -915,8 +915,8 @@ void OpNode::codeGen(IntermediateCodeGen *instrList)
 	    else
 	    	jmpcInstr->relational_op(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::GT));
 
-	    jmpcInstr->operand_src1(arg(1)->getReg(), NULL, arg(1)->reg_type());
-	    jmpcInstr->operand_src2(arg(0)->getReg(), NULL, arg(0)->reg_type());
+	    jmpcInstr->operand_src1(arg(0)->getReg(), NULL, arg(0)->reg_type());
+	    jmpcInstr->operand_src2(arg(1)->getReg(), NULL, arg(1)->reg_type());
 	    jmpcInstr->label(newLabel);
 
 	    instrList->addInstruction(jmpcInstr);
@@ -954,8 +954,8 @@ void OpNode::codeGen(IntermediateCodeGen *instrList)
 	    else
 	    	jmpcInstr->relational_op(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::GE));
 
-	    jmpcInstr->operand_src1(arg(0)->getReg(), NULL, arg(0)->reg_type());
-	    jmpcInstr->operand_src2(arg(1)->getReg(), NULL, arg(1)->reg_type());
+	    jmpcInstr->operand_src1(arg(1)->getReg(), NULL, arg(1)->reg_type());
+	    jmpcInstr->operand_src2(arg(0)->getReg(), NULL, arg(0)->reg_type());
 	    jmpcInstr->label(newLabel);
 
 	    instrList->addInstruction(jmpcInstr);
@@ -993,8 +993,8 @@ void OpNode::codeGen(IntermediateCodeGen *instrList)
 	    else
 	    	jmpcInstr->relational_op(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::GT));
 
-	    jmpcInstr->operand_src1(arg(0)->getReg(), NULL, arg(0)->reg_type());
-	    jmpcInstr->operand_src2(arg(1)->getReg(), NULL, arg(1)->reg_type());
+	    jmpcInstr->operand_src1(arg(1)->getReg(), NULL, arg(1)->reg_type());
+	    jmpcInstr->operand_src2(arg(0)->getReg(), NULL, arg(0)->reg_type());
 	    jmpcInstr->label(newLabel);
 
 	    instrList->addInstruction(jmpcInstr);
@@ -1154,29 +1154,28 @@ void InvocationNode::codeGen(IntermediateCodeGen *instrList)
     retAddrLabel = Instruction::Label::get_label();
     immediate1 = new Value(1, Type::TypeTag::INT);
 
-    if(exps == NULL || exps->size() == 0)
-	    return;
+    if(exps != NULL && exps->size() != 0) {
+	for(std::vector<ExprNode*>::const_reverse_iterator it = exps->crbegin(); it != exps->crend(); it++) {
+	    (*it)->codeGen(instrList);
 
-    for(std::vector<ExprNode*>::const_reverse_iterator it = exps->crbegin(); it != exps->crend(); it++) {
-        (*it)->codeGen(instrList);
-    
-        if (((*it)->coercedType() && Type::isIntegral((*it)->coercedType()->tag())) || Type::isIntegral((*it)->type()->tag()))
-    	    isInt = 1;
-        else
-    	    isInt = 0;
-    
-        instr = new Instruction(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::STI));
-        instr->operand_src1((*it)->getReg(), NULL, (*it)->reg_type());
-        instr->operand_dest(get_vreg_sp(), NULL, VREG_INT);
-    
-        instrList->addInstruction(instr);
-    
-        subInstr = new Instruction(Instruction::Mnemonic::SUB);
-        subInstr->operand_src1(get_vreg_sp(), NULL, VREG_INT);
-        subInstr->operand_src2(-1, immediate1, Instruction::OpType::IMM);
-        subInstr->operand_dest(get_vreg_sp(), NULL, VREG_INT);
-    
-        instrList->addInstruction(subInstr);
+	    if (((*it)->coercedType() && Type::isIntegral((*it)->coercedType()->tag())) || Type::isIntegral((*it)->type()->tag()))
+		isInt = 1;
+	    else
+		isInt = 0;
+
+	    instr = new Instruction(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::STI));
+	    instr->operand_src1((*it)->getReg(), NULL, (*it)->reg_type());
+	    instr->operand_dest(get_vreg_sp(), NULL, VREG_INT);
+
+	    instrList->addInstruction(instr);
+
+	    subInstr = new Instruction(Instruction::Mnemonic::SUB);
+	    subInstr->operand_src1(get_vreg_sp(), NULL, VREG_INT);
+	    subInstr->operand_src2(-1, immediate1, Instruction::OpType::IMM);
+	    subInstr->operand_dest(get_vreg_sp(), NULL, VREG_INT);
+
+	    instrList->addInstruction(subInstr);
+	}
     }
 
     int tempReg = get_vreg_int();

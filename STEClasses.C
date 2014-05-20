@@ -419,7 +419,7 @@ void FunctionEntry::codeGen(IntermediateCodeGen * list)
 
     /* Call Function Body's CodeGen */
     if (body())
-	body()->typeCheck();
+	body()->codeGen(list);
 
     /* Pop stuff off stack by Adding num_local + num_params + 3
      * XXX TODO: Add code for adding local variables to stack
