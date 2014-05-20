@@ -1388,6 +1388,7 @@ void WhileNode::codeGen(IntermediateCodeGen *instrList)
     cond()->codeGen(instrList);
     
     newExitLabel = Instruction::Label::get_label();
+    exit_label(newExitLabel);
     immediate0 = new Value(0, Type::TypeTag::INT);
     jmpcInstr = new Instruction(Instruction::Mnemonic::JMPC);
     jmpcInstr->relational_op(Instruction::Mnemonic::EQ);
@@ -1796,6 +1797,17 @@ void BreakStmtNode::codeGen(IntermediateCodeGen *instrList)
 {
     LOG("");
 
+    Instruction *instr = NULL;
+
+    if (!whileStmt())
+	    return;
+
+    instr = new Instruction(Instruction::Mnemonic::JMP);
+    instr->label(whileStmt()->exit_label());
+
+    instrList->addInstruction(instr);
+
+    return;
 }
 
 const Type *
