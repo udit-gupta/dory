@@ -18,6 +18,7 @@ Type *var_type;
 Type *fun_ret_type;
 RuleBlockEntry* rbe = NULL;
 int start_rule_scope = 0;
+ WhileNode*         Globwhile;
 
 %}
 
@@ -495,7 +496,7 @@ return_stmt:            TOK_RETURN expr {
                                 $$ = new ReturnStmtNode($2, ((FunctionEntry*)ce), yylinenum, 0, yyfilename);
                         };
 
-break_stmt:             TOK_BREAK                       { $$ = new BreakStmtNode(NULL, yylinenum, 0, yyfilename); };
+break_stmt:             TOK_BREAK                       { $$ = new BreakStmtNode(NULL, Globwhile, yylinenum, 0, yyfilename); };
 
 
                 /********** If Expressions  *************/
@@ -510,7 +511,7 @@ if_expr:                TOK_IF expr stmt { $$ = new IfNode($2, $3, NULL, yylinen
                 /********** While Expressions  *************/
 
 
-while_expr:             TOK_WHILE expr stmt { $$ = new WhileNode($2, $3, yylinenum, 0, yyfilename); };
+while_expr:             TOK_WHILE expr stmt { $$ = new WhileNode($2, $3, yylinenum, 0, yyfilename); Globwhile = $$;};
 
                 
         /************ Function Invocation *******************/

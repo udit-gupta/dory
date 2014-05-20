@@ -21,6 +21,7 @@ class PrimitivePatNode;
 class RulezNode;
 class SymTabEntry;
 class VariableEntry;
+class WhileNode;
 
 /*****************************************************************************
    Here is the class hierarchy:
@@ -113,6 +114,8 @@ class ExprNode: public AstNode {
   const Type* coercedType() const { return coercedType_; }
   void coercedType(const Type* type) { coercedType_ = type; }
 
+  virtual int getDestAddrReg(void) { return -1; };
+
   void print(ostream& os, int indent=0) const=0;
 
   const Type* typeCheck() {return NULL;};
@@ -141,6 +144,9 @@ class RefExprNode: public ExprNode {
   const SymTabEntry* symTabEntry() const { return sym_;};
   void symTabEntry(const SymTabEntry *ste)  { sym_ = ste;};
 
+  int getDestAddrReg(void) { return destReg_; };
+  void setDestAddrReg(int destReg) { destReg_ = destReg; };
+
   void print(ostream& os, int indent=0) const;
 
   const Type* typeCheck();
@@ -150,6 +156,7 @@ class RefExprNode: public ExprNode {
  private:
   string ext_;
   const SymTabEntry* sym_;
+  int destReg_;
 };
 
 /****************************************************************/
@@ -455,7 +462,7 @@ class ReturnStmtNode: public StmtNode {
 
 class BreakStmtNode: public StmtNode {
  public:
-  BreakStmtNode(ExprNode *e, int line=0, int column=0, string file=""):
+  BreakStmtNode(ExprNode *e, WhileNode *wsn, int line=0, int column=0, string file=""):
     StmtNode(StmtNode::StmtNodeKind::BREAK,line,column,file) { expr_ = e;};
   ~BreakStmtNode() {};
 
@@ -468,6 +475,12 @@ class BreakStmtNode: public StmtNode {
     os << "break"; 
     if(expr_ != NULL) expr_->print(os, indent); else os <<";";
   }
+
+  void whileStmt (WhileNode *wsn) {
+  	wsn_ = wsn;
+  };
+
+  WhileNode * whileStmt(void) { return wsn_; };
 
   void typePrint(ostream& os, int indent) const {
     os << "break ";
@@ -484,6 +497,7 @@ class BreakStmtNode: public StmtNode {
   void codeGen(IntermediateCodeGen *list);
  private:
   ExprNode* expr_;
+  WhileNode* wsn_;
 };
 
 /****************************************************************/
@@ -596,9 +610,19 @@ class WhileNode: public StmtNode{
   void typePrint(ostream& os, int indent) const;
   void codeGen(IntermediateCodeGen *list);
 
+  void exit_label(int label) {
+	label_ = label;
+  };
+
+  int exit_label(void) {
+	return label_;
+  }
+
  private: 
   ExprNode *cond_;
   StmtNode *do_;
+
+  int label_;
 
   WhileNode(const WhileNode&);
 
