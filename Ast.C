@@ -1140,6 +1140,76 @@ void InvocationNode::codeGen(IntermediateCodeGen *instrList)
 {
     LOG("");
 
+    int retAddrLabel, isInt;
+    Value *immediate1 = NULL;
+    Instruction *instr = NULL;
+    Instruction *movlInstr = NULL;
+    Instruction *subInstr = NULL;
+    Instruction *jmpInstr = NULL;
+    Instruction *labelInstr = NULL;
+    const vector<ExprNode*> *exps = params();
+
+    /* XXX TODO: Figure out where to initialize the SP */
+
+    retAddrLabel = Instruction::Label::get_label();
+    immediate1 = new Value(1, Type::TypeTag::INT);
+
+    if(exps == NULL || exps->size() == 0)
+	    return;
+
+    for(std::vector<ExprNode*>::const_reverse_iterator it = exps->crbegin(); it != exps->crend(); it++) {
+        (*it)->codeGen(instrList);
+    
+        if (((*it)->coercedType() && Type::isIntegral((*it)->coercedType()->tag())) || Type::isIntegral((*it)->type()->tag()))
+    	    isInt = 1;
+        else
+    	    isInt = 0;
+    
+        instr = new Instruction(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::STI));
+        instr->operand_src1((*it)->getReg(), NULL, (*it)->reg_type());
+        instr->operand_dest(get_vreg_sp(), NULL, VREG_INT);
+    
+        instrList->addInstruction(instr);
+    
+        subInstr = new Instruction(Instruction::Mnemonic::SUB);
+        subInstr->operand_src1(get_vreg_sp(), NULL, VREG_INT);
+        subInstr->operand_src2(-1, immediate1, Instruction::OpType::IMM);
+        subInstr->operand_dest(get_vreg_sp(), NULL, VREG_INT);
+    
+        instrList->addInstruction(subInstr);
+    }
+
+    int tempReg = get_vreg_int();
+    movlInstr = new Instruction(Instruction::Mnemonic::MOVL);
+    movlInstr->label(retAddrLabel);
+    movlInstr->operand_dest(tempReg, NULL, VREG_INT);
+
+    instrList->addInstruction(movlInstr);
+
+    instr = new Instruction(Instruction::Mnemonic::STI);
+    instr->operand_src1(tempReg, NULL, VREG_INT);
+    instr->operand_dest(get_vreg_sp(), NULL, VREG_INT);
+    
+    instrList->addInstruction(instr);
+    
+    subInstr = new Instruction(Instruction::Mnemonic::SUB);
+    subInstr->operand_src1(get_vreg_sp(), NULL, VREG_INT);
+    subInstr->operand_src2(-1, immediate1, Instruction::OpType::IMM);
+    subInstr->operand_dest(get_vreg_sp(), NULL, VREG_INT);
+    
+    instrList->addInstruction(subInstr);
+
+    jmpInstr = new Instruction(Instruction::Mnemonic::JMP);
+    jmpInstr->funLabel(symTabEntry()->name());
+    
+    instrList->addInstruction(jmpInstr);
+
+    labelInstr = new Instruction(Instruction::Mnemonic::LABEL);
+    labelInstr->label(retAddrLabel);
+    
+    instrList->addInstruction(labelInstr);
+
+    return;
 }
 
 IfNode::IfNode(ExprNode* cond, StmtNode* thenStmt, StmtNode* elseStmt, int line, int column, string file):
