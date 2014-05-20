@@ -113,6 +113,8 @@ class ExprNode: public AstNode {
   const Type* coercedType() const { return coercedType_; }
   void coercedType(const Type* type) { coercedType_ = type; }
 
+  virtual int getDestAddrReg(void) { return -1; };
+
   void print(ostream& os, int indent=0) const=0;
 
   const Type* typeCheck() {return NULL;};
@@ -141,6 +143,9 @@ class RefExprNode: public ExprNode {
   const SymTabEntry* symTabEntry() const { return sym_;};
   void symTabEntry(const SymTabEntry *ste)  { sym_ = ste;};
 
+  int getDestAddrReg(void) { return destReg_; };
+  void setDestAddrReg(int destReg) { destReg_ = destReg; };
+
   void print(ostream& os, int indent=0) const;
 
   const Type* typeCheck();
@@ -150,6 +155,7 @@ class RefExprNode: public ExprNode {
  private:
   string ext_;
   const SymTabEntry* sym_;
+  int destReg_;
 };
 
 /****************************************************************/

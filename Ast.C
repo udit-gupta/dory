@@ -425,6 +425,7 @@ void OpNode::codeGen(IntermediateCodeGen *instrList)
     Instruction *movImmInstr = NULL;
     Instruction *movFinalInstr = NULL;
     Instruction *jmpcInstr = NULL;
+    Instruction *jmpcInstr2 = NULL;
     Instruction *jmpInstr = NULL;
     Instruction *mov1Instr = NULL;
     Instruction *newLabelInstr = NULL;
@@ -432,9 +433,11 @@ void OpNode::codeGen(IntermediateCodeGen *instrList)
     Instruction *mulordivInstr = NULL;
     Instruction *subInstr = NULL;
 
-    for (unsigned int i = 0; i < arity_; i++) {
-        if (arg(i))
-            arg(i)->codeGen(instrList);
+    if (opCode() != OpNode::OpCode::AND && opCode() != OpNode::OpCode::OR) {
+        for (unsigned int i = 0; i < arity_; i++) {
+            if (arg(i))
+                arg(i)->codeGen(instrList);
+        }
     }
 
     if ((coercedType() && (Type::isIntegral(coercedType()->tag()) || Type::isBool(coercedType()->tag()))) ||
@@ -663,13 +666,15 @@ void OpNode::codeGen(IntermediateCodeGen *instrList)
 	    /* AND the arg(0) with arg(1). If 0, then result is 0, else result is 1 */
 	    tempReg = get_vreg_int();
 
-	    /* Step 1: Perform a bitwise AND of the two operands. */
-	    instr->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::AND));
-	    instr->operand_src2(arg(1)->getReg(), NULL, arg(1)->reg_type());
-    	    instr->operand_src1(arg(0)->getReg(), NULL, arg(0)->reg_type());
-	    instr->operand_dest(tempReg, NULL, VREG_INT);
+	    arg(0)->codeGen(instrList);
 
-	    instrList->addInstruction(instr);
+	    /* Step 1: Perform a bitwise AND of the two operands. */
+//	    instr->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::AND));
+//	    instr->operand_src2(arg(1)->getReg(), NULL, arg(1)->reg_type());
+//  	    instr->operand_src1(arg(0)->getReg(), NULL, arg(0)->reg_type());
+//	    instr->operand_dest(tempReg, NULL, VREG_INT);
+
+//	    instrList->addInstruction(instr);
 
 	    /* Step 2: MOVI 0 to actual destReg */
 	    immediate0 = new Value(0, Type::TypeTag::INT);
@@ -683,11 +688,22 @@ void OpNode::codeGen(IntermediateCodeGen *instrList)
 	    newLabel = Instruction::Label::get_label();
 	    jmpcInstr = new Instruction(Instruction::Mnemonic::JMPC);
 	    jmpcInstr->relational_op(Instruction::Mnemonic::EQ);
-	    jmpcInstr->operand_src1(tempReg, NULL, VREG_INT);
+//	    jmpcInstr->operand_src1(tempReg, NULL, VREG_INT);
+	    jmpcInstr->operand_src1(arg(0)->getReg(), NULL, arg(0)->reg_type());
 	    jmpcInstr->operand_src2(-1, immediate0, Instruction::OpType::IMM);
 	    jmpcInstr->label(newLabel);
 
 	    instrList->addInstruction(jmpcInstr);
+
+	    arg(1)->codeGen(instrList);
+
+	    jmpcInstr2 = new Instruction(Instruction::Mnemonic::JMPC);
+	    jmpcInstr2->relational_op(Instruction::Mnemonic::EQ);
+	    jmpcInstr2->operand_src1(arg(1)->getReg(), NULL, arg(1)->reg_type());
+	    jmpcInstr2->operand_src2(-1, immediate0, Instruction::OpType::IMM);
+	    jmpcInstr2->label(newLabel);
+
+	    instrList->addInstruction(jmpcInstr2);
 
 	    /* Step 4: MOVI 1 to actual destReg */
 	    immediate1 = new Value(1, Type::TypeTag::INT);
@@ -708,18 +724,21 @@ void OpNode::codeGen(IntermediateCodeGen *instrList)
 	    /* OR the arg(0) with arg(1). If 0, then result is 0, else result is 1 */
 	    tempReg = get_vreg_int();
 
+	    arg(0)->codeGen(instrList);
+
 	    /* Step 1: Perform a bitwise OR of the two operands. */
-	    instr->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::OR));
-	    instr->operand_src2(arg(1)->getReg(), NULL, arg(1)->reg_type());
-    	    instr->operand_src1(arg(0)->getReg(), NULL, arg(0)->reg_type());
-	    instr->operand_dest(tempReg, NULL, VREG_INT);
+//	    instr->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::OR));
+//	    instr->operand_src2(arg(1)->getReg(), NULL, arg(1)->reg_type());
+//    	    instr->operand_src1(arg(0)->getReg(), NULL, arg(0)->reg_type());
+//	    instr->operand_dest(tempReg, NULL, VREG_INT);
+//
+//	    instrList->addInstruction(instr);
 
-	    instrList->addInstruction(instr);
-
-	    /* Step 2: MOVI 0 to actual destReg */
+	    /* Step 2: MOVI 1 to actual destReg */
+	    immediate1 = new Value(1, Type::TypeTag::INT);
 	    immediate0 = new Value(0, Type::TypeTag::INT);
 	    movInstr = new Instruction(Instruction::Mnemonic::MOVI);
-	    movInstr->operand_src1(-1, immediate0, Instruction::OpType::IMM);
+	    movInstr->operand_src1(-1, immediate1, Instruction::OpType::IMM);
     	    movInstr->operand_dest(getReg(), NULL, reg_type());
 
 	    instrList->addInstruction(movInstr);
@@ -727,17 +746,27 @@ void OpNode::codeGen(IntermediateCodeGen *instrList)
 	    /* Step 3: JMPC EQ tempReg 0 newLabel */
 	    newLabel = Instruction::Label::get_label();
 	    jmpcInstr = new Instruction(Instruction::Mnemonic::JMPC);
-	    jmpcInstr->relational_op(Instruction::Mnemonic::EQ);
-	    jmpcInstr->operand_src1(tempReg, NULL, VREG_INT);
+	    jmpcInstr->relational_op(Instruction::Mnemonic::NE);
+//	    jmpcInstr->operand_src1(tempReg, NULL, VREG_INT);
+	    jmpcInstr->operand_src1(arg(0)->getReg(), NULL, arg(0)->reg_type());
 	    jmpcInstr->operand_src2(-1, immediate0, Instruction::OpType::IMM);
 	    jmpcInstr->label(newLabel);
 
 	    instrList->addInstruction(jmpcInstr);
 
-	    /* Step 4: MOVI 1 to actual destReg */
-	    immediate1 = new Value(1, Type::TypeTag::INT);
+	    arg(1)->codeGen(instrList);
+
+	    jmpcInstr2 = new Instruction(Instruction::Mnemonic::JMPC);
+	    jmpcInstr2->relational_op(Instruction::Mnemonic::NE);
+	    jmpcInstr2->operand_src1(arg(1)->getReg(), NULL, arg(1)->reg_type());
+	    jmpcInstr2->operand_src2(-1, immediate0, Instruction::OpType::IMM);
+	    jmpcInstr2->label(newLabel);
+
+	    instrList->addInstruction(jmpcInstr2);
+
+	    /* Step 4: MOVI 0 to actual destReg */
 	    mov1Instr = new Instruction(Instruction::Mnemonic::MOVI);
-	    mov1Instr->operand_src1(-1, immediate1, Instruction::OpType::IMM);
+	    mov1Instr->operand_src1(-1, immediate0, Instruction::OpType::IMM);
     	    mov1Instr->operand_dest(getReg(), NULL, reg_type());
 
 	    instrList->addInstruction(mov1Instr);
@@ -785,7 +814,7 @@ void OpNode::codeGen(IntermediateCodeGen *instrList)
 	    return;
     case static_cast<int>(OpNode::OpCode::ASSIGN):
 	    instr->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::STI));
-    	    instr->operand_dest(arg(0)->getReg(), NULL, arg(0)->reg_type());
+    	    instr->operand_dest(arg(0)->getDestAddrReg(), NULL, VREG_INT);
             instr->operand_src1(arg(1)->getReg(), NULL, arg(1)->reg_type());
     	    instrList->addInstruction(instr);
 	    return;
@@ -1081,6 +1110,7 @@ void RefExprNode::codeGen(IntermediateCodeGen *instrList)
             instrAddOffset->operand_src2(-1, immediate, Instruction::OpType::IMM);
             regPtr = get_vreg_int();
             instrAddOffset->operand_dest(regPtr, NULL, VREG_INT);
+	    setDestAddrReg(regPtr);
             break;
     case VariableEntry::VarKind::LOCAL_VAR:
             instrAddOffset->opcode(Instruction::Mnemonic::SUB);
@@ -1089,6 +1119,7 @@ void RefExprNode::codeGen(IntermediateCodeGen *instrList)
             instrAddOffset->operand_src2(-1, immediate, Instruction::OpType::IMM);
             regPtr = get_vreg_int();
             instrAddOffset->operand_dest(regPtr, NULL, VREG_INT);
+	    setDestAddrReg(regPtr);
             break;
     case VariableEntry::VarKind::PARAM_VAR:
             instrAddOffset->opcode(Instruction::Mnemonic::ADD);
@@ -1097,6 +1128,7 @@ void RefExprNode::codeGen(IntermediateCodeGen *instrList)
             instrAddOffset->operand_src2(-1, immediate, Instruction::OpType::IMM);
             regPtr = get_vreg_int();
             instrAddOffset->operand_dest(regPtr, NULL, VREG_INT);
+	    setDestAddrReg(regPtr);
             break;
     default:
             LOG("PANIC PANIC!");
@@ -1140,13 +1172,18 @@ void InvocationNode::codeGen(IntermediateCodeGen *instrList)
 {
     LOG("");
 
-    int retAddrLabel, isInt;
+    int retAddrLabel, isInt, count = 0;
     Value *immediate1 = NULL;
+    Value *immediate = NULL;
     Instruction *instr = NULL;
     Instruction *movlInstr = NULL;
     Instruction *subInstr = NULL;
+    Instruction *subArityInstr = NULL;
+    Instruction *addInstr = NULL;
     Instruction *jmpInstr = NULL;
     Instruction *labelInstr = NULL;
+    Instruction *stiCLInstr = NULL;
+    Instruction *ldiCLInstr = NULL;
     const vector<ExprNode*> *exps = params();
 
     /* XXX TODO: Figure out where to initialize the SP */
@@ -1175,8 +1212,12 @@ void InvocationNode::codeGen(IntermediateCodeGen *instrList)
 	    subInstr->operand_dest(get_vreg_sp(), NULL, VREG_INT);
 
 	    instrList->addInstruction(subInstr);
+
+	    count++;
 	}
     }
+
+    instrList->addInstruction(subInstr);	//Points to retValue
 
     int tempReg = get_vreg_int();
     movlInstr = new Instruction(Instruction::Mnemonic::MOVL);
@@ -1196,7 +1237,16 @@ void InvocationNode::codeGen(IntermediateCodeGen *instrList)
     subInstr->operand_src2(-1, immediate1, Instruction::OpType::IMM);
     subInstr->operand_dest(get_vreg_sp(), NULL, VREG_INT);
     
-    instrList->addInstruction(subInstr);
+    instrList->addInstruction(subInstr);	//Points to Control Link
+
+    /* STI get_vreg_bp() to sp() */
+    stiCLInstr = new Instruction(Instruction::Mnemonic::STI);
+    stiCLInstr->operand_src1(get_vreg_bp(), NULL, VREG_INT);
+    stiCLInstr->operand_dest(get_vreg_sp(), NULL, VREG_INT);
+
+    instrList->addInstruction(stiCLInstr);
+
+    instrList->addInstruction(subInstr);	//Points to Nothing...
 
     jmpInstr = new Instruction(Instruction::Mnemonic::JMP);
     jmpInstr->funLabel(symTabEntry()->name());
@@ -1207,6 +1257,36 @@ void InvocationNode::codeGen(IntermediateCodeGen *instrList)
     labelInstr->label(retAddrLabel);
     
     instrList->addInstruction(labelInstr);
+
+    /* Increment the stack pointer and take return value
+     * load ret value in this node's register.
+     * Decrement stack pointer by arity...
+     */
+    addInstr = new Instruction(Instruction::Mnemonic::ADD);
+    addInstr->operand_src1(get_vreg_sp(), NULL, VREG_INT);
+    addInstr->operand_src2(-1, immediate1, Instruction::OpType::IMM);
+    addInstr->operand_dest(get_vreg_sp(), NULL, VREG_INT);
+
+    instrList->addInstruction(addInstr);
+
+    if ((coercedType() && Type::isIntegral(coercedType()->tag())) || Type::isIntegral(type()->tag()))
+	isInt = 1;
+    else
+	isInt = 0;
+
+    ldiCLInstr = new Instruction(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::LDI));
+    ldiCLInstr->operand_src1(get_vreg_sp(), NULL, VREG_INT);
+    ldiCLInstr->operand_dest(getReg(), NULL, reg_type());
+
+    instrList->addInstruction(ldiCLInstr);
+
+    immediate = new Value(count, Type::TypeTag::INT);
+    subArityInstr = new Instruction(Instruction::Mnemonic::SUB);
+    subArityInstr->operand_src1(get_vreg_sp(), NULL, VREG_INT);
+    subArityInstr->operand_src2(-1, immediate, Instruction::OpType::IMM);
+    subArityInstr->operand_dest(get_vreg_sp(), NULL, VREG_INT);
+    
+    instrList->addInstruction(subArityInstr);	//Points to Control Link
 
     return;
 }
