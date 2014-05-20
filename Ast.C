@@ -1427,6 +1427,38 @@ void PrimitivePatNode::codeGen(IntermediateCodeGen *instrList)
 {
     LOG("");
 
+    int isInt, count = 0;
+    vector<int> inputRegisters = event()->inputRegisterList();
+    vector<VariableEntry*>* args = params();
+    vector<VariableEntry*>::const_iterator it;
+    Instruction *event_label = NULL;
+    Instruction *event_input = NULL;
+
+    event_label = new Instruction(Instruction::Mnemonic::LABEL);
+    event_label->funLabel(event()->name());
+
+    instrList->addInstruction(event_label);
+
+    if (args != NULL) {
+	for (it = args->begin(); it != args->end(); ++it) {
+	    if (Type::isIntegral((*it)->type()->tag()))
+		isInt = 1;
+	    else
+		isInt = 0;
+
+	    event_input = new Instruction(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::INI));
+	    if (isInt)
+		event_input->operand_dest(inputRegisters.at(count), NULL, VREG_INT);
+	    else
+		event_input->operand_dest(inputRegisters.at(count), NULL, VREG_FLOAT);
+
+	    instrList->addInstruction(event_input);
+
+	    count++;
+	}
+    }
+
+    return;
 }
 
 PatNode::PatNode(PatNodeKind pk, BasePatNode *p1, BasePatNode*p2, int line, int column, string file):
@@ -1440,6 +1472,13 @@ void PatNode::codeGen(IntermediateCodeGen *instrList)
 {
     LOG("");
 
+    /* TODO: HOw to handle multiple basepattern nodes? 
+     * For now only calling codeGen of first.
+     */
+    if (pat1_)
+	pat1_->codeGen(instrList);
+
+    return;
 }
 
 RuleNode::RuleNode(BlockEntry *re, BasePatNode* pat, StmtNode* reaction, int line, int column, string file):

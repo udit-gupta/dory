@@ -18,7 +18,7 @@ Type *var_type;
 Type *fun_ret_type;
 RuleBlockEntry* rbe = NULL;
 int start_rule_scope = 0;
- WhileNode*         Globwhile;
+WhileNode* Globwhile;
 
 %}
 

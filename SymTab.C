@@ -205,3 +205,20 @@ SymTab::codeGenST(int first, int last, IntermediateCodeGen *list) const {
 
   return count;
 }
+
+vector<SymTabEntry*> *
+SymTab::getEventEntry(void) const
+{
+    SymTab::const_iterator it = begin();
+    vector<SymTabEntry*> * eventEntry = new vector<SymTabEntry*>();
+
+    for (it=begin();
+	    (it != end()); ++it)  {
+	SymTabEntry *ste = (SymTabEntry *)(*it);
+
+	if (ste->kind() == SymTabEntry::Kind::EVENT_KIND)
+	    eventEntry->push_back(ste);
+    }
+
+    return eventEntry;
+}

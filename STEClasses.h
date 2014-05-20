@@ -179,6 +179,12 @@ class EventEntry: public SymTabEntry {
 
   void memAlloc(int reset_AR);
   void codeGen(IntermediateCodeGen * list);
+
+  vector<int> inputRegisterList(void) { return inputRegList_; };
+  void inputRegisterList(int reg) { inputRegList_.push_back(reg); };
+
+ private:
+  vector<int> inputRegList_;
 };  
 
 #endif
