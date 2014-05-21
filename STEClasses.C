@@ -409,7 +409,7 @@ void FunctionEntry::codeGen(IntermediateCodeGen * list)
     Instruction * funcRetLabel = NULL;
     Instruction * getParam = NULL;
     Instruction * getRetAddr = NULL;
-    Instruction * getRetValue = NULL;
+//    Instruction * getRetValue = NULL;
     Instruction * getBP = NULL;
     Instruction * incrSP = NULL;
     Instruction * popAllSP = NULL;

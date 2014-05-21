@@ -1836,20 +1836,21 @@ void ReturnStmtNode::codeGen(IntermediateCodeGen *instrList)
     else
             isInt = Type::isIntegral(expr_->type()->tag());
 
-    instrStore->opcode(typedMnemonic(isInt, Instruction::Mnemonic::LDI));
+    instrStore->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::LDI));
 
     instrStore->operand_src1(expr_->getReg(), NULL, expr_->reg_type());
     instrStore->operand_dest(regPtr, NULL, VREG_INT);
 
-
-    // TODO: create jump node
-    instrJump->opcode();
+    instrJump->opcode(Instruction::Mnemonic::JMP);
+    instrJump->label(fun_->getReturnLabel());
 
     setReg(expr_->getReg(), expr_->reg_type());
     
     instrList->addInstruction(instrAddOffset);
     instrList->addInstruction(instrStore);
+    instrList->addInstruction(instrJump);
 
+    return;
 }
 
 const Type *
