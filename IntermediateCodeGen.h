@@ -20,7 +20,7 @@ class IntermediateCodeGen {
 
     void addInstruction(Instruction * instr);
 
-    void printInstructionList(void);
+    void printInstructionList(const char *outFile);
 
   private:
     std::list<Instruction *> instrList_;

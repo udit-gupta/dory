@@ -47,6 +47,7 @@ void yyerror(const char *s)
 SymTabMgr stm;
 string outputFile;
 const char* inputFile = "";
+const char* outFile = "";
 string cppShellCmd, ccShellCmd;
 
 int debugLevel;
@@ -101,12 +102,13 @@ parseOptions(int argc, char* argv[]) {
   }
 
   while (1) {
-	if ((argc > 2) || (argc < 2)) {
+	if ((argc > 3) || (argc < 3)) {
 		cerr << "Please specify only a single input file\n";
 		return -1;
 	}
 	else {
 	  inputFile = argv[1];
+	  outFile = argv[2];
 	  return 0;
 	}
   }
@@ -115,7 +117,7 @@ parseOptions(int argc, char* argv[]) {
   if (genSharedLib)
 	outFileSuffix = ".so";
 
-  if (*inputFile == '\0') 
+  if (*inputFile == '\0' || *outFile == '\0')
     return -1;
 
   if (outputFile == "") {
@@ -218,7 +220,7 @@ main(int argc, char *argv[], char *envp[]) {
 	ge->typePrint(cout);
 	ge->memAlloc(0);
 	ge->codeGen(instrList);
-	instrList->printInstructionList();
+	instrList->printInstructionList(outFile);
   }
 #endif
 }
