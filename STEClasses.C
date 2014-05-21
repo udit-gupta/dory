@@ -123,13 +123,15 @@ void GlobalEntry::codeGen(IntermediateCodeGen * instrList)
 	jmpcInstr->operand_src1(regTemp, NULL, VREG_INT);
 	jmpcInstr->operand_src2(regInput, NULL, VREG_INT);
 	jmpcInstr->funLabel((*sit)->name());
+
+	instrList->addInstruction(jmpcInstr);
     }
 
     /* Iterate through the eventList and move their names into registers one by one. 
      * Then compare one by one and JMP to appropriate target. Target named same as event name.
      * Target event will be created at EventEntry, where it will get the required inputs. */
+    instrList->addInstruction(initial_jmp);
     
-
     for(vector<RuleNode*>::const_iterator it = pr.begin(); it != pr.end(); it++) {
 	(*it)->codeGen(instrList);
     }

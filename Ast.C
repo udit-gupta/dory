@@ -252,12 +252,30 @@ OpNode::typeCheck()
 {
   LOG("");
 
-  LOG("_arity = " << arity_);
-  assert(arity_ <= MAX_OP_ARITY);
+  if (opCode_ != OpNode::OpCode::PRINT)
+    assert(arity_ <= MAX_OP_ARITY);
 
   for (unsigned int i = 0; i < arity_; i++) {
     if (arg(i))
       arg(i)->typeCheck();
+  }
+
+  if (opCode_ == OpNode::OpCode::PRINT) {
+    /* Just check that the first argument is a string. */
+    if (!Type::isString(arg(0)->type()->tag()))
+      type(new Type(Type::TypeTag::ERROR));
+
+    for (unsigned int i = 1; i < arity_; i++) {
+      if (!Type::isScalar(arg(i)->type()->tag())) {
+        type(new Type(Type::TypeTag::ERROR));
+	break;
+      }
+    }
+
+    /* TODO: Check if this is a correct assumption. */
+    type(new Type(Type::TypeTag::INT));
+
+    return type();
   }
 
   if (opCode_ == OpNode::OpCode::MOD) {
@@ -412,6 +430,7 @@ void OpNode::codeGen(IntermediateCodeGen *instrList)
 
     bool isInt;
     bool isSigned;
+    unsigned int count;
     Instruction *instr = new Instruction();
     Value *immediate = NULL;
     Value *immediate0 = NULL;
@@ -432,6 +451,9 @@ void OpNode::codeGen(IntermediateCodeGen *instrList)
     Instruction *newLabelInstr2 = NULL;
     Instruction *mulordivInstr = NULL;
     Instruction *subInstr = NULL;
+    Instruction *prtInstr = NULL;
+    Instruction *prtInstr2 = NULL;
+    char * tempStr = NULL, * ptr = NULL;
 
     if (opCode() != OpNode::OpCode::AND && opCode() != OpNode::OpCode::OR && opCode() != OpNode::OpCode::PRINT) {
         for (unsigned int i = 0; i < arity_; i++) {
@@ -458,6 +480,49 @@ void OpNode::codeGen(IntermediateCodeGen *instrList)
 	    setReg(get_vreg_float(), VREG_FLOAT);
 
     switch(static_cast<int>(opCode())) {
+    case static_cast<int>(OpNode::OpCode::PRINT):
+	    for (unsigned int j=1; j < arity_; j++)
+		arg(j)->codeGen(instrList);
+
+	    count = 1;
+
+	    if ((arg(0)->value() != NULL) && (!arg(0)->value()->sval().empty())) {
+	    tempStr = (char *)malloc(arg(0)->value()->sval().length());
+	    strcpy(tempStr, (char *) arg(0)->value()->sval().c_str());
+
+	    ptr = strtok(tempStr, "%");
+		while(ptr != NULL && (count < arity_ || arity_ == 1)) {
+		    tempReg = get_vreg_int();
+
+		    immediate = new Value(ptr);
+		    instr->opcode(Instruction::Mnemonic::MOVS);
+		    instr->operand_src1(-1, immediate, Instruction::OpType::IMM);
+		    instr->operand_dest(tempReg, NULL, VREG_INT);
+
+		    instrList->addInstruction(instr);
+
+		    prtInstr = new Instruction(Instruction::Mnemonic::PRTS);
+		    prtInstr->operand_src1(tempReg, NULL, VREG_INT);
+
+		    instrList->addInstruction(prtInstr);
+
+		    if (Type::isString(arg(count)->type()->tag()))
+			    prtInstr2 = new Instruction(Instruction::Mnemonic::PRTS);
+		    else if (Type::isIntegral(arg(count)->type()->tag()))
+			    prtInstr2 = new Instruction(Instruction::Mnemonic::PRTI);
+		    else
+			    prtInstr2 = new Instruction(Instruction::Mnemonic::PRTF);
+		    prtInstr2->operand_src1(arg(count)->getReg(), NULL, arg(count)->reg_type());
+
+		    instrList->addInstruction(prtInstr2);
+
+		    ptr = strtok(NULL, "%");
+		    ptr++;  // We want to ignore the d in %d
+		    count++;
+		}
+	    }
+
+	    return;
     case static_cast<int>(OpNode::OpCode::PLUS):
 	    instr->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::ADD));
 	    instr->operand_src2(arg(1)->getReg(), NULL, arg(1)->reg_type());
