@@ -121,6 +121,7 @@ class ExprNode: public AstNode {
   const Type* typeCheck() {return NULL;};
   void typePrint(ostream& os, int indent=0) const { return; };
   void codeGen(IntermediateCodeGen *list);
+  virtual void args(vector<ExprNode*> * args) { return; };
 
  private:
   ExprNodeType exprType_;
@@ -205,8 +206,12 @@ class OpNode: public ExprNode {
   void opCode(OpCode a) { opCode_ = a; };
   ExprNode* arg(unsigned int i) 
     { return (i < arg_.size())? arg_[i] : NULL; };
-  vector<ExprNode*>* args() 
+  vector<ExprNode*>* args()
     { return &arg_; }
+  void args(vector<ExprNode*> * args)
+    { arg_ = *args;
+      arity_ = args->size();
+    }
 
   void print(ostream& os, int indent=0) const;  
 

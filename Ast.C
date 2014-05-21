@@ -433,7 +433,7 @@ void OpNode::codeGen(IntermediateCodeGen *instrList)
     Instruction *mulordivInstr = NULL;
     Instruction *subInstr = NULL;
 
-    if (opCode() != OpNode::OpCode::AND && opCode() != OpNode::OpCode::OR) {
+    if (opCode() != OpNode::OpCode::AND && opCode() != OpNode::OpCode::OR && opCode() != OpNode::OpCode::PRINT) {
         for (unsigned int i = 0; i < arity_; i++) {
             if (arg(i))
                 arg(i)->codeGen(instrList);

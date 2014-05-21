@@ -469,7 +469,7 @@ stmt:                   TOK_SEMICOLON                           { $$=NULL;      
                         |   return_stmt TOK_SEMICOLON           { $$=$1;                                                    }  
                         |   break_stmt TOK_SEMICOLON            { $$=$1;                                                    }  
                         |   compstmt_star                       { $$=$1;                                                    }
-                        |   assign_expr TOK_SEMICOLON           { $$=new ExprStmtNode($1, yylinenum, 0, yyfilename);                                  } 
+                        |   assign_expr TOK_SEMICOLON           { $$=new ExprStmtNode($1, yylinenum, 0, yyfilename);        } 
                         |   if_expr_star                        { $$=$1;                                                    }
                         |   while_expr                          { $$=$1;                                                    }
                         |   fun_call_stmt                       { $$=$1;                                                    };
@@ -477,7 +477,8 @@ stmt:                   TOK_SEMICOLON                           { $$=NULL;      
 compstmt_star:          compstmt { $$=$1; } %prec "reduce" 
                         |   compstmt TOK_SEMICOLON              { $$=$1;                                                    };
 
-compstmt:               TOK_LBRACE stmt_star TOK_RBRACE         { $$ = new CompoundStmtNode($2, yylinenum, 0, yyfilename);                            };
+compstmt:               TOK_LBRACE stmt_star TOK_RBRACE         { $$ = new CompoundStmtNode($2, yylinenum, 0, yyfilename);  };
+
 stmt_star:              stmt_star stmt {
                             if($1 != NULL)
                                 $$->push_back($2); 
@@ -517,11 +518,21 @@ while_expr:             TOK_WHILE expr stmt { $$ = new WhileNode($2, $3, yylinen
         /************ Function Invocation *******************/
 
 
-fun_call_stmt:          TOK_IDENT func_params TOK_SEMICOLON  {
-                           $$ = new ExprStmtNode(new InvocationNode(stm.lookUp($1), $2), yylinenum, 0, yyfilename); 
+fun_call_stmt:          fun_call TOK_SEMICOLON  {
+                           //$$ = new ExprStmtNode(new InvocationNode(stm.lookUp($1), $2), yylinenum, 0, yyfilename);
+			   $$ = new ExprStmtNode($1, yylinenum, 0, yyfilename);
                         };
-fun_call:               TOK_IDENT func_params                   { $$=new InvocationNode(stm.lookUp($1), $2, yylinenum, 0, yyfilename);                };
+
+fun_call:               TOK_IDENT func_params   {
+				if ((strlen($1) == 6) && (strcmp($1, "printf") == 0)) {
+					$$=new OpNode(OpNode::OpCode::PRINT, NULL, NULL, yylinenum, 0, yyfilename);
+					$$->args($2);
+				} else
+					$$=new InvocationNode(stm.lookUp($1), $2, yylinenum, 0, yyfilename);
+			};
+
 func_params:            TOK_LPAREN func_param_list TOK_RPAREN   { $$=$2;                                                    };
+
 func_param_list:        { $$ = new vector<ExprNode*>();} 
                         |   expr { 
                                 $$ = new vector<ExprNode*>(); 
