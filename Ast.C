@@ -1776,10 +1776,12 @@ void ReturnStmtNode::codeGen(IntermediateCodeGen *instrList)
 {
     LOG("");
     int regPtr = -1;
+    bool isInt;
     Value *immediate = NULL;
 
     Instruction *instrAddOffset = new Instruction();
-    Instruction *instr;
+    Instruction *instrStore = new Instruction();
+    Instruction *instrJump = new Instruction();
 
     expr_->codeGen(instrList);
 
@@ -1795,16 +1797,19 @@ void ReturnStmtNode::codeGen(IntermediateCodeGen *instrList)
     else
             isInt = Type::isIntegral(expr_->type()->tag());
 
-    if(isInt)
-            instr->opcode(Instruction::Mnemonic::LDI);
-    else
-            instr->opcode(Instruction::Mnemonic::LDF);
+    instrStore->opcode(typedMnemonic(isInt, Instruction::Mnemonic::LDI));
 
-    instr->operand_src1(expr_->getReg(), NULL, expr_->reg_type());
-    instr->operand_dest(regPtr, NULL, VREG_INT);
+    instrStore->operand_src1(expr_->getReg(), NULL, expr_->reg_type());
+    instrStore->operand_dest(regPtr, NULL, VREG_INT);
+
+
+    // TODO: create jump node
+    instrJump->opcode();
+
+    setReg(expr_->getReg(), expr_->reg_type());
     
     instrList->addInstruction(instrAddOffset);
-    instrList->addInstruction(instr);
+    instrList->addInstruction(instrStore);
 
 }
 
