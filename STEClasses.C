@@ -77,8 +77,19 @@ void GlobalEntry::codeGen(IntermediateCodeGen * instrList)
 
     assert(instrList);
 
+    int regInput = get_vreg_int();
+    int regTemp;
     Instruction *initial_jmp = NULL;
+    Instruction *initial_label = NULL;
+    Instruction *initial_in = NULL;
+    Instruction *movsName = NULL;
+    Instruction *jmpcInstr = NULL;
+    Value *immediateName = NULL;
+
     const vector<RuleNode*> pr = GlobalEntry::rules();
+    vector<SymTabEntry*> * eventList = getEventEntry();
+    vector<SymTabEntry*>::const_iterator sit;
+    vector<int> regList;
 
     /* Code to create first "JMP L_MAIN:" label */
     initial_jmp = new Instruction(Instruction::Mnemonic::JMP);
@@ -87,6 +98,37 @@ void GlobalEntry::codeGen(IntermediateCodeGen * instrList)
     instrList->addInstruction(initial_jmp);
 
     codeGenST(0, 0, instrList);
+
+    initial_label = new Instruction(Instruction::Mnemonic::LABEL);
+    initial_label->funLabel("begin");
+
+    instrList->addInstruction(initial_label);
+
+    initial_in = new Instruction(Instruction::Mnemonic::IN);
+    initial_in->operand_src1(regInput, NULL, VREG_INT);
+
+    instrList->addInstruction(initial_in);
+
+    for (sit = eventList->begin(); sit != eventList->end(); ++sit) {
+	regTemp = get_vreg_int();
+	immediateName = new Value((*sit)->name());
+	movsName = new Instruction(Instruction::Mnemonic::MOVS);
+	movsName->operand_src1(-1, immediateName, Instruction::OpType::IMM);
+	movsName->operand_dest(regTemp, NULL, VREG_INT);
+	
+	instrList->addInstruction(movsName);
+
+	jmpcInstr = new Instruction(Instruction::Mnemonic::JMPC);
+	jmpcInstr->relational_op(Instruction::Mnemonic::EQ);
+	jmpcInstr->operand_src1(regTemp, NULL, VREG_INT);
+	jmpcInstr->operand_src2(regInput, NULL, VREG_INT);
+	jmpcInstr->funLabel((*sit)->name());
+    }
+
+    /* Iterate through the eventList and move their names into registers one by one. 
+     * Then compare one by one and JMP to appropriate target. Target named same as event name.
+     * Target event will be created at EventEntry, where it will get the required inputs. */
+    
 
     for(vector<RuleNode*>::const_iterator it = pr.begin(); it != pr.end(); it++) {
 	(*it)->codeGen(instrList);
@@ -123,6 +165,18 @@ void EventEntry::memAlloc(int reset_AT)
 void EventEntry::codeGen(IntermediateCodeGen * list)
 {
     LOG("");
+
+    vector<Type*> * args = type()->argTypes();
+    vector<Type*>::const_iterator it;
+
+    if (args != NULL && args->size() > 0) {
+   	 for (it = args->begin(); it != args->end(); ++it) {
+   	     if (Type::isIntegral((*it)->tag()))
+   	         inputRegisterList(get_vreg_int());
+   	     else
+   	         inputRegisterList(get_vreg_float());
+   	 }
+    }
 
     return;
 }

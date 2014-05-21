@@ -75,6 +75,8 @@ class SymTab {
   virtual void typePrintST(ostream& os,int ind=0,char ldelim='{',char rdelim='}',
 					   bool linebreaks=true, int first=0, int last=0) const;
 
+  vector<SymTabEntry*> * getEventEntry(void) const;
+
   const_iterator begin() const { return const_iterator(first_); };
   iterator begin() { return iterator(first_); };
   // End of list is indicated when the iterator's current pointer
