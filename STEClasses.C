@@ -119,9 +119,9 @@ void GlobalEntry::codeGen(IntermediateCodeGen * instrList)
 
     instrList->addInstruction(initSP);
 
-    initSP = new Instruction(Instruction::Mnemonic::MOVI);
-    initSP->operand_src1(-1, immediateAddr, Instruction::OpType::IMM);
-    initSP->operand_src2(get_vreg_bp(), NULL, VREG_INT);
+    initBP = new Instruction(Instruction::Mnemonic::MOVI);
+    initBP->operand_src1(-1, immediateAddr, Instruction::OpType::IMM);
+    initBP->operand_src2(get_vreg_bp(), NULL, VREG_INT);
 
     instrList->addInstruction(initBP);
 
