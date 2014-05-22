@@ -18,26 +18,26 @@ void operators_test() {
     int m = a >> 2;
     double n = (a % b - d / 3);
     bool p = (true || false);
-    int q =  !a || (b<d) && (e>=f) || (g==h);
+    bool q =  !a || (b<d) && (e>=f) || (g==h);
 
 
     printf("\nEntering Operator Testing Function\n");
-    printf("\n a = (1+2): ",a);
-    printf("\n b = (a-(-3)): ", b);
-    printf("\n c = (5.67*10): ", c);
-    printf("\n d = (4*b): ", d);
-    printf("\n e = (2-a): ", e);
-    printf("\n f = (6/2): ", f);
-    printf("\n g = (a/2): ", g);
-    printf("\n h = (8%2): ", h);
-    printf("\n i = (0|1&0): ", i);
-    printf("\n j = (~i): ", j);
-    printf("\n k = (1^1): ", k);
-    printf("\n l = (a<<2): ", l);
-    printf("\n m = (a>>2): ", m);
-    printf("\n n = (a % b - d / 3): ", n);
-    printf("\n p = (true || false): ", p);
-    printf("\n q =  !a || (b<d) && ((e>=f) || (g==h)): ",q);
+    printf("\n a = (1+2): %d",a);
+    printf("\n b = (a-(-3)): %d", b);
+    printf("\n c = (5.67*10): %f", c);
+    printf("\n d = (4*b): %d", d);
+    printf("\n e = (2-a): %d", e);
+    printf("\n f = (6/2): %d", f);
+    printf("\n g = (a/2): %d", g);
+    printf("\n h = (8%2): %d", h);
+    printf("\n i = (0|1&0): %d", i);
+    printf("\n j = (~i): %d", j);
+    printf("\n k = (1^1): %d", k);
+    printf("\n l = (a<<2): %d", l);
+    printf("\n m = (a>>2): %d", m);
+    printf("\n n = (a % b - d / 3): %f", n);
+    printf("\n p = (true || false): %d", p);
+    printf("\n q =  !a || (b<d) && ((e>=f) || (g==h)): %d",q);
     printf("\nLeaving Operator Testing Function\n");
 }
 
