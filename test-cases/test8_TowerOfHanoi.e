@@ -6,7 +6,6 @@ void TOH(int n,int first,int last);
 
 void call_test(int n) {
     print("\n................Start-Test................\n");
-    /* n is number of plates */
     TOH(n,1,3);
     print("\n.................End-Test..................\n");
 }
@@ -17,7 +16,14 @@ void TOH(int n, int startPole, int endPole) {
     }
     int intermediatePole = 6 - startPole - endPole;
     move(n-1, startPole, intermediatePole);
-    System.out.println("Move " +n + " from " + startPole + " to " +endPole);
+    print("\n"); 
+    print("Move "); 
+    print(n); 
+    print(" from "); 
+    print(startPole); 
+    print(" to "); 
+    print(endPole);
+    print("\n"); 
     TOH(n-1, intermediatePole, endPole);
 }
 
