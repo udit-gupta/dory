@@ -220,6 +220,7 @@ main(int argc, char *argv[], char *envp[]) {
 	ge->typeCheck();
 	ge->typePrint(cout);
 	if (errCount() == 0) {
+		cout << "Generating intermediate code...\n" << endl;
 		ge->memAlloc(0);
 		ge->codeGen(instrList);
 		instrList->printInstructionList(outFile);

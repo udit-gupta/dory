@@ -407,6 +407,7 @@ OpNode::typeCheck()
   }
 
   if (opCode_ == OpNode::OpCode::ASSIGN) {
+	cout << " arg 0 type: " << arg(0)->type()->tag() << " arg 1 type: " << arg(1)->type()->tag();
     if (arg(0)->type()->isSubType(arg(1)->type())) {
       if (!arg(1)->type()->isSubType(arg(0)->type()))
         arg(1)->coercedType(arg(0)->type());
@@ -487,11 +488,11 @@ void OpNode::codeGen(IntermediateCodeGen *instrList)
 	    count = 1;
 
 	    if ((arg(0)->value() != NULL) && (!arg(0)->value()->sval().empty())) {
-	    tempStr = (char *)malloc(arg(0)->value()->sval().length());
-	    strcpy(tempStr, (char *) arg(0)->value()->sval().c_str());
+		tempStr = (char *)malloc(arg(0)->value()->sval().length());
+		strcpy(tempStr, (char *) arg(0)->value()->sval().c_str());
 
-	    ptr = strtok(tempStr, "%");
-		while(ptr != NULL && (count < arity_ || arity_ == 1)) {
+		ptr = strtok(tempStr, "%");
+		if (ptr == NULL) {
 		    tempReg = get_vreg_int();
 
 		    immediate = new Value(ptr);
@@ -505,20 +506,39 @@ void OpNode::codeGen(IntermediateCodeGen *instrList)
 		    prtInstr->operand_src1(tempReg, NULL, VREG_INT);
 
 		    instrList->addInstruction(prtInstr);
+		} else {
+		    while(ptr != NULL && (count < arity_ || arity_ == 1)) {
+			tempReg = get_vreg_int();
 
-		    if (Type::isString(arg(count)->type()->tag()))
-			    prtInstr2 = new Instruction(Instruction::Mnemonic::PRTS);
-		    else if (Type::isIntegral(arg(count)->type()->tag()))
-			    prtInstr2 = new Instruction(Instruction::Mnemonic::PRTI);
-		    else
-			    prtInstr2 = new Instruction(Instruction::Mnemonic::PRTF);
-		    prtInstr2->operand_src1(arg(count)->getReg(), NULL, arg(count)->reg_type());
+			immediate = new Value(ptr);
+			instr->opcode(Instruction::Mnemonic::MOVS);
+			instr->operand_src1(-1, immediate, Instruction::OpType::IMM);
+			instr->operand_dest(tempReg, NULL, VREG_INT);
 
-		    instrList->addInstruction(prtInstr2);
+			instrList->addInstruction(instr);
 
-		    ptr = strtok(NULL, "%");
-		    ptr++;  // We want to ignore the d in %d
-		    count++;
+			prtInstr = new Instruction(Instruction::Mnemonic::PRTS);
+			prtInstr->operand_src1(tempReg, NULL, VREG_INT);
+
+			instrList->addInstruction(prtInstr);
+
+			if (arity_ > 1) {
+			    if (Type::isString(arg(count)->type()->tag()))
+				prtInstr2 = new Instruction(Instruction::Mnemonic::PRTS);
+			    else if (Type::isIntegral(arg(count)->type()->tag()))
+				prtInstr2 = new Instruction(Instruction::Mnemonic::PRTI);
+			    else
+				prtInstr2 = new Instruction(Instruction::Mnemonic::PRTF);
+			    prtInstr2->operand_src1(arg(count)->getReg(), NULL, arg(count)->reg_type());
+
+			    instrList->addInstruction(prtInstr2);
+			}
+
+			ptr = strtok(NULL, "%");
+			if (ptr != NULL)
+			    ptr++;  // We want to ignore the d in %d
+			count++;
+		    }
 		}
 	    }
 
@@ -1337,7 +1357,7 @@ void InvocationNode::codeGen(IntermediateCodeGen *instrList)
 
     /* Increment the stack pointer and take return value
      * load ret value in this node's register.
-     * Decrement stack pointer by arity...
+     * Increment stack pointer by arity...
      */
     addInstr = new Instruction(Instruction::Mnemonic::ADD);
     addInstr->operand_src1(get_vreg_sp(), NULL, VREG_INT);
@@ -1358,7 +1378,7 @@ void InvocationNode::codeGen(IntermediateCodeGen *instrList)
     instrList->addInstruction(ldiCLInstr);
 
     immediate = new Value(count, Type::TypeTag::INT);
-    subArityInstr = new Instruction(Instruction::Mnemonic::SUB);
+    subArityInstr = new Instruction(Instruction::Mnemonic::ADD);
     subArityInstr->operand_src1(get_vreg_sp(), NULL, VREG_INT);
     subArityInstr->operand_src2(-1, immediate, Instruction::OpType::IMM);
     subArityInstr->operand_dest(get_vreg_sp(), NULL, VREG_INT);
@@ -1913,7 +1933,7 @@ void ReturnStmtNode::codeGen(IntermediateCodeGen *instrList)
     else
             isInt = Type::isIntegral(expr_->type()->tag());
 
-    instrStore->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::LDI));
+    instrStore->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::STI));
 
     instrStore->operand_src1(expr_->getReg(), NULL, expr_->reg_type());
     instrStore->operand_dest(regPtr, NULL, VREG_INT);

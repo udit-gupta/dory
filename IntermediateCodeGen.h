@@ -23,6 +23,8 @@ class IntermediateCodeGen {
     void printInstructionList(const char *outFile);
 
   private:
+    string escapeChars(string old);
+
     std::list<Instruction *> instrList_;
 };
 

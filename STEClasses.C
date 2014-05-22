@@ -237,6 +237,7 @@ const Type* VariableEntry::typeCheck()
     if (initVal()) {
         init_type = (Type *)initVal()->typeCheck();
 
+	cout << " initVal() subtype: " << init_type->tag() << " initVal() set type: " << initVal()->type()->tag() << endl;
         if (type()->isSubType(init_type)) {
             if (!init_type->isSubType(type()))
                 initVal()->coercedType(type());
@@ -469,10 +470,11 @@ void FunctionEntry::codeGen(IntermediateCodeGen * list)
 //    setReturnValueRegister(regRetValue);	// To be used by return statement node
 
     /* Get all Parameters */
-//    if (this->type()->arity())
-//        this->codeGenST(0, this->type()->arity());
+    if (this->type()->arity())
+        this->codeGenST(0, this->type()->arity(), list);
 
-    int num_local_var = this->codeGenST(this->type()->arity(), 100000);
+    int num_local_var = this->codeGenST(this->type()->arity(), 100000, list);
+
     getParamImm = new Value(num_local_var, Type::TypeTag::INT);
     getParam = new Instruction(Instruction::Mnemonic::ADD);
     getParam->operand_src1(get_vreg_sp(), NULL, VREG_INT);

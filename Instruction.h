@@ -28,7 +28,7 @@ class Instruction {
         STI, STF,
         LDI, LDF,
         IN, INI, INF,
-        ERROR, LABEL
+        ERROR, LABEL, INVALID
     };
 
     enum OpType {
@@ -63,6 +63,7 @@ class Instruction {
     };
 
     Instruction() {
+	opcode_ = Mnemonic::INVALID;
 	label_function_ = 0;
 	rel_ = Mnemonic::ERROR;
     };

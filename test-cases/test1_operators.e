@@ -18,7 +18,7 @@ void operators_test() {
     int m = a >> 2;
     double n = (a % b - d / 3);
     bool p = (true || false);
-    bool q =  !a || (b<d) && (e>=f) || (g==h);
+/*    bool q =  !a || (b<d) && (e>=f) || (g==h); */
 
 
     printf("\nEntering Operator Testing Function\n");
@@ -37,7 +37,7 @@ void operators_test() {
     printf("\n m = (a>>2): %d", m);
     printf("\n n = (a % b - d / 3): %f", n);
     printf("\n p = (true || false): %d", p);
-    printf("\n q =  !a || (b<d) && ((e>=f) || (g==h)): %d",q);
+/*    printf("\n q =  !a || (b<d) && ((e>=f) || (g==h)): %d",q); */
     printf("\nLeaving Operator Testing Function\n");
 }
 
