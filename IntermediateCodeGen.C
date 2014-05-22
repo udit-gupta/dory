@@ -1,6 +1,7 @@
 #include "IntermediateCodeGen.h"
 #include "log.h"
 #include <fstream>
+#include <iomanip>
 
 #define DEFAULT_LABEL_PREFIX	"L"
 #define INT_REGISTER_PREFIX	"R"
@@ -104,7 +105,7 @@ void IntermediateCodeGen::printInstructionList(const char *outputFile)
 		} else if ((*it)->operand_src1()->immediate()->type()->tag() == Type::TypeTag::BOOL)
 		    outFile << " " << (*it)->operand_src1()->immediate()->bval();
 		else if ((*it)->operand_src1()->immediate()->type()->tag() == Type::TypeTag::DOUBLE)
-		    outFile << " " << (*it)->operand_src1()->immediate()->dval();
+		    outFile << " " << fixed << std::setprecision(3) << (*it)->operand_src1()->immediate()->dval();
 		else
 		    outFile << " " << (*it)->operand_src1()->immediate()->ival();
 	    } else if ((*it)->operand_src1()->type == VREG_INT ||
@@ -134,7 +135,7 @@ void IntermediateCodeGen::printInstructionList(const char *outputFile)
 		else if ((*it)->operand_src2()->immediate()->type()->tag() == Type::TypeTag::BOOL)
 		    outFile << " " << (*it)->operand_src2()->immediate()->bval();
 		else if ((*it)->operand_src2()->immediate()->type()->tag() == Type::TypeTag::DOUBLE)
-		    outFile << " " << (*it)->operand_src2()->immediate()->dval();
+		    outFile << " " << fixed << std::setprecision(3) << (*it)->operand_src2()->immediate()->dval();
 		else
 		    outFile << " " << (*it)->operand_src2()->immediate()->ival();
 	    } else if ((*it)->operand_src2()->type == VREG_INT ||

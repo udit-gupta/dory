@@ -324,14 +324,6 @@ void VariableEntry::codeGen(IntermediateCodeGen * list)
 
 	list->addInstruction(getParam);
     } else if (varKind() == VariableEntry::VarKind::LOCAL_VAR) {
-        immediate1 = new Value(1, Type::TypeTag::INT);
-        instr = new Instruction(Instruction::Mnemonic::SUB);
-        instr->operand_src1(get_vreg_sp(), NULL, VREG_INT);
-        instr->operand_src2(-1, immediate1, Instruction::OpType::IMM);
-        instr->operand_dest(get_vreg_sp(), NULL, VREG_INT);
-
-        list->addInstruction(instr);
-
 	if (initVal()) {
 	    initVal()->codeGen(list);
 	    getParam = new Instruction(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::STI));
@@ -339,6 +331,14 @@ void VariableEntry::codeGen(IntermediateCodeGen * list)
 	    getParam->operand_dest(get_vreg_sp(), NULL, VREG_INT);
 	    list->addInstruction(getParam);
 	}
+
+        immediate1 = new Value(1, Type::TypeTag::INT);
+        instr = new Instruction(Instruction::Mnemonic::SUB);
+        instr->operand_src1(get_vreg_sp(), NULL, VREG_INT);
+        instr->operand_src2(-1, immediate1, Instruction::OpType::IMM);
+        instr->operand_dest(get_vreg_sp(), NULL, VREG_INT);
+
+        list->addInstruction(instr);
     } else if (varKind() == VariableEntry::VarKind::GLOBAL_VAR) {
 	instrAddOffset = new Instruction();
         instrAddOffset->opcode(Instruction::Mnemonic::ADD);
