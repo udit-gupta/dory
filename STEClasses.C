@@ -110,6 +110,10 @@ void GlobalEntry::codeGen(IntermediateCodeGen * instrList)
     instrList->addInstruction(initial_in);
 
     for (sit = eventList->begin(); sit != eventList->end(); ++sit) {
+	/* Not generating label and JMPC code for "any" event */
+	if ((*sit)->name().compare("any") == 0)
+	    continue;
+
 	regTemp = get_vreg_int();
 	immediateName = new Value((*sit)->name());
 	movsName = new Instruction(Instruction::Mnemonic::MOVS);

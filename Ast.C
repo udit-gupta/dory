@@ -571,7 +571,7 @@ void OpNode::codeGen(IntermediateCodeGen *instrList)
 	    /* Move the RHS to a temporary register */
 	    instr->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::MOVI));
 	    instr->operand_src1(arg(1)->getReg(), NULL, arg(1)->reg_type());
-	    instr->operand_dest(tempReg, NULL, VREG_INT);
+	    instr->operand_dest(tempReg, NULL, arg(1)->reg_type());
 
 	    instrList->addInstruction(instr);
 
@@ -584,9 +584,12 @@ void OpNode::codeGen(IntermediateCodeGen *instrList)
 
 	    /* Move immediate 2 to a temporary register */
 	    immediate = new Value(2, Type::TypeTag::INT);
-	    movImmInstr = new Instruction(Instruction::Mnemonic::MOVI);
+	    if (arg(0)->reg_type() == VREG_INT || arg(0)->reg_type() == REG_INT)
+	    	movImmInstr = new Instruction(Instruction::Mnemonic::MOVI);
+	    else if (arg(0)->reg_type() == VREG_FLOAT || arg(0)->reg_type() == REG_FLOAT)
+	    	movImmInstr = new Instruction(Instruction::Mnemonic::MOVIF);
 	    movImmInstr->operand_src1(-1, immediate, Instruction::OpType::IMM);
-	    movImmInstr->operand_dest(tempRegImm, NULL, VREG_INT);
+	    movImmInstr->operand_dest(tempRegImm, NULL, arg(0)->reg_type());
 
 	    instrList->addInstruction(movImmInstr);
 
@@ -610,7 +613,7 @@ void OpNode::codeGen(IntermediateCodeGen *instrList)
 
 	    /* Multiply LHS with 2. */
     	    mulordivInstr = new Instruction(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::MUL));
-	    mulordivInstr->operand_src1(tempRegImm, NULL, VREG_INT);
+	    mulordivInstr->operand_src1(tempRegImm, NULL, arg(0)->reg_type());
 	    mulordivInstr->operand_src2(tempRegMain, NULL, arg(0)->reg_type());
 	    mulordivInstr->operand_dest(tempRegMain, NULL, arg(0)->reg_type());
 
@@ -653,7 +656,7 @@ void OpNode::codeGen(IntermediateCodeGen *instrList)
 	    /* Move the RHS to a temporary register */
 	    instr->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::MOVI));
 	    instr->operand_src1(arg(1)->getReg(), NULL, arg(1)->reg_type());
-	    instr->operand_dest(tempReg, NULL, VREG_INT);
+	    instr->operand_dest(tempReg, NULL, arg(1)->reg_type());
 
 	    instrList->addInstruction(instr);
 
@@ -666,9 +669,12 @@ void OpNode::codeGen(IntermediateCodeGen *instrList)
 
 	    /* Move immediate 2 to a temporary register */
 	    immediate = new Value(2, Type::TypeTag::INT);
-	    movImmInstr = new Instruction(Instruction::Mnemonic::MOVI);
+	    if (arg(0)->reg_type() == VREG_INT || arg(0)->reg_type() == REG_INT)
+	    	movImmInstr = new Instruction(Instruction::Mnemonic::MOVI);
+	    else if (arg(0)->reg_type() == VREG_FLOAT || arg(0)->reg_type() == REG_FLOAT)
+	    	movImmInstr = new Instruction(Instruction::Mnemonic::MOVIF);
 	    movImmInstr->operand_src1(-1, immediate, Instruction::OpType::IMM);
-	    movImmInstr->operand_dest(tempRegImm, NULL, VREG_INT);
+	    movImmInstr->operand_dest(tempRegImm, NULL, arg(0)->reg_type());
 
 	    instrList->addInstruction(movImmInstr);
 
@@ -692,7 +698,7 @@ void OpNode::codeGen(IntermediateCodeGen *instrList)
 
 	    /* Multiply LHS with 2. */
     	    mulordivInstr = new Instruction(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::DIV));
-	    mulordivInstr->operand_src1(tempRegImm, NULL, VREG_INT);
+	    mulordivInstr->operand_src1(tempRegImm, NULL, arg(0)->reg_type());
 	    mulordivInstr->operand_src2(tempRegMain, NULL, arg(0)->reg_type());
 	    mulordivInstr->operand_dest(tempRegMain, NULL, arg(0)->reg_type());
 
@@ -878,7 +884,13 @@ void OpNode::codeGen(IntermediateCodeGen *instrList)
 
 	    return;
     case static_cast<int>(OpNode::OpCode::ASSIGN):
-	    instr->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::STI));
+	    /* Here the type of ST[IF] depends on arg(1)'s type */
+
+	    if (arg(1)->reg_type() == VREG_FLOAT || arg(1)->reg_type() == REG_FLOAT)
+		instr->opcode(Instruction::Mnemonic::STF);
+	    else
+		instr->opcode(Instruction::Mnemonic::STI);
+//	    instr->opcode(Instruction::typedMnemonic(isArgInt, Instruction::Mnemonic::STI));
     	    instr->operand_dest(arg(0)->getDestAddrReg(), NULL, VREG_INT);
             instr->operand_src1(arg(1)->getReg(), NULL, arg(1)->reg_type());
     	    instrList->addInstruction(instr);
