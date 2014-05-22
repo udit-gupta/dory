@@ -61,9 +61,12 @@ void IntermediateCodeGen::printInstructionList(const char *outputFile)
 	    assert((*it)->operand_src1()->type < Instruction::OpType::OP_TYPE_COUNT);
 
 	    if ((*it)->operand_src1()->type == Instruction::OpType::IMM) {
-		if ((*it)->operand_src1()->immediate()->type()->tag() == Type::TypeTag::STRING)
-		    outFile << " " << (*it)->operand_src1()->immediate()->sval();
-		else if ((*it)->operand_src1()->immediate()->type()->tag() == Type::TypeTag::BOOL)
+		if ((*it)->operand_src1()->immediate()->type()->tag() == Type::TypeTag::STRING) {
+		    if ((*it)->opcode() != Instruction::Mnemonic::MOVS)
+		    	outFile << " " << (*it)->operand_src1()->immediate()->sval();
+		    else
+		    	outFile << " \"" << (*it)->operand_src1()->immediate()->sval() << "\"";
+		} else if ((*it)->operand_src1()->immediate()->type()->tag() == Type::TypeTag::BOOL)
 		    outFile << " " << (*it)->operand_src1()->immediate()->bval();
 		else if ((*it)->operand_src1()->immediate()->type()->tag() == Type::TypeTag::DOUBLE)
 		    outFile << " " << (*it)->operand_src1()->immediate()->dval();
