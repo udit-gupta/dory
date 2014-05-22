@@ -80,6 +80,7 @@ void GlobalEntry::codeGen(IntermediateCodeGen * instrList)
     int regInput = get_vreg_int();
     int regTemp;
     Instruction *initial_jmp = NULL;
+    Instruction *initial_prt = NULL;
     Instruction *initial_label = NULL;
     Instruction *initial_in = NULL;
     Instruction *movsName = NULL;
@@ -112,6 +113,11 @@ void GlobalEntry::codeGen(IntermediateCodeGen * instrList)
 
     instrList->addInstruction(initial_in);
 
+    initial_prt = new Instruction(Instruction::Mnemonic::PRTI);
+    initial_prt->operand_src1(regInput, NULL, VREG_INT);
+
+    instrList->addInstruction(initial_prt);
+
     immediateAddr = new Value(10000, Type::TypeTag::INT);
     initSP = new Instruction(Instruction::Mnemonic::MOVI);
     initSP->operand_src1(-1, immediateAddr, Instruction::OpType::IMM);
@@ -131,8 +137,8 @@ void GlobalEntry::codeGen(IntermediateCodeGen * instrList)
 	    continue;
 
 	regTemp = get_vreg_int();
-	immediateName = new Value((*sit)->name());
-	movsName = new Instruction(Instruction::Mnemonic::MOVS);
+	immediateName = new Value((*sit)->name()[0], Type::TypeTag::INT);
+	movsName = new Instruction(Instruction::Mnemonic::MOVI);
 	movsName->operand_src1(-1, immediateName, Instruction::OpType::IMM);
 	movsName->operand_dest(regTemp, NULL, VREG_INT);
 	

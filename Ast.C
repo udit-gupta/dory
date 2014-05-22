@@ -1313,6 +1313,11 @@ void InvocationNode::codeGen(IntermediateCodeGen *instrList)
 	    count++;
 	}
     } else {
+	    subInstr = new Instruction(Instruction::Mnemonic::SUB);
+	    subInstr->operand_src1(get_vreg_sp(), NULL, VREG_INT);
+	    subInstr->operand_src2(-1, immediate1, Instruction::OpType::IMM);
+	    subInstr->operand_dest(get_vreg_sp(), NULL, VREG_INT);
+
 	    instrList->addInstruction(subInstr);
     }
 
@@ -1373,11 +1378,13 @@ void InvocationNode::codeGen(IntermediateCodeGen *instrList)
     else
 	isInt = 0;
 
-    ldiCLInstr = new Instruction(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::LDI));
-    ldiCLInstr->operand_src1(get_vreg_sp(), NULL, VREG_INT);
-    ldiCLInstr->operand_dest(getReg(), NULL, reg_type());
+    if (type() && type()->retType() && !(type()->retType()->tag() == Type::TypeTag::VOID)) {
+	ldiCLInstr = new Instruction(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::LDI));
+    	ldiCLInstr->operand_src1(get_vreg_sp(), NULL, VREG_INT);
+    	ldiCLInstr->operand_dest(getReg(), NULL, reg_type());
 
-    instrList->addInstruction(ldiCLInstr);
+    	instrList->addInstruction(ldiCLInstr);
+    }
 
     immediate = new Value(count, Type::TypeTag::INT);
     subArityInstr = new Instruction(Instruction::Mnemonic::ADD);
