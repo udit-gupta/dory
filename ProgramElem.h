@@ -62,7 +62,7 @@ class ProgramElem {
   //int getReg(void) { return reg_; }
   int getReg(void) const { return reg_; }
 
-  enum RegType reg_type(void) { return regType_; };
+  enum RegType reg_type(void) const { return regType_; };
 
  private:
   int line_; 

@@ -1152,7 +1152,7 @@ void RefExprNode::codeGen(IntermediateCodeGen *instrList)
 
     /* TODO: Handle strings :?  */
     if (symTabEntry() && (symTabEntry()->getReg() > -1)) {
-            setReg(symTabEntry()->getReg(), reg_type());
+            setReg(symTabEntry()->getReg(), symTabEntry()->reg_type());
     } else {
             LOG("Internal Error!");
             return;

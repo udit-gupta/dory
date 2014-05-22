@@ -275,7 +275,7 @@ void VariableEntry::codeGen(IntermediateCodeGen * list)
     Value *immediate = NULL;
     Value *immediate1 = NULL;
 
-    if (type()->isIntegral(type()->tag())) {
+    if (type()->isIntegral(type()->tag()) || type()->isBool(type()->tag())) {
 	setReg(get_vreg_int(), VREG_INT);
 	isInt = 1;
     } else {
