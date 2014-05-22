@@ -13,10 +13,10 @@ int fibonacci(int x)
 }
 
 void call_test(int n) {
-    print("\n................Start-Test................\n");
+    printf("\n................Start-Test................\n");
     num = fibonacci(n);
-    print("\\n" , i , "th Fibonacci Number: ", num);
-    print("\n.................End-Test..................\n");
+    printf("\\n" , i , "th Fibonacci Number: ", num);
+    printf("\n.................End-Test..................\n");
 }
 
 

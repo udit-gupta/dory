@@ -7,6 +7,6 @@ double result = 0;
 
 f()-> {
     result = 1 + 2 * 3 / 4;
-    print("\n Computation result inside Event: %f", result);
+    printf("\n Computation result inside Event: %f", result);
 }
 

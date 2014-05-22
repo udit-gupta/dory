@@ -3,27 +3,27 @@
 event f(); /* Event Name can be only one character */
 
 void recursion_test(int counter) {
-    print("\nEntering Recursion Function\n");
+    printf("\nEntering Recursion Function\n");
     if(counter == 0)
         return;
     else {
-       print("Count before:");
-       print(counter);
-       print("\n");
+       printf("Count before:");
+       printf(counter);
+       printf("\n");
        counter=counter-1;
        recurion_test(counter);
-       print("Count After:");
-       print(counter);
-       print("\n");
+       printf("Count After:");
+       printf(counter);
+       printf("\n");
        return;
     }
-    print("\nLeaving Recursion Function\n");
+    printf("\nLeaving Recursion Function\n");
 } 
 
 void call_test() {
-    print("\n................Start-Test................\n");
+    printf("\n................Start-Test................\n");
     recursion_test(10);
-    print("\n.................End-Test..................\n");
+    printf("\n.................End-Test..................\n");
 }
 
 

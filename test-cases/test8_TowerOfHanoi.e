@@ -5,9 +5,9 @@ event f(int number); /* Event Name can be only one character */
 void TOH(int n,int first,int last);
 
 void call_test(int n) {
-    print("\n................Start-Test................\n");
+    printf("\n................Start-Test................\n");
     TOH(n,1,3);
-    print("\n.................End-Test..................\n");
+    printf("\n.................End-Test..................\n");
 }
 
 void TOH(int n, int startPole, int endPole) {
@@ -16,14 +16,14 @@ void TOH(int n, int startPole, int endPole) {
     }
     int intermediatePole = 6 - startPole - endPole;
     move(n-1, startPole, intermediatePole);
-    print("\n"); 
-    print("Move "); 
-    print(n); 
-    print(" from "); 
-    print(startPole); 
-    print(" to "); 
-    print(endPole);
-    print("\n"); 
+    printf("\n"); 
+    printf("Move "); 
+    printf(n); 
+    printf(" from "); 
+    printf(startPole); 
+    printf(" to "); 
+    printf(endPole);
+    printf("\n"); 
     TOH(n-1, intermediatePole, endPole);
 }
 
