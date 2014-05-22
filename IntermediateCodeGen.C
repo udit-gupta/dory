@@ -70,10 +70,21 @@ void IntermediateCodeGen::printInstructionList(const char *outputFile)
 		else
 		    outFile << " " << (*it)->operand_src1()->immediate()->ival();
 	    } else if ((*it)->operand_src1()->type == VREG_INT ||
-		    (*it)->operand_src1()->type == REG_INT)
-		outFile << " " << INT_REGISTER_PREFIX << (*it)->operand_src1()->reg;
-	    else
-		outFile << " " << FLOAT_REGISTER_PREFIX << (*it)->operand_src1()->reg;
+		    (*it)->operand_src1()->type == REG_INT) {
+		if ((*it)->operand_src1()->reg > 99)
+			outFile << " " << INT_REGISTER_PREFIX << (*it)->operand_src1()->reg;
+		else if ((*it)->operand_src1()->reg > 9)
+			outFile << " " << INT_REGISTER_PREFIX << "0" << (*it)->operand_src1()->reg;
+		else
+			outFile << " " << INT_REGISTER_PREFIX << "00" << (*it)->operand_src1()->reg;
+	    } else {
+		if ((*it)->operand_src1()->reg > 99)
+			outFile << " " << FLOAT_REGISTER_PREFIX << (*it)->operand_src1()->reg;
+		else if ((*it)->operand_src1()->reg > 9)
+			outFile << " " << FLOAT_REGISTER_PREFIX << "0" << (*it)->operand_src1()->reg;
+		else
+			outFile << " " << FLOAT_REGISTER_PREFIX << "00" << (*it)->operand_src1()->reg;
+	    }
 	}
 
 	if ((*it)->operand_src2() && !((*it)->operand_src2()->type == Instruction::OpType::NIL)) {
@@ -89,10 +100,21 @@ void IntermediateCodeGen::printInstructionList(const char *outputFile)
 		else
 		    outFile << " " << (*it)->operand_src2()->immediate()->ival();
 	    } else if ((*it)->operand_src2()->type == VREG_INT ||
-		    (*it)->operand_src2()->type == REG_INT)
-		outFile << " " << INT_REGISTER_PREFIX << (*it)->operand_src2()->reg;
-	    else
-		outFile << " " << FLOAT_REGISTER_PREFIX << (*it)->operand_src2()->reg;
+		    (*it)->operand_src2()->type == REG_INT) {
+		if ((*it)->operand_src2()->reg > 99)
+			outFile << " " << INT_REGISTER_PREFIX << (*it)->operand_src2()->reg;
+		if ((*it)->operand_src2()->reg > 9)
+			outFile << " " << INT_REGISTER_PREFIX << "0" <<  (*it)->operand_src2()->reg;
+		else
+			outFile << " " << INT_REGISTER_PREFIX << "00" << (*it)->operand_src2()->reg;
+	    } else {
+		if ((*it)->operand_src2()->reg > 99)
+			outFile << " " << FLOAT_REGISTER_PREFIX << (*it)->operand_src2()->reg;
+		if ((*it)->operand_src2()->reg > 9)
+			outFile << " " << FLOAT_REGISTER_PREFIX << "0" <<  (*it)->operand_src2()->reg;
+		else
+			outFile << " " << FLOAT_REGISTER_PREFIX << "00" << (*it)->operand_src2()->reg;
+	    }
 	}
 
 	if ((*it)->opcode() == Instruction::Mnemonic::JMPC) {
@@ -107,10 +129,21 @@ void IntermediateCodeGen::printInstructionList(const char *outputFile)
 	    assert((*it)->operand_dest()->type < REG_TYPE_COUNT);
 
 	    if ((*it)->operand_dest()->type == VREG_INT ||
-		    (*it)->operand_dest()->type == REG_INT)
-		outFile << " " << INT_REGISTER_PREFIX << (*it)->operand_dest()->reg;
-	    else
-		outFile << " " << FLOAT_REGISTER_PREFIX << (*it)->operand_dest()->reg;
+		    (*it)->operand_dest()->type == REG_INT) {
+		if ((*it)->operand_dest()->reg > 99)
+			outFile << " " << INT_REGISTER_PREFIX << (*it)->operand_dest()->reg;
+		if ((*it)->operand_dest()->reg > 9)
+			outFile << " " << INT_REGISTER_PREFIX << "0" <<  (*it)->operand_dest()->reg;
+		else
+			outFile << " " << INT_REGISTER_PREFIX << "00" << (*it)->operand_dest()->reg;
+	    } else {
+		if ((*it)->operand_dest()->reg > 99)
+			outFile << " " << FLOAT_REGISTER_PREFIX << (*it)->operand_dest()->reg;
+		if ((*it)->operand_dest()->reg > 9)
+			outFile << " " << FLOAT_REGISTER_PREFIX << "0" <<  (*it)->operand_dest()->reg;
+		else
+			outFile << " " << FLOAT_REGISTER_PREFIX << "00" << (*it)->operand_dest()->reg;
+	    }
 	}
 
 	outFile << endl;
