@@ -9,6 +9,7 @@
 #include "STEClasses.h"
 #include "SymTab.h"
 #include "Value.h"
+#include "Error.h"
 #include "IntermediateCodeGen.h"
 #include "Instruction.h"
 
@@ -218,9 +219,11 @@ main(int argc, char *argv[], char *envp[]) {
 	ge->print(cout);
 	ge->typeCheck();
 	ge->typePrint(cout);
-	ge->memAlloc(0);
-	ge->codeGen(instrList);
-	instrList->printInstructionList(outFile);
+	if (errCount() == 0) {
+		ge->memAlloc(0);
+		ge->codeGen(instrList);
+		instrList->printInstructionList(outFile);
+	}
   }
 #endif
 }
