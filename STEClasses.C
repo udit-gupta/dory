@@ -84,7 +84,10 @@ void GlobalEntry::codeGen(IntermediateCodeGen * instrList)
     Instruction *initial_in = NULL;
     Instruction *movsName = NULL;
     Instruction *jmpcInstr = NULL;
+    Instruction *initSP = NULL;
+    Instruction *initBP = NULL;
     Value *immediateName = NULL;
+    Value *immediateAddr = NULL;
 
     const vector<RuleNode*> pr = GlobalEntry::rules();
     vector<SymTabEntry*> * eventList = getEventEntry();
@@ -108,6 +111,19 @@ void GlobalEntry::codeGen(IntermediateCodeGen * instrList)
     initial_in->operand_src1(regInput, NULL, VREG_INT);
 
     instrList->addInstruction(initial_in);
+
+    immediateAddr = new Value(10000, Type::TypeTag::INT);
+    initSP = new Instruction(Instruction::Mnemonic::MOVI);
+    initSP->operand_src1(-1, immediateAddr, Instruction::OpType::IMM);
+    initSP->operand_src2(get_vreg_sp(), NULL, VREG_INT);
+
+    instrList->addInstruction(initSP);
+
+    initSP = new Instruction(Instruction::Mnemonic::MOVI);
+    initSP->operand_src1(-1, immediateAddr, Instruction::OpType::IMM);
+    initSP->operand_src2(get_vreg_bp(), NULL, VREG_INT);
+
+    instrList->addInstruction(initBP);
 
     for (sit = eventList->begin(); sit != eventList->end(); ++sit) {
 	/* Not generating label and JMPC code for "any" event */
@@ -237,7 +253,6 @@ const Type* VariableEntry::typeCheck()
     if (initVal()) {
         init_type = (Type *)initVal()->typeCheck();
 
-	cout << " initVal() subtype: " << init_type->tag() << " initVal() set type: " << initVal()->type()->tag() << endl;
         if (type()->isSubType(init_type)) {
             if (!init_type->isSubType(type()))
                 initVal()->coercedType(type());
@@ -505,7 +520,7 @@ void FunctionEntry::codeGen(IntermediateCodeGen * list)
     funcRetLabel = new Instruction(Instruction::Mnemonic::LABEL);
     funcRetLabel->label(newFuncRetLabel);
 
-    list->addInstruction(functionLabel);
+    list->addInstruction(funcRetLabel);
     /* Pop stuff off stack by Adding num_local + num_params + 3
      * XXX TODO: Add code for adding local variables to stack
      * For now Only adding num_params + 3

@@ -1312,6 +1312,8 @@ void InvocationNode::codeGen(IntermediateCodeGen *instrList)
 
 	    count++;
 	}
+    } else {
+	    instrList->addInstruction(subInstr);
     }
 
     instrList->addInstruction(subInstr);	//Points to retValue

@@ -76,6 +76,7 @@ Instruction::Mnemonic Instruction::opcode(void)
 
 void Instruction::label(int label)
 {
+    label_function_ = 0;
     label_ = label;
 }
 
