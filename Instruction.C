@@ -160,6 +160,7 @@ int Instruction::isFloating(Mnemonic intOpcode)
 	    intOpcode == Instruction::Mnemonic::FDIV ||
 	    intOpcode == Instruction::Mnemonic::FMUL ||
 	    intOpcode == Instruction::Mnemonic::FNEG ||
+	    intOpcode == Instruction::Mnemonic::LDF ||
 	    intOpcode == Instruction::Mnemonic::MOVF)
 	ret = 1;
 

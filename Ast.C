@@ -531,7 +531,7 @@ void OpNode::codeGen(IntermediateCodeGen *instrList)
 			if (arity_ > 1) {
 			    if (Type::isString(arg(count)->type()->tag()))
 				prtInstr2 = new Instruction(Instruction::Mnemonic::PRTS);
-			    else if (Type::isIntegral(arg(count)->type()->tag()))
+			    else if (Type::isIntegral(arg(count)->type()->tag()) || Type::isBool(arg(count)->type()->tag()))
 				prtInstr2 = new Instruction(Instruction::Mnemonic::PRTI);
 			    else
 				prtInstr2 = new Instruction(Instruction::Mnemonic::PRTF);
@@ -1239,9 +1239,9 @@ void RefExprNode::codeGen(IntermediateCodeGen *instrList)
     }
 
     if(coercedType())
-            isInt = Type::isIntegral(coercedType()->tag());
+            isInt = (Type::isIntegral(coercedType()->tag()) || Type::isBool(coercedType()->tag()));
     else
-            isInt = Type::isIntegral(type()->tag());
+            isInt = (Type::isIntegral(type()->tag()) || Type::isBool(type()->tag()));
 
     if(isInt)
             instrLoadData->opcode(Instruction::Mnemonic::LDI);

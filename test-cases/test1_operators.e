@@ -15,10 +15,9 @@ void operators_test() {
     int j = ~i;
     int k = 1 ^ 1;
     int l = a << 2;
-    int m = a >> 2;
+    int m = a >> 1;
     double n = (a % b - d / 3);
     bool p = (true || false);
-/*    bool q =  !a || (b<d) && (e>=f) || (g==h); */
 
 
     printf("\nEntering Operator Testing Function\n");
@@ -29,15 +28,14 @@ void operators_test() {
     printf("\n e = (2-a): %d", e);
     printf("\n f = (6/2): %d", f);
     printf("\n g = (a/2): %d", g);
-    printf("\n h = (8%2): %d", h);
+    printf("\n h = (8 mod 2): %d", h);
     printf("\n i = (0|1&0): %d", i);
     printf("\n j = (~i): %d", j);
     printf("\n k = (1^1): %d", k);
     printf("\n l = (a<<2): %d", l);
     printf("\n m = (a>>2): %d", m);
-    printf("\n n = (a % b - d / 3): %f", n);
+    printf("\n n = (a mod b - d / 3): %f", n);
     printf("\n p = (true || false): %d", p);
-/*    printf("\n q =  !a || (b<d) && ((e>=f) || (g==h)): %d",q); */
     printf("\nLeaving Operator Testing Function\n");
 }
 
