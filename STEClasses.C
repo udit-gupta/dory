@@ -89,8 +89,10 @@ void GlobalEntry::codeGen(IntermediateCodeGen * instrList)
     Instruction *jmpcInstr = NULL;
     Instruction *initSP = NULL;
     Instruction *initBP = NULL;
+    Instruction *initGlobal = NULL;
     Value *immediateName = NULL;
     Value *immediateAddr = NULL;
+    Value *immediateAddrG = NULL;
     Value *imm = NULL;
 
     const vector<RuleNode*> pr = GlobalEntry::rules();
@@ -140,6 +142,13 @@ void GlobalEntry::codeGen(IntermediateCodeGen * instrList)
     initBP->operand_src2(get_vreg_bp(), NULL, VREG_INT);
 
     instrList->addInstruction(initBP);
+
+    immediateAddrG = new Value(100, Type::TypeTag::INT);
+    initGlobal = new Instruction(Instruction::Mnemonic::MOVI);
+    initGlobal->operand_src1(-1, immediateAddrG, Instruction::OpType::IMM);
+    initGlobal->operand_src2(get_vreg_global(), NULL, VREG_INT);
+
+    instrList->addInstruction(initGlobal);
 
     for (sit = eventList->begin(); sit != eventList->end(); ++sit) {
 	/* Not generating label and JMPC code for "any" event */
