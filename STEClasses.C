@@ -80,8 +80,10 @@ void GlobalEntry::codeGen(IntermediateCodeGen * instrList)
     int regInput = get_vreg_int();
     int regTemp;
     Instruction *initial_jmp = NULL;
-    Instruction *initial_prt = NULL;
+    //Instruction *initial_prt = NULL;
     Instruction *initial_label = NULL;
+    Instruction *final_label = NULL;
+    Instruction *final_prt = NULL;
     Instruction *initial_in = NULL;
     Instruction *movsName = NULL;
     Instruction *jmpcInstr = NULL;
@@ -89,6 +91,7 @@ void GlobalEntry::codeGen(IntermediateCodeGen * instrList)
     Instruction *initBP = NULL;
     Value *immediateName = NULL;
     Value *immediateAddr = NULL;
+    Value *imm = NULL;
 
     const vector<RuleNode*> pr = GlobalEntry::rules();
     vector<SymTabEntry*> * eventList = getEventEntry();
@@ -120,10 +123,10 @@ void GlobalEntry::codeGen(IntermediateCodeGen * instrList)
 
     instrList->addInstruction(initial_in);
 
-    initial_prt = new Instruction(Instruction::Mnemonic::PRTI);
-    initial_prt->operand_src1(regInput, NULL, VREG_INT);
+//    initial_prt = new Instruction(Instruction::Mnemonic::PRTI);
+//    initial_prt->operand_src1(regInput, NULL, VREG_INT);
 
-    instrList->addInstruction(initial_prt);
+//    instrList->addInstruction(initial_prt);
 
     immediateAddr = new Value(10000, Type::TypeTag::INT);
     initSP = new Instruction(Instruction::Mnemonic::MOVI);
@@ -168,6 +171,17 @@ void GlobalEntry::codeGen(IntermediateCodeGen * instrList)
     for(vector<RuleNode*>::const_iterator it = pr.begin(); it != pr.end(); it++) {
 	(*it)->codeGen(instrList);
     }
+
+    final_label = new Instruction(Instruction::Mnemonic::LABEL);
+    final_label->funLabel("end_label");
+
+    instrList->addInstruction(final_label);
+
+    imm = new Value("**** Done ****");
+    final_prt = new Instruction(Instruction::Mnemonic::PRTS);
+    final_prt->operand_src1(-1, imm, Instruction::OpType::IMM);
+
+    instrList->addInstruction(final_prt);
 
     return;
 }
@@ -573,8 +587,14 @@ void FunctionEntry::codeGen(IntermediateCodeGen * list)
     
     list->addInstruction(oldbptonewbpoff);
 
-    oldbptonewbp = new Instruction(Instruction::Mnemonic::STI);
-    oldbptonewbp->operand_src1(get_vreg_temp_stack(), NULL, VREG_INT);
+    int blahReg = get_vreg_int();
+    Instruction *blahLoad = new Instruction(Instruction::Mnemonic::LDI);
+    blahLoad->operand_src1(get_vreg_temp_stack(), NULL, VREG_INT);
+    blahLoad->operand_dest(blahReg, NULL, VREG_INT);
+    list->addInstruction(blahLoad);
+
+    oldbptonewbp = new Instruction(Instruction::Mnemonic::MOVI);
+    oldbptonewbp->operand_src1(blahReg, NULL, VREG_INT);
     oldbptonewbp->operand_dest(get_vreg_bp(), NULL, VREG_INT);
 
     list->addInstruction(oldbptonewbp);

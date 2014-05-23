@@ -98,7 +98,7 @@ void IntermediateCodeGen::printInstructionList(const char *outputFile)
 
 	    if ((*it)->operand_src1()->type == Instruction::OpType::IMM) {
 		if ((*it)->operand_src1()->immediate()->type()->tag() == Type::TypeTag::STRING) {
-		    if ((*it)->opcode() != Instruction::Mnemonic::MOVS)
+		    if ((*it)->opcode() != Instruction::Mnemonic::MOVS && (*it)->opcode() != Instruction::Mnemonic::PRTS)
 		    	outFile << " " << (*it)->operand_src1()->immediate()->sval();
 		    else
 		    	outFile << " \"" << escapeChars((*it)->operand_src1()->immediate()->sval()) << "\"";

@@ -4,18 +4,17 @@ event f(); /* Event Name can be only one character */
 
 int recursion_test(int counter) {
     printf("\nEntering Recursion Function\n");
-    if(counter == 0)
+    if(counter == 0) {
+        printf("\ncounter is 0\n");
         return 0;
-    else {
-       printf("Count before:");
-       printf(counter);
+    } else {
+       printf("Count before: %d", counter);
        printf("\n");
        counter=counter-1;
-       recurion_test(counter);
-       printf("Count After:");
-       printf(counter);
+       recursion_test(counter);
+       printf("Count After: %d", counter);
        printf("\n");
-       return 0;
+       return counter;
     }
     printf("\nLeaving Recursion Function\n");
 } 

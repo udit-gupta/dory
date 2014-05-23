@@ -1,20 +1,16 @@
 /* Test Program for Tower Of Hanoii recursion */
 
-event f(int number); /* Event Name can be only one character */
+event f(); /* Event Name can be only one character */
 
-void TOH(int n,int first,int last);
+int start = 3;
 
-void call_test(int n) {
-    printf("\n................Start-Test................\n");
-    TOH(n,1,3);
-    printf("\n.................End-Test..................\n");
-}
-
-void TOH(int n, int startPole, int endPole) {
-    if (n== 0){
-      return; 
-    }
+int TOH(int n, int startPole, int endPole) {
     int intermediatePole = 6 - startPole - endPole;
+
+    if (n== 0){
+      return 0; 
+    }
+
     move(n-1, startPole, intermediatePole);
     printf("\n"); 
     printf("Move "); 
@@ -27,8 +23,14 @@ void TOH(int n, int startPole, int endPole) {
     TOH(n-1, intermediatePole, endPole);
 }
 
-f(i) -> {
-    call_test(i);
+void call_test(int n) {
+    printf("\n................Start-Test................\n");
+    TOH(n,1,3);
+    printf("\n.................End-Test..................\n");
+}
+
+f() -> {
+    call_test(start);
 };
 
 

@@ -1393,6 +1393,8 @@ void InvocationNode::codeGen(IntermediateCodeGen *instrList)
     }
 
     //immediate = new Value(count+1, Type::TypeTag::INT);
+    if (count == 0)
+	    count = 1;
     immediate = new Value(count, Type::TypeTag::INT);
     subArityInstr = new Instruction(Instruction::Mnemonic::ADD);
     subArityInstr->operand_src1(get_vreg_sp(), NULL, VREG_INT);
@@ -1619,12 +1621,18 @@ void RuleNode::codeGen(IntermediateCodeGen *instrList)
 {
     LOG("");
 
+    Instruction *final_jmp = NULL;
     /* TODO: This is mostly incomplete, complete this. */
     if (pat())
 	pat()->codeGen(instrList);
 
     if (reaction())
 	reaction()->codeGen(instrList);
+
+    final_jmp = new Instruction(Instruction::Mnemonic::JMP);
+    final_jmp->funLabel("end_label");
+
+    instrList->addInstruction(final_jmp);
 
     return;
 }
