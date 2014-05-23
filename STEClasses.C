@@ -269,7 +269,6 @@ const Type* VariableEntry::typeCheck()
         if (type()->isSubType(initVal()->type())) {
             if (!init_type->isSubType(type())) {
                 initVal()->coercedType(type());
-		cout << "coersion required!!" << endl;
 	    }
             return_type = type();
         } else {

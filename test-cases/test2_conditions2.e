@@ -11,6 +11,7 @@ void if_test() {
 void call_test() {
     printf("\n................Start-Test................\n");
     if_test();
+    if_test();
     printf("\n.................End-Test..................\n");
 }
 

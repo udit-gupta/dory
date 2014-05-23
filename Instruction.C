@@ -104,7 +104,8 @@ int Instruction::isFunLabel(void)
 void Instruction::relational_op(Mnemonic rel)
 {
     assert(rel == Mnemonic::GE || rel == Mnemonic::GT || rel == Mnemonic::EQ || rel == Mnemonic::NE ||
-		    rel == Mnemonic::FGE || rel == Mnemonic::FGT || rel == Mnemonic::FEQ || rel == Mnemonic::FNE);
+		    rel == Mnemonic::FGE || rel == Mnemonic::FGT || rel == Mnemonic::FEQ || rel == Mnemonic::FNE ||
+		    rel == Mnemonic::UGE || rel == Mnemonic::UGT);
 
     if (opcode_ == Mnemonic::JMPC || opcode_ == Mnemonic::JMPCI)
 	rel_ = rel;
