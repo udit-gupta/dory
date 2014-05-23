@@ -151,6 +151,21 @@ Instruction::Mnemonic Instruction::typedMnemonic(bool isInt, Mnemonic intOpcode)
     }
 }
 
+int Instruction::isFloating(Mnemonic intOpcode)
+{
+    int ret = 0;
+
+    if (intOpcode == Instruction::Mnemonic::FADD ||
+	    intOpcode == Instruction::Mnemonic::FSUB ||
+	    intOpcode == Instruction::Mnemonic::FDIV ||
+	    intOpcode == Instruction::Mnemonic::FMUL ||
+	    intOpcode == Instruction::Mnemonic::FNEG ||
+	    intOpcode == Instruction::Mnemonic::MOVF)
+	ret = 1;
+
+    return ret;
+}
+
 /*****************************************************************************
  *				LABEL FUNCTIONS				     *
  *****************************************************************************/

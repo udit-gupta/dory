@@ -252,6 +252,8 @@ OpNode::typeCheck()
 {
   LOG("");
 
+  Type *actType = NULL;
+
   if (opCode_ != OpNode::OpCode::PRINT)
     assert(arity_ <= MAX_OP_ARITY);
 
@@ -407,9 +409,13 @@ OpNode::typeCheck()
   }
 
   if (opCode_ == OpNode::OpCode::ASSIGN) {
-	cout << " arg 0 type: " << arg(0)->type()->tag() << " arg 1 type: " << arg(1)->type()->tag();
-    if (arg(0)->type()->isSubType(arg(1)->type())) {
-      if (!arg(1)->type()->isSubType(arg(0)->type()))
+    if (arg(1)->coercedType())
+	actType = (Type *) arg(1)->coercedType();
+    else
+	actType = (Type *) arg(1)->type();
+
+    if (arg(0)->type()->isSubType(actType)) {
+      if (!actType->isSubType(arg(0)->type()))
         arg(1)->coercedType(arg(0)->type());
       
       type(new Type(Type::TypeTag::BOOL));
@@ -1386,7 +1392,7 @@ void InvocationNode::codeGen(IntermediateCodeGen *instrList)
     	instrList->addInstruction(ldiCLInstr);
     }
 
-    immediate = new Value(count, Type::TypeTag::INT);
+    immediate = new Value(count+1, Type::TypeTag::INT);
     subArityInstr = new Instruction(Instruction::Mnemonic::ADD);
     subArityInstr->operand_src1(get_vreg_sp(), NULL, VREG_INT);
     subArityInstr->operand_src2(-1, immediate, Instruction::OpType::IMM);
@@ -1641,12 +1647,19 @@ void ValueNode::codeGen(IntermediateCodeGen *instrList)
 //    if (getReg() > -1)
 //            return;
 
+    const Type *thisType = NULL;
+
     Instruction *instrMov = new Instruction();
 
-    if (Type::isIntegral(value()->type()->tag()) || Type::isBool(value()->type()->tag())) {
+    if (coercedType())
+	    thisType = coercedType();
+    else
+	    thisType = type();
+
+    if (Type::isIntegral(thisType->tag()) || Type::isBool(thisType->tag())) {
             setReg(get_vreg_int(), VREG_INT);
             instrMov->opcode(Instruction::Mnemonic::MOVI);
-    } else if (Type::isString(value()->type()->tag())) {
+    } else if (Type::isString(thisType->tag())) {
             setReg(get_vreg_int(), VREG_INT);
     	    instrMov->opcode(Instruction::Mnemonic::MOVS);
     } else {

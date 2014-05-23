@@ -116,6 +116,16 @@ class SymTabEntry: public ProgramElem {
     return eventEntry;
   }
 
+  vector<SymTabEntry*> * getVariableEntry(void) const
+  {
+    vector<SymTabEntry*> *eventEntry = NULL;
+
+    if (symTab())
+	eventEntry = symTab()->getVariableEntry();
+
+    return eventEntry;
+  }
+
  private:
   string name_;
   Kind kind_;

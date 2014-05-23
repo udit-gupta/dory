@@ -106,8 +106,12 @@ void IntermediateCodeGen::printInstructionList(const char *outputFile)
 		    outFile << " " << (*it)->operand_src1()->immediate()->bval();
 		else if ((*it)->operand_src1()->immediate()->type()->tag() == Type::TypeTag::DOUBLE)
 		    outFile << " " << fixed << std::setprecision(3) << (*it)->operand_src1()->immediate()->dval();
-		else
-		    outFile << " " << (*it)->operand_src1()->immediate()->ival();
+		else {
+		    if (Instruction::isFloating((*it)->opcode()))
+			outFile << " " << fixed << std::setprecision(3) << (double) (*it)->operand_src1()->immediate()->ival();
+		    else
+			outFile << " " << (*it)->operand_src1()->immediate()->ival();
+		}
 	    } else if ((*it)->operand_src1()->type == VREG_INT ||
 		    (*it)->operand_src1()->type == REG_INT) {
 		if ((*it)->operand_src1()->reg > 99)
@@ -136,8 +140,12 @@ void IntermediateCodeGen::printInstructionList(const char *outputFile)
 		    outFile << " " << (*it)->operand_src2()->immediate()->bval();
 		else if ((*it)->operand_src2()->immediate()->type()->tag() == Type::TypeTag::DOUBLE)
 		    outFile << " " << fixed << std::setprecision(3) << (*it)->operand_src2()->immediate()->dval();
-		else
-		    outFile << " " << (*it)->operand_src2()->immediate()->ival();
+		else {
+		    if (Instruction::isFloating((*it)->opcode()))
+			outFile << " " << fixed << std::setprecision(3) << (double) (*it)->operand_src2()->immediate()->ival();
+		    else
+			outFile << " " << (*it)->operand_src2()->immediate()->ival();
+		}
 	    } else if ((*it)->operand_src2()->type == VREG_INT ||
 		    (*it)->operand_src2()->type == REG_INT) {
 		if ((*it)->operand_src2()->reg > 99)

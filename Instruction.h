@@ -103,6 +103,8 @@ class Instruction {
 
     static Mnemonic typedMnemonic(bool isInt, Mnemonic intOpcode);
 
+    static int isFloating(Mnemonic intOpcode);
+
   private:
     Mnemonic opcode_;
     Operand src1_;

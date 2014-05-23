@@ -92,7 +92,9 @@ void GlobalEntry::codeGen(IntermediateCodeGen * instrList)
 
     const vector<RuleNode*> pr = GlobalEntry::rules();
     vector<SymTabEntry*> * eventList = getEventEntry();
+    vector<SymTabEntry*> * varList = getVariableEntry();
     vector<SymTabEntry*>::const_iterator sit;
+    vector<SymTabEntry*>::const_iterator vit;
     vector<int> regList;
 
     /* Code to create first "JMP L_MAIN:" label */
@@ -107,6 +109,11 @@ void GlobalEntry::codeGen(IntermediateCodeGen * instrList)
     initial_label->funLabel("begin");
 
     instrList->addInstruction(initial_label);
+
+    //codeGenST(0, 0, instrList, 1);
+    for (vit = varList->begin(); vit != varList->end(); ++vit) {
+	(*vit)->codeGen(instrList);
+    }
 
     initial_in = new Instruction(Instruction::Mnemonic::IN);
     initial_in->operand_src1(regInput, NULL, VREG_INT);
@@ -259,9 +266,11 @@ const Type* VariableEntry::typeCheck()
     if (initVal()) {
         init_type = (Type *)initVal()->typeCheck();
 
-        if (type()->isSubType(init_type)) {
-            if (!init_type->isSubType(type()))
+        if (type()->isSubType(initVal()->type())) {
+            if (!init_type->isSubType(type())) {
                 initVal()->coercedType(type());
+		cout << "coersion required!!" << endl;
+	    }
             return_type = type();
         } else {
             return_type = new Type(Type::TypeTag::ERROR);
@@ -294,9 +303,10 @@ void VariableEntry::codeGen(IntermediateCodeGen * list)
 {
     LOG("");
 
-    int isInt, regPtr = -1;
+    int isInt, regPtr = -1, hackyReg = -1;
     Instruction *instr = NULL;
     Instruction *getParam = NULL;
+    Instruction *hackyinstr = NULL;
     Instruction *instrAddOffset = NULL;
     Value *immediate = NULL;
     Value *immediate1 = NULL;
@@ -326,10 +336,24 @@ void VariableEntry::codeGen(IntermediateCodeGen * list)
     } else if (varKind() == VariableEntry::VarKind::LOCAL_VAR) {
 	if (initVal()) {
 	    initVal()->codeGen(list);
-	    getParam = new Instruction(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::STI));
-	    getParam->operand_src1(initVal()->getReg(), NULL, initVal()->reg_type());
-	    getParam->operand_dest(get_vreg_sp(), NULL, VREG_INT);
-	    list->addInstruction(getParam);
+
+	    if (!isInt && initVal()->reg_type() == VREG_INT) {
+		hackyinstr = new Instruction(Instruction::Mnemonic::MOVIF);
+		hackyinstr->operand_src1(initVal()->getReg(), NULL, initVal()->reg_type());
+		hackyReg = get_vreg_float();
+		hackyinstr->operand_dest(hackyReg, NULL, VREG_FLOAT);
+		list->addInstruction(hackyinstr);
+
+	    	getParam = new Instruction(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::STI));
+	    	getParam->operand_src1(hackyReg, NULL, VREG_FLOAT);
+	    	getParam->operand_dest(get_vreg_sp(), NULL, VREG_INT);
+	    	list->addInstruction(getParam);
+	    } else {
+	    	getParam = new Instruction(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::STI));
+	    	getParam->operand_src1(initVal()->getReg(), NULL, initVal()->reg_type());
+	    	getParam->operand_dest(get_vreg_sp(), NULL, VREG_INT);
+	    	list->addInstruction(getParam);
+	    }
 	}
 
         immediate1 = new Value(1, Type::TypeTag::INT);
@@ -432,17 +456,21 @@ void FunctionEntry::codeGen(IntermediateCodeGen * list)
     //int regRetValue = get_vreg_int();
     Value *immediate1 = new Value(1, Type::TypeTag::INT);
     Value *popImm = NULL;
-    Value *getParamImm = NULL;
+//    Value *getParamImm = NULL;
+    Value *valBP = NULL;
     Instruction * functionLabel = NULL;
     Instruction * funcRetLabel = NULL;
-    Instruction * getParam = NULL;
+//    Instruction * getParam = NULL;
     Instruction * getRetAddr = NULL;
 //    Instruction * getRetValue = NULL;
     Instruction * getBP = NULL;
     Instruction * incrSP = NULL;
+    Instruction * incrTempSP = NULL;
     Instruction * popAllSP = NULL;
     Instruction * jmpRetAddr = NULL;
     Instruction * sp2bp = NULL;
+    Instruction * oldbptonewbp = NULL;
+    Instruction * oldbptonewbpoff = NULL;
 
     /* Function Label */
     functionLabel = new Instruction(Instruction::Mnemonic::LABEL);
@@ -471,7 +499,13 @@ void FunctionEntry::codeGen(IntermediateCodeGen * list)
     list->addInstruction(getBP);
 
     /* Get Return Address */
-    list->addInstruction(incrSP);
+//    list->addInstruction(incrSP);
+    incrTempSP = new Instruction(Instruction::Mnemonic::ADD);
+    incrTempSP->operand_src1(get_vreg_temp_stack(), NULL, VREG_INT);
+    incrTempSP->operand_src2(-1, immediate1, Instruction::OpType::IMM);
+    incrTempSP->operand_dest(get_vreg_temp_stack(), NULL, VREG_INT);
+
+    list->addInstruction(incrTempSP);
 
     getRetAddr = new Instruction(Instruction::Mnemonic::LDI);
     getRetAddr->operand_src1(get_vreg_temp_stack(), NULL, VREG_INT);
@@ -480,7 +514,8 @@ void FunctionEntry::codeGen(IntermediateCodeGen * list)
     list->addInstruction(getRetAddr);
 
     /* Get Return Value */
-    list->addInstruction(incrSP);
+    //list->addInstruction(incrSP);
+    list->addInstruction(incrTempSP);
 
 //    getRetValue = new Instruction(Instruction::Mnemonic::LDI);
 //    getRetValue->operand_src1(get_vreg_temp_stack(), NULL, VREG_INT);
@@ -496,11 +531,16 @@ void FunctionEntry::codeGen(IntermediateCodeGen * list)
 
     int num_local_var = this->codeGenST(this->type()->arity(), 100000, list);
 
-    getParamImm = new Value(num_local_var, Type::TypeTag::INT);
-    getParam = new Instruction(Instruction::Mnemonic::ADD);
-    getParam->operand_src1(get_vreg_sp(), NULL, VREG_INT);
-    getParam->operand_src2(-1, getParamImm, Instruction::OpType::IMM);
-    getParam->operand_dest(get_vreg_sp(), NULL, VREG_INT);
+//    getParamImm = new Value(num_local_var, Type::TypeTag::INT);
+//    getParam = new Instruction(Instruction::Mnemonic::SUB);
+//    getParam->operand_src1(get_vreg_sp(), NULL, VREG_INT);
+//    getParam->operand_src2(-1, getParamImm, Instruction::OpType::IMM);
+//    getParam->operand_dest(get_vreg_sp(), NULL, VREG_INT);
+//    list->addInstruction(getParam);
+
+
+
+
 //    for (i = 0; i < type()->arity(); i++) {
 //	list->addInstruction(incrSP);
 //
@@ -512,21 +552,32 @@ void FunctionEntry::codeGen(IntermediateCodeGen * list)
 //
 //	list->addInstruction(getParam);
 //    }
-
-    /* XXX TODO: Code to add local variables to STACK */
+    /* Call Function Body's CodeGen */
+    if (body())
+	    body()->codeGen(list);
 
     newFuncRetLabel = Instruction::Label::get_label();
     setReturnLabel(newFuncRetLabel);
-
-    /* Call Function Body's CodeGen */
-    if (body()) {
-	body()->codeGen(list);
-    }
 
     funcRetLabel = new Instruction(Instruction::Mnemonic::LABEL);
     funcRetLabel->label(newFuncRetLabel);
 
     list->addInstruction(funcRetLabel);
+
+    valBP = new Value(num_local_var + /*type()->arity() + 1*/ + 1, Type::TypeTag::INT);
+    oldbptonewbpoff = new Instruction(Instruction::Mnemonic::ADD);
+    oldbptonewbpoff->operand_src1(get_vreg_sp(), NULL, VREG_INT);
+    oldbptonewbpoff->operand_src2(-1, valBP, Instruction::OpType::IMM);
+    oldbptonewbpoff->operand_dest(get_vreg_temp_stack(), NULL, VREG_INT);
+    
+    list->addInstruction(oldbptonewbpoff);
+
+    oldbptonewbp = new Instruction(Instruction::Mnemonic::MOVI);
+    oldbptonewbp->operand_src1(get_vreg_temp_stack(), NULL, VREG_INT);
+    oldbptonewbp->operand_dest(get_vreg_bp(), NULL, VREG_INT);
+
+    list->addInstruction(oldbptonewbp);
+
     /* Pop stuff off stack by Adding num_local + num_params + 3
      * XXX TODO: Add code for adding local variables to stack
      * For now Only adding num_params + 3

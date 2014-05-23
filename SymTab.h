@@ -77,6 +77,8 @@ class SymTab {
 
   vector<SymTabEntry*> * getEventEntry(void) const;
 
+  vector<SymTabEntry*> * getVariableEntry(void) const;
+
   const_iterator begin() const { return const_iterator(first_); };
   iterator begin() { return iterator(first_); };
   // End of list is indicated when the iterator's current pointer

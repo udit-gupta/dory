@@ -222,3 +222,20 @@ SymTab::getEventEntry(void) const
 
     return eventEntry;
 }
+
+vector<SymTabEntry*> *
+SymTab::getVariableEntry(void) const
+{
+    SymTab::const_iterator it = begin();
+    vector<SymTabEntry*> * eventEntry = new vector<SymTabEntry*>();
+
+    for (it=begin();
+	    (it != end()); ++it)  {
+	SymTabEntry *ste = (SymTabEntry *)(*it);
+
+	if (ste->kind() == SymTabEntry::Kind::VARIABLE_KIND)
+	    eventEntry->push_back(ste);
+    }
+
+    return eventEntry;
+}
