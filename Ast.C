@@ -1392,7 +1392,8 @@ void InvocationNode::codeGen(IntermediateCodeGen *instrList)
     	instrList->addInstruction(ldiCLInstr);
     }
 
-    immediate = new Value(count+1, Type::TypeTag::INT);
+    //immediate = new Value(count+1, Type::TypeTag::INT);
+    immediate = new Value(count, Type::TypeTag::INT);
     subArityInstr = new Instruction(Instruction::Mnemonic::ADD);
     subArityInstr->operand_src1(get_vreg_sp(), NULL, VREG_INT);
     subArityInstr->operand_src2(-1, immediate, Instruction::OpType::IMM);
@@ -1964,9 +1965,9 @@ void ReturnStmtNode::codeGen(IntermediateCodeGen *instrList)
     instrAddOffset->operand_dest(regPtr, NULL, VREG_INT);
 
     if(expr_->coercedType())
-            isInt = Type::isIntegral(expr_->coercedType()->tag());
+            isInt = (Type::isIntegral(expr_->coercedType()->tag()) || Type::isBool(expr_->coercedType()->tag()));
     else
-            isInt = Type::isIntegral(expr_->type()->tag());
+            isInt = (Type::isIntegral(expr_->type()->tag()) || Type::isBool(expr_->type()->tag()));
 
     instrStore->opcode(Instruction::typedMnemonic(isInt, Instruction::Mnemonic::STI));
 
@@ -1976,6 +1977,7 @@ void ReturnStmtNode::codeGen(IntermediateCodeGen *instrList)
     instrJump->opcode(Instruction::Mnemonic::JMP);
     instrJump->label(fun_->getReturnLabel());
 
+    cout << " ********************** get ret label: " << fun_->getReturnLabel() << endl;
     setReg(expr_->getReg(), expr_->reg_type());
     
     instrList->addInstruction(instrAddOffset);

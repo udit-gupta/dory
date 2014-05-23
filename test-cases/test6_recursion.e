@@ -2,10 +2,10 @@
 
 event f(); /* Event Name can be only one character */
 
-void recursion_test(int counter) {
+int recursion_test(int counter) {
     printf("\nEntering Recursion Function\n");
     if(counter == 0)
-        return;
+        return 0;
     else {
        printf("Count before:");
        printf(counter);
@@ -15,7 +15,7 @@ void recursion_test(int counter) {
        printf("Count After:");
        printf(counter);
        printf("\n");
-       return;
+       return 0;
     }
     printf("\nLeaving Recursion Function\n");
 } 

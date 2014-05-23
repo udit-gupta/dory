@@ -321,7 +321,7 @@ void VariableEntry::codeGen(IntermediateCodeGen * list)
     if (varKind() == VariableEntry::VarKind::PARAM_VAR) {
         immediate1 = new Value(1, Type::TypeTag::INT);
         instr = new Instruction(Instruction::Mnemonic::ADD);
-        instr->operand_src1(get_vreg_sp(), NULL, VREG_INT);
+        instr->operand_src1(get_vreg_temp_stack(), NULL, VREG_INT);
         instr->operand_src2(-1, immediate1, Instruction::OpType::IMM);
         instr->operand_dest(get_vreg_temp_stack(), NULL, VREG_INT);
 
@@ -451,6 +451,7 @@ void FunctionEntry::codeGen(IntermediateCodeGen * list)
     std::vector<int> regLocalList;
     int regBP = get_vreg_int();
     int regRetAddr = get_vreg_int();
+    int regRetAddrLoad = 0;
     int newFuncRetLabel = -1;
     //int regRetValue = get_vreg_int();
     Value *immediate1 = new Value(1, Type::TypeTag::INT);
@@ -470,6 +471,7 @@ void FunctionEntry::codeGen(IntermediateCodeGen * list)
     Instruction * sp2bp = NULL;
     Instruction * oldbptonewbp = NULL;
     Instruction * oldbptonewbpoff = NULL;
+    Instruction * retAddrLoad = NULL;
 
     /* Function Label */
     functionLabel = new Instruction(Instruction::Mnemonic::LABEL);
@@ -552,11 +554,11 @@ void FunctionEntry::codeGen(IntermediateCodeGen * list)
 //	list->addInstruction(getParam);
 //    }
     /* Call Function Body's CodeGen */
-    if (body())
-	    body()->codeGen(list);
-
     newFuncRetLabel = Instruction::Label::get_label();
     setReturnLabel(newFuncRetLabel);
+
+    if (body())
+	    body()->codeGen(list);
 
     funcRetLabel = new Instruction(Instruction::Mnemonic::LABEL);
     funcRetLabel->label(newFuncRetLabel);
@@ -571,7 +573,7 @@ void FunctionEntry::codeGen(IntermediateCodeGen * list)
     
     list->addInstruction(oldbptonewbpoff);
 
-    oldbptonewbp = new Instruction(Instruction::Mnemonic::MOVI);
+    oldbptonewbp = new Instruction(Instruction::Mnemonic::STI);
     oldbptonewbp->operand_src1(get_vreg_temp_stack(), NULL, VREG_INT);
     oldbptonewbp->operand_dest(get_vreg_bp(), NULL, VREG_INT);
 
@@ -590,9 +592,17 @@ void FunctionEntry::codeGen(IntermediateCodeGen * list)
 
     list->addInstruction(popAllSP);
 
+    regRetAddrLoad = get_vreg_int();
+    retAddrLoad = new Instruction(Instruction::Mnemonic::LDI);
+    retAddrLoad->operand_src1(get_vreg_sp(), NULL, VREG_INT);
+    retAddrLoad->operand_dest(regRetAddrLoad, NULL, VREG_INT);
+
+    list->addInstruction(retAddrLoad);
+
     /* JMPI to return address */
     jmpRetAddr = new Instruction(Instruction::Mnemonic::JMPI);
-    jmpRetAddr->operand_dest(regRetAddr, NULL, VREG_INT);
+//    jmpRetAddr->operand_dest(regRetAddr, NULL, VREG_INT);
+    jmpRetAddr->operand_dest(regRetAddrLoad, NULL, VREG_INT);
 
     list->addInstruction(jmpRetAddr);
 
