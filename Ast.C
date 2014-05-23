@@ -1985,7 +1985,6 @@ void ReturnStmtNode::codeGen(IntermediateCodeGen *instrList)
     instrJump->opcode(Instruction::Mnemonic::JMP);
     instrJump->label(fun_->getReturnLabel());
 
-    cout << " ********************** get ret label: " << fun_->getReturnLabel() << endl;
     setReg(expr_->getReg(), expr_->reg_type());
     
     instrList->addInstruction(instrAddOffset);

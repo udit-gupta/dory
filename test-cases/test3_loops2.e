@@ -3,24 +3,20 @@
 event f(); /* Event Name can be only one character */
 
 void while_test() {
-    int a = 1;
-    int b = 2;
+    int c = 0;
+    int a = 10;
+    int b = 20;
     printf("\nEntering While Function\n");
-    while(b<=15) {
-        printf("\n Outer Loop: \n");
-        b=b+1;
-        if(b==15) {
-            printf("\nexit\n");
+    while(b>0) {
+        while(a > 0) {
+	    c = c+a*b;
+            a=a-1;
         }
-        while(a <= 15) {
-            a=a+1;
-            printf("\n Inner Loop: \n");
-            if(a==13) {
-                printf("\n break from outer while\n");
-            }
-        }
+        b=b-1;
     }    
     printf("\nLeaving While Function\n");
+
+    printf("\nReturned value: %d\n", c);
 } 
 
 void call_test() {
