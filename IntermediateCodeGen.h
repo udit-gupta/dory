@@ -22,6 +22,8 @@ class IntermediateCodeGen {
 
     void printInstructionList(const char *outFile);
 
+    Instruction * getLastInstruction(void);
+
   private:
     string escapeChars(string old);
 

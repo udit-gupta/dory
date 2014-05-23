@@ -2,8 +2,6 @@
 
 event f(); /* Event Name can be only one character */
 
-void while_test();
-
 void while_test() {
     int a = 1;
     int b = 2;

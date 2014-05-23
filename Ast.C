@@ -1482,20 +1482,30 @@ void WhileNode::codeGen(IntermediateCodeGen *instrList)
 
     int newStartLabel = -1;
     int newExitLabel = -1;
+    int isStartFuncLabel = 0;
     Instruction *startLabel = NULL;
     Instruction *exitLabel = NULL;
     Instruction *jmpcInstr = NULL;
     Instruction *jmpInstr = NULL;
     Value * immediate0 = NULL;
+    Instruction *prevInstr = NULL;
 
     if (!cond())
 	return;
 
-    newStartLabel = Instruction::Label::get_label();
-    startLabel = new Instruction(Instruction::Mnemonic::LABEL);
-    startLabel->label(newStartLabel);
+    prevInstr = instrList->getLastInstruction();
+    if (!prevInstr || prevInstr->opcode() != Instruction::Mnemonic::LABEL) {
+    	newStartLabel = Instruction::Label::get_label();
+    	startLabel = new Instruction(Instruction::Mnemonic::LABEL);
+    	startLabel->label(newStartLabel);
 
-    instrList->addInstruction(startLabel);
+    	instrList->addInstruction(startLabel);
+    } else {
+	if (prevInstr->isFunLabel())
+	    isStartFuncLabel = 1;
+	else
+	    newStartLabel = prevInstr->label();
+    }
 
     cond()->codeGen(instrList);
     
@@ -1514,7 +1524,10 @@ void WhileNode::codeGen(IntermediateCodeGen *instrList)
         doStmt()->codeGen(instrList);
     
         jmpInstr = new Instruction(Instruction::Mnemonic::JMP);
-        jmpInstr->label(newStartLabel);
+	if (!isStartFuncLabel)
+	    jmpInstr->label(newStartLabel);
+	else
+	    jmpInstr->funLabel(prevInstr->funLabel());
     
         instrList->addInstruction(jmpInstr);
     }

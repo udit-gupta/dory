@@ -200,3 +200,8 @@ void IntermediateCodeGen::printInstructionList(const char *outputFile)
 
     return;
 }
+    
+Instruction * IntermediateCodeGen::getLastInstruction(void)
+{
+    return instrList_.back();
+}
